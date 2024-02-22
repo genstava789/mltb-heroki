@@ -1,4 +1,4 @@
-from aiofiles.os import path as aiopath, listdir, makedirs
+from aiofiles.os import path as aiopath, listdir, makedirs, remove
 from aioshutil import move
 from asyncio import sleep, gather
 from html import escape
@@ -439,6 +439,8 @@ class TaskListener(TaskConfig):
         await clean_download(self.dir)
         if self.newDir:
             await clean_download(self.newDir)
+        if await aiopath.exists(self.thumb):
+            await remove(self.thumb)
 
     async def onUploadError(self, error):
         async with task_dict_lock:
@@ -476,3 +478,5 @@ class TaskListener(TaskConfig):
         await clean_download(self.dir)
         if self.newDir:
             await clean_download(self.newDir)
+        if await aiopath.exists(self.thumb):
+            await remove(self.thumb)

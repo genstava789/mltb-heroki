@@ -518,8 +518,7 @@ class TgUploader:
                     else:
                         self._last_msg_in_group = True
 
-            if (
-                (self._thumb is None or self._listener.thumb is not None)
+            if (self._thumb is None
                 and thumb is not None
                 and await aiopath.exists(thumb)
             ):
@@ -543,8 +542,7 @@ class TgUploader:
             LOGGER.warning(str(f))
             await sleep(f.value)
         except Exception as err:
-            if (
-                (self._thumb is None or self._listener.thumb is not None)
+            if (self._thumb is None
                 and thumb is not None
                 and await aiopath.exists(thumb)
             ):
