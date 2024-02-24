@@ -267,18 +267,7 @@ class TaskConfig:
 
                     if self.threadId.isdigit():
                         self.threadId = int(self.threadId)
-                
-                try:
-                    if len(config_dict["LEECH_CHAT_ID"]) != 0:
-                        await bot.send_message(
-                            self.upDest,
-                            "<blockquote>Hello World!</blockquote>"
-                        )
-                except Exception as error:
-                    LOGGER.warning(
-                        f"The bot doesnt has access to LEECH_CHAT_ID -> {error}"
-                    )
-                
+                                
                 if self.userTransmission:
                     chat = await user.get_chat(self.upDest)
                     uploader_id = user.me.id
