@@ -38,13 +38,13 @@ Include Python Packages and some cool Apps like AniDL, Bento4, Gallery-DL, HandB
 ```
 
 ## Custom Apps Name
-- Aria2c : Chrome
-- FFMPEG : Opera
+- Aria2c : chrome
+- FFMPEG : opera
 - HandBrakeCLI : handbrake
-- Java : Safari
-- QBittorrent : Nightly
-- QBittorrent-Nox : Firefox
-- RClone : Edge
+- Java : safari
+- QBittorrent : nightly
+- QBittorrent-Nox : firefox
+- RClone : edge
 
 ## qBittorrent
 
