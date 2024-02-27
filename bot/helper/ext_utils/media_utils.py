@@ -254,23 +254,13 @@ async def take_ss(video_file, ss_nb) -> bool:
             cap_time += interval
             cmds.append(cmd_exec(cmd))
         try:
-            if IS_HEROKU:
-                for cmd in cmds:
-                    _, err, code = await wait_for(cmd_exec(cmd), timeout=150)
-                    if code != 0:
-                        LOGGER.error(
-                            f"Error while creating sreenshots from video. Path: {video_file}. stderr: {err}"
-                        )
-                        await rmtree(dirpath, ignore_errors=True)
-                        return False
-            else:
-                resutls = await wait_for(gather(*cmds), timeout=15)
-                if resutls[0][2] != 0:
-                    LOGGER.error(
-                        f"Error while creating sreenshots from video. Path: {video_file}. stderr: {resutls[0][1]}"
-                    )
-                    await rmtree(dirpath, ignore_errors=True)
-                    return False
+            resutls = await wait_for(gather(*cmds), timeout=(150 if IS_HEROKU else 15))
+            if resutls[0][2] != 0:
+                LOGGER.error(
+                    f"Error while creating sreenshots from video. Path: {video_file}. stderr: {resutls[0][1]}"
+                )
+                await rmtree(dirpath, ignore_errors=True)
+                return False
         except Exception:
             LOGGER.error(
                 f"Error while creating sreenshots from video. Path: {video_file}. Error: Timeout some issues with ffmpeg with specific arch!"

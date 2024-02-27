@@ -102,13 +102,10 @@ async def stats(_, message):
 <code>{get_progress_bar_string(cpu_percent(interval=0.5))} - {cpu_percent(interval=0.5)}%</code>
 
 <b>RAM</b> 
-<b>Terpakai     :</b> <code>{get_readable_file_size(memory.used)}</code>
+<b>Terpakai     :</b> <code>{get_readable_file_size(memory.used)}</code> [<code>{get_readable_file_size(Process(getpid()).memory_info().rss)}</code>]
 <b>Tersedia     :</b> <code>{get_readable_file_size(memory.available)}</code>
 <b>Total        :</b> <code>{get_readable_file_size(memory.total)}</code>
 <code>{get_progress_bar_string(memory.percent)} - {memory.percent}%</code>
-
-<b>Pemakaian RAM</b>
-<b>Python       :</b> <code>{get_readable_file_size(Process(getpid()).memory_info().rss)}</code>
 
 <b>Penyimpanan</b> 
 <b>Terpakai     :</b> <code>{get_readable_file_size(used)}</code>
@@ -328,7 +325,7 @@ async def restart_notification():
         except Exception as e:
             LOGGER.error(e)
 
-    now = datetime.now(timezone(f"Asia/Jakarta"))
+    now = datetime.now(timezone("Asia/Jakarta"))
     if INCOMPLETE_TASK_NOTIFIER and DATABASE_URL:
         if notifier_dict := await DbManager().get_incomplete_tasks():
             for cid, data in notifier_dict.items():
@@ -340,7 +337,7 @@ async def restart_notification():
 </pre>           
 """
                 if data.items():
-                    msg += f"<b>Tugas yang belum selesai :</b>"
+                    msg += "<b>Tugas yang belum selesai :</b>"
                 for tag, links in data.items():
                     msg += f"\n{tag} :"
                     for index, link in enumerate(links, start=1):
