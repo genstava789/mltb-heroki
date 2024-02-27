@@ -27,19 +27,20 @@ Note : Sometimes I often change the Docker Image for testing purposes, maybe som
 
 ```
 Based on Alpine Latest with Heroku Bypass
-Include Python Packages and some cool Apps like AniDL, Bento4, Gallery-DL, MegaSDK, MKVToolnix, N_m3u8DL-RE (m3u8), PhantomJS, Shaka-Packager, VCSI, YT-DLP
+Include Python Packages and some cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MegaSDK, MKVToolnix, N_m3u8DL-RE (m3u8), PhantomJS, Shaka-Packager, VCSI, YT-DLP
 ```
 
 - arakurumi/mltb:ubuntu
 
 ```
 Based on Ubuntu 22.04 with Heroku Bypass
-Include Python Packages and some cool Apps like AniDL, Bento4, Gallery-DL, MegaSDK, MKVToolnix, N_m3u8DL-RE (m3u8), PhantomJS, Shaka-Packager, VCSI, YT-DLP
+Include Python Packages and some cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MegaSDK, MKVToolnix, N_m3u8DL-RE (m3u8), PhantomJS, Shaka-Packager, VCSI, YT-DLP
 ```
 
 ## Custom Apps Name
 - Aria2c : Chrome
 - FFMPEG : Opera
+- HandBrakeCLI : handbrake
 - Java : Safari
 - QBittorrent : Nightly
 - QBittorrent-Nox : Firefox
