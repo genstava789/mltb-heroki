@@ -781,14 +781,14 @@ async def rssMonitor():
                         
                         elif "ouo" in url.lower():
                             view = rss_d.entries[feed_count].get("id")
-                            description = re_sub(r"<.*?>", "", description)
+                            description = re_sub(r"<.*?>", "", description).replace("\n", "")
                             description = f"""<b>CRC32 :</b> <code>{description.split('CRC32: ')[1].split('MediaInfo')[0]}</code>
 
 <b>BitRate :</b> <code>{description.split('Overall Bit Rate: ')[1].split('Subtitle: ')[0]}</code>
 
 <b>Duration :</b> <code>{description.split('Duration: ')[1].split('CRC32: ')[0]}</code>
 
-<b>Subtitle :</b> <code>{description.split('Subtitle: ')[1].split('Duration: ')[0]}</code>"""
+<b>Subtitle :</b> <code>{description.split('Subtitle: ')[1].split('Duration: ')[0]}</code>""".replace("\n", "")
                         
                         elif "bangumi" in url.lower():
                             image = re_findall(r"\bhttps?://\S+?\.(?:png|jpe?g)\b", description)[0]
