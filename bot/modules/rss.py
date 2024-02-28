@@ -733,9 +733,9 @@ async def rssMonitor():
                             p2p_group is None
                             and "-" in item_title
                         ):
-                            p2p_group = re_findall(r"(\-[0-9a-zA-Z\-\.]+)", item_title)
+                            p2p_group = re_findall(r"\-([0-9a-zA-Z\-]+)", item_title)
                             if len(p2p_group) != 0:
-                                p2p_group = p2p_group[-1].replace("-", "")
+                                p2p_group = p2p_group[-1]
                                 if (
                                     isinstance(p2p_group, str)
                                     and (not p2p_group.isdigit())
