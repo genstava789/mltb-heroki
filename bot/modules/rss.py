@@ -720,18 +720,45 @@ async def rssMonitor():
                         not_tracker = False
                         private_tracker = False
                         
-                        item_title = item_title.replace('>', '').replace('<', '')
+                        item_title = item_title.replace(">", "").replace("<", "")
+
+                        # BlackListed p2p_group / p2p_name
+                        blacklist = [
+                            "ass", "audio", "audios", "chan", "compilation", "dl", "dlrip", "empire", "en", "global",
+                            "hd", "hen", "id", "in", "jap", "kaime", "kun", "la", "off", "pot", "raw", "raws", "ray", 
+                            "rayrip", "res", "rip", "sama", "san", "srt", "sub", "subs", "subtitle"
+                        ]
                         
-                        if "-" in item_title:
-                            p2p_group = re_findall(r"(\-[0-9a-zA-Z]+)", item_title)
+                        if (
+                            p2p_group is None
+                            and "-" in item_title
+                        ):
+                            p2p_group = re_findall(r"(\-[0-9a-zA-Z\-\.]+)", item_title)
                             if len(p2p_group) != 0:
                                 p2p_group = p2p_group[-1].replace("-", "")
                                 if (
                                     isinstance(p2p_group, str)
                                     and (not p2p_group.isdigit())
-                                    and len(p2p_group) > 1
-                                    # BlackListed p2p_group / p2p_name
-                                    and p2p_group.lower() not in ["ass", "audio", "audios", "chan", "compilation", "dl", "dlrip", "empire", "en", "hd", "id", "in", "jap", "kun", "off", "pot", "raw", "raws", "ray", "rayrip", "res", "rip", "sama", "srt", "sub", "subs", "subtitle"]
+                                    and p2p_group.lower() not in blacklist
+                                ):
+                                    p2p_group = p2p_group
+                                else:
+                                    p2p_group = None
+                            else:
+                                p2p_group = None
+                        
+                        if (
+                            p2p_group is None
+                            and "[" in item_title
+                            and "]" in item_title
+                        ):
+                            p2p_group = re_findall(r"\[([0-9a-zA-Z\-\.]+)\]", item_title)
+                            if len(p2p_group) != 0:
+                                p2p_group = p2p_group[0]
+                                if (
+                                    isinstance(p2p_group, str)
+                                    and (not p2p_group.isdigit())
+                                    and p2p_group.lower() not in blacklist
                                 ):
                                     p2p_group = p2p_group
                                 else:
@@ -751,6 +778,21 @@ async def rssMonitor():
 
 <b>Hash :</b>
 <code>{rss_d.entries[feed_count].get('nyaa_infohash')}</code>"""
+                        
+                        elif "ouo" in url.lower():
+                            view = rss_d.entries[feed_count].get("id")
+                            description = re_sub(r"<.*?>", "", description)
+                            description = f"""<b>CRC32 :</b> <code>{description.split('CRC32: ')[1].split('MediaInfo')[0]}</code>
+
+<b>BitRate :</b> <code>{description.split('Overall Bit Rate: ')[1].split('Subtitle: ')[0]}</code>
+
+<b>Duration :</b> <code>{description.split('Duration: ')[1].split('CRC32: ')[0]}</code>
+
+<b>Subtitle :</b> <code>{description.split('Subtitle: ')[1].split('Duration: ')[0]}</code>"""
+                        
+                        elif "bangumi" in url.lower():
+                            image = re_findall(r"\bhttps?://\S+?\.(?:png|jpe?g)\b", description)[0]
+                            description = None
 
                         elif "watercache" in url.lower():
                             view = rss_d.entries[feed_count].get("comments")
@@ -759,7 +801,7 @@ async def rssMonitor():
                             description = None
                             
                         elif "yts" in url.lower():
-                            view = rss_d.entries[feed_count].get('guid')
+                            view = rss_d.entries[feed_count].get("guid")
                             if description:
                                 image = re_findall(r"\bhttps?://\S+?\.(?:png|jpe?g)\b", description)[0]
                                 description = re_sub(r"<.*?>", "", description)
@@ -804,7 +846,7 @@ async def rssMonitor():
                         elif "hdencode" in url.lower():
                             not_tracker = True
                             view = url
-                            # NOTE: Manually get categories from title when set rss subscription on bot. Example the title is HDEncode_Movies so the category will be Movies
+                            # NOTE: Manually get categories from title when set rss subscription on bot. Example: the title is HDEncode_Movies so the category will be Movies
                             category = title.split("_", 1)[-1].replace("_", " ") 
                             size = item_title.split(" – ")[-1]
                             item_title = item_title.split(" – ")[0]
