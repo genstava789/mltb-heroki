@@ -724,9 +724,10 @@ async def rssMonitor():
 
                         # BlackListed p2p_group / p2p_name
                         blacklist = [
-                            "ass", "audio", "audios", "chan", "compilation", "dl", "dlrip", "empire", "en", "global",
-                            "hd", "hen", "id", "in", "jap", "kaime", "kun", "la", "off", "pot", "raw", "raws", "ray", 
-                            "rayrip", "res", "rip", "sama", "san", "srt", "sub", "subs", "subtitle"
+                            "ass", "audio", "audios", "br", "chan", "compilation", "dl", "dlrip", "empire", "en", 
+                            "eng", "global", "hd", "hen", "id", "in", "jap", "kaime", "kun", "la", "man", "media", 
+                            "off", "pot", "raw", "raws", "ray",  "rayrip", "res", "rip", "sai", "sama", "san", "srt", 
+                            "sub", "subs", "subtitle", "true", "us",
                         ]
                         
                         if (
@@ -765,9 +766,23 @@ async def rssMonitor():
                                     p2p_group = None
                             else:
                                 p2p_group = None
-                                    
-                        # Add Your Custom Here
                         
+                        # Some Groups which using - and . character is not detected as Tag (#)
+                        if (
+                            p2p_group is not None
+                            and "-" in p2p_group
+                        ):
+                            p2p_group = p2p_group.replace("-", "_")
+
+                        if (
+                            p2p_group is not None
+                            and "." in p2p_group
+                        ):
+                            p2p_group = p2p_group.replace(".", "")
+
+
+                        # Add Your custom RSS feed here
+                        # https://nyaa.si/ or https://sukebei.nyaa.si/
                         if "nyaa" in url.lower():
                             view = rss_d.entries[feed_count].get("id")
                             size = rss_d.entries[feed_count].get("nyaa_size")
@@ -779,6 +794,7 @@ async def rssMonitor():
 <b>Hash :</b>
 <code>{rss_d.entries[feed_count].get('nyaa_infohash')}</code>"""
                         
+                        # https://ouo.si/
                         elif "ouo" in url.lower():
                             view = rss_d.entries[feed_count].get("id")
                             description = re_sub(r"<.*?>", "", description).replace("\n", "")
@@ -788,18 +804,21 @@ async def rssMonitor():
 
 <b>Duration :</b> <code>{description.split('Duration: ')[1].split('CRC32: ')[0]}</code>
 
-<b>Subtitle :</b> <code>{description.split('Subtitle: ')[1].split('Duration: ')[0]}</code>""".replace("\n", "")
+<b>Subtitle :</b> <code>{description.split('Subtitle: ')[1].split('Duration: ')[0]}</code>"""
                         
+                        # https://bangumi.moe/
                         elif "bangumi" in url.lower():
                             image = re_findall(r"\bhttps?://\S+?\.(?:png|jpe?g)\b", description)[0]
                             description = None
 
+                        # https://tgx.rs/
                         elif "watercache" in url.lower():
                             view = rss_d.entries[feed_count].get("comments")
                             if description:
                                 size = description.split("Size: ")[-1].split(" Added:")[0]
                             description = None
-                            
+                        
+                        # https://yts.mx/
                         elif "yts" in url.lower():
                             view = rss_d.entries[feed_count].get("guid")
                             if description:
@@ -810,7 +829,8 @@ async def rssMonitor():
                                 description = rss_d.entries[feed_count].get("description").split("<br />")[-1]
                             if image:
                                 image_caption = item_title
-                            
+                        
+                        # https://avistaz.to/
                         elif "avistaz" in url.lower():
                             private_tracker = True
                             url = "https://avistaz.to/"
@@ -822,12 +842,14 @@ async def rssMonitor():
 
 <b>Oleh :</b> <code>{description.split("Uploader: ")[-1].split("Rip Type: ")[0]}</code>"""
 
+                        # https://www.torrentleech.org/
                         elif "torrentleech" in url.lower():
                             private_tracker = True
                             url = "https://www.torrentleech.org/"
                             view = rss_d.entries[feed_count].get("guid")
                             description = f"""<b>Seed :</b> <code>{description.split('Seeders: ', 1)[-1].split(' ')[0]}</code> | <b>Leech :</b> <code>{description.split('Leechers: ', 1)[-1].split(' ')[0]}</code>"""
                         
+                        # https://psa.wf/
                         elif "psa" in url.lower():
                             not_tracker = True
                             view = url
@@ -837,16 +859,19 @@ async def rssMonitor():
                                 description = re_sub(r"<.*?>", "", description)
                             if image:
                                 image_caption = item_title
-                            
+                        
+                        # https://pahe.ink/
                         elif "pahe" in url.lower():
                             not_tracker = True
                             view = url
                             category = ", ".join(x["term"] for x in rss_d.entries[feed_count].get("tags"))
-                            
+                        
+                        # https://hdencode.ro/
                         elif "hdencode" in url.lower():
                             not_tracker = True
                             view = url
-                            # NOTE: Manually get categories from title when set rss subscription on bot. Example: the title is HDEncode_Movies so the category will be Movies
+                            # Manually get categories from title when set rss subscription on bot.
+                            # Example: the title is HDEncode_Movies so the category will be Movies
                             category = title.split("_", 1)[-1].replace("_", " ") 
                             size = item_title.split(" – ")[-1]
                             item_title = item_title.split(" – ")[0]
