@@ -19,6 +19,8 @@ async def convert_video(listener, video_file, ext, retry=False):
     if retry:
         cmd = [
             "opera",
+            "-timeout",
+            "600",
             "-i",
             video_file,
             "-c:v",
@@ -69,6 +71,8 @@ async def convert_audio(listener, audio_file, ext):
     output = f"{base_name}.{ext}"
     cmd = [
         "opera",
+        "-timeout",
+        "600",
         "-i",
         audio_file,
         "-threads",
@@ -241,6 +245,8 @@ async def take_ss(video_file, ss_nb) -> bool:
                 "-hide_banner",
                 "-loglevel",
                 "error",
+                "-timeout",
+                "600",
                 "-ss",
                 f"{cap_time}",
                 "-i",
@@ -283,6 +289,8 @@ async def get_audio_thumb(audio_file):
         "-hide_banner",
         "-loglevel",
         "error",
+        "-timeout",
+        "600",
         "-i",
         audio_file,
         "-an",
@@ -313,6 +321,8 @@ async def create_thumbnail(video_file, duration):
         "-hide_banner",
         "-loglevel",
         "error",
+        "-timeout",
+        "600",
         "-ss",
         f"{duration}",
         "-i",
@@ -369,6 +379,8 @@ async def split_file(
                 "-hide_banner",
                 "-loglevel",
                 "error",
+                "-timeout",
+                "600",
                 "-ss",
                 str(start_time),
                 "-i",
@@ -524,6 +536,8 @@ async def createSampleVideo(listener, video_file, sample_duration, part_duration
 
     cmd = [
         "opera",
+        "-timeout",
+        "600",
         "-i",
         video_file,
         "-filter_complex",
