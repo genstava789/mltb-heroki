@@ -828,6 +828,17 @@ Network:
 ```
 TRC20
 ```
+TRX Address:
+
+```
+TEzjjfkxLKQqndpsdpkA7jgiX7QQCL5p4f
+```
+
+Network:
+
+```
+TRC20
+```
 
 BTC Address:
 
