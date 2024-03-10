@@ -149,7 +149,7 @@ async def get_user_settings(from_user):
         ex_ex = "None"
 
     ns_msg = "Exists" if user_dict.get("name_sub", False) else "Not Exists"
-    buttons.ibutton("YT-DLP Options", f"userset {user_id} name_subtitute")
+    buttons.ibutton("Name Substitute", f"userset {user_id} name_subtitute")
 
     buttons.ibutton("YT-DLP Options", f"userset {user_id} yto")
     if user_dict.get("yt_opt", False):
@@ -182,7 +182,7 @@ async def get_user_settings(from_user):
 <b>Index Link       :</b> <code>{index}</code>
 <b>Stop Duplicate   :</b> <code>{sd_msg}</code>
 <b>Default Upload   :</b> <code>{du}</code>
-<b>Name Substitution:</b> <code>{ns_msg}</code>
+<b>Name Subtitution :</b> <code>{ns_msg}</code>
 <b>Excluded Ext     :</b> <code>{ex_ex}</code>
 <b>YT-DLP Options   :</b> <code>{escape(ytopt)}</code>
 </pre>
