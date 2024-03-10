@@ -179,6 +179,8 @@ Include Python Packages and some cool Apps like AniDL, Bento4, Gallery-DL, HandB
 - Force start to upload or download or both from queue using cmds or args once you add the download (task option)
 - Shell and Executor
 - Add sudo users
+- Ability to save upload Paths
+- Name Substitution to rename the files before upload
 - Supported Direct links Generators:
 
 > mediafire (file/folders), hxfile.co (need cookies txt with name) [hxfile.txt], streamtape.com, streamsb.net, streamhub.ink,
@@ -289,6 +291,12 @@ quotes, even if it's `Int`, `Bool` or `List`.
 - `USE_SERVICE_ACCOUNTS`: Whether to use Service Accounts or not, with google-api-python-client. For this to work
   see [Using Service Accounts](https://github.com/anasty17/mirror-leech-telegram-bot#generate-service-accounts-what-is-service-account)
   section below. Default is `False`. `Bool`
+- `NAME_SUBSTITUTE`: Add word/letter/sentense/pattern to remove or replace with other words with sensitive case or without. **Note**: Seed will get disbaled while using this option
+  * Example: 'text : code : s|mirror : leech|tea :  : s|clone'
+    - text will get replaced by code with sensitive case
+    - mirror will get replaced by leech
+    - tea will get removed with sensitive case
+    - clone will get removed
 
 ### GDrive Tools
 
