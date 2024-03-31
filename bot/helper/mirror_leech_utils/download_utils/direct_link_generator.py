@@ -22,8 +22,6 @@ from bot.helper.ext_utils.links_utils import is_share_link
 from bot.helper.ext_utils.status_utils import speed_string_to_bytes, get_readable_time
 
 
-_caches = {}
-
 userAgent = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0"
 )
@@ -126,6 +124,7 @@ def direct_link_generator(link: str):
             "d0o0d.com",
             "ds2video.com",
             "do0od.com",
+            "d000d.com",
         ]
     ):
         return pake(link)
@@ -619,7 +618,7 @@ def hxfile(url):
         except Exception as e:
             raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}") from e
     if direct_link := html.xpath("//a[@class='btn btn-dow']/@href"):
-        return direct_link[0]
+        return direct_link[0], f"Referer: {url}"
     raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
 
 
@@ -874,7 +873,7 @@ def terabox(url):
                         details["title"] = content["server_filename"]
                     folderPath = details["title"]
                 item = {
-                    "url": content["dlink"],
+                    "url": content["dlink"].replace("https://d.1024tera.com", "https://d4.1024tera.com"),
                     "filename": content["server_filename"],
                     "path": ospath.join(folderPath),
                 }
@@ -902,7 +901,7 @@ def terabox(url):
         except Exception as e:
             raise DirectDownloadLinkException (f"ERROR: {e}")
     if len(details["contents"]) == 1:
-        return details["contents"][0]["url"]
+        return details["contents"][0]["url"].replace("https://d.1024tera.com", "https://d4.1024tera.com")
     return details
 
 

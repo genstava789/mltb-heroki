@@ -44,7 +44,7 @@ async def mirror_status(_, message):
         count = len(task_dict)
     if count == 0:
         msg = "<b>Tidak ada Tugas AKTIF!</b>"
-        msg += f"\n\n<b>Note :</b>\nTambahkan <code>me</code> atau <code>userId</code> setelah perintah untuk menampilkan Tugas secara spesifik!"
+        msg += "\n\n<b>Note :</b>\nTambahkan <code>me</code> atau <code>userId</code> setelah perintah untuk menampilkan Tugas secara spesifik!"
         msg += "\n___________________________"
         msg += (
             f"\n<b>CPU :</b> <code>{cpu_percent()}%</code> | <b>RAM :</b> <code>{virtual_memory().percent}%</code>" \
@@ -91,7 +91,7 @@ async def status_pages(_, query):
             status_dict[key]["status"] = data[3]
         await update_status_message(key, force=True)
     elif data[2] == "ov":
-        message = query.message
+        # message = query.message
         tasks = {
             "Download": 0,
             "Upload": 0,

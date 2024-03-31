@@ -869,9 +869,9 @@ async def rssMonitor():
                             if description:
                                 description = re_sub(r"<.*?>", "", description)
                                 size = description.split("Size: ")[-1].split("Uploaded: ")[0]
-                                description = f"""<b>Seed :</b> <code>{description.split("Seed: ")[-1].split(" |")[0]}</code> | <b>Leech :</b> <code>{description.split("Leech: ")[-1].split(" |")[0]}</code> | <b>Completed :</b> <code>{description.split("Completed: ")[-1].split("Uploader: ")[0]}</code>
+                                description = f"""<b>Seed :</b> <code>{description.split('Seed: ')[-1].split(' ')[0]}</code> | <b>Leech :</b> <code>{description.split('Leech: ')[-1].split(' ')[0]}</code> | <b>Completed :</b> <code>{description.split('Completed: ')[-1].split('Uploader: ')[0]}</code>
 
-<b>Oleh :</b> <code>{description.split("Uploader: ")[-1].split("Rip Type: ")[0]}</code>"""
+<b>Oleh :</b> <code>{description.split('Uploader: ')[-1].split('Rip Type: ')[0]}</code>"""
 
                         # https://www.torrentleech.org/
                         elif "torrentleech" in url.lower():
@@ -879,6 +879,19 @@ async def rssMonitor():
                             url = "https://www.torrentleech.org/"
                             view = rss_d.entries[feed_count].get("guid")
                             description = f"""<b>Seed :</b> <code>{description.split('Seeders: ', 1)[-1].split(' ')[0]}</code> | <b>Leech :</b> <code>{description.split('Leechers: ', 1)[-1].split(' ')[0]}</code>"""
+
+                        # https://blutopia.cc/
+                        elif "blutopia" in url.lower():
+                            private_tracker = True
+                            url = "https://blutopia.cc/"
+                            view = rss_d.entries[feed_count].get("guid")
+                            if description:
+                                description = re_sub(r"<.*?>", "", description)
+                                size = description.split("Size: ")[-1].split("\n")[0]
+                                category = description.split("Category: ")[-1].split("\n")[0]
+                                description = f"""<b>Seed :</b> <code>{description.split('Seeders: ')[-1].split(' ')[0]}</code> | <b>Leech :</b> <code>{description.split('Leechers: ')[-1].split(' ')[0]}</code> | <b>Completed :</b> <code>{description.split('Completed: ')[-1].split(f'{chr(10)}')[0]}</code>
+
+<b>Oleh :</b> <code>{rss_d.entries[feed_count].author or description.split(f'Uploader:{chr(10)}')[-1].split(f'{chr(10)}')[0]}</code>"""
                         
                         # https://psa.wf/
                         elif "psa" in url.lower():
@@ -909,9 +922,13 @@ async def rssMonitor():
                             description = None
                             
                         if published_date:
-                            date = datetime.strptime(published_date, "%a, %d %b %Y %H:%M:%S %z")
-                            date_time_jkt = date.astimezone(timezone(timedelta(hours=7)))
-                            published_date = date_time_jkt.strftime("%A, %d %B %Y %H:%M:%S WIB")
+                            try:
+                                date = datetime.strptime(published_date, "%a, %d %b %Y %H:%M:%S %z")
+                                date_time_jkt = date.astimezone(timezone(timedelta(hours=7)))
+                                published_date = date_time_jkt.strftime("%A, %d %B %Y %H:%M:%S WIB")
+                            
+                            except Exception:
+                                pass
                                                      
                         feed_msg = f"""
 <b>Nama :</b> 

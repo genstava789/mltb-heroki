@@ -4,12 +4,10 @@ from html import escape
 from math import ceil
 from pyrogram.filters import command, regex
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
-from urllib.parse import quote
 
 from bot import bot, LOGGER, USE_TELEGRAPH, config_dict, get_qb_client
 from bot.helper.ext_utils.bot_utils import sync_to_async, new_task, get_telegraph_list
 from bot.helper.ext_utils.status_utils import get_readable_file_size
-from bot.helper.ext_utils.telegraph_helper import telegraph
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.filters import CustomFilters
@@ -97,11 +95,11 @@ async def _search(key, site, message, method):
             msg += "\n╾────────────╼\n"
             msg += f"<b>Situs :</b> <code>{SITES.get(site)}</code>"
             if method == "apitrend":
-                msg += f"\n<b>Metode :</b> <code>Api Trending</code>"
+                msg += "\n<b>Metode :</b> <code>Api Trending</code>"
             elif method == "apirecent":
-                msg += f"\n<b>Metode :</b> <code>Api Trending</code>"
+                msg += "\n<b>Metode :</b> <code>Api Trending</code>"
             else:
-                msg += f"\n<b>Metode :</b> <code>Api Search</code>"
+                msg += "\n<b>Metode :</b> <code>Api Search</code>"
                 msg += f"\n<b>Kata Kunci :</b> <code>{key.title()}</code>"
             msg += "\n╾────────────╼\n"
             search_results = search_results["data"]
@@ -201,9 +199,9 @@ async def _getResult(search_results, key, method):
     Torrent = False
 
     if USE_TELEGRAPH:
-        msg += f"<h4>Hasil pencarian Torrent</h4>"
+        msg += "<h4>Hasil pencarian Torrent</h4>"
     else:
-        msg += f"<b>Hasil pencarian Torrent</b>"
+        msg += "<b>Hasil pencarian Torrent</b>"
 
     msg += "\n╾────────────╼\n"
     
@@ -443,7 +441,7 @@ async def torrentSearchUpdate(_, query):
                 )
             else:
                 msg += f"<b>Situs :</b> <code>{SITES.get(site)}</code>"
-                msg += f"\n<b>Metode :</b> <code>Api Search</code>"
+                msg += "\n<b>Metode :</b> <code>Api Search</code>"
                 msg += f"\n<b>Kata Kunci :</b> <code>{key.title()}</code>"
                 msg += "\n╾────────────╼\n"
                 await editMessage(
@@ -452,7 +450,7 @@ async def torrentSearchUpdate(_, query):
                 )
         else:
             msg += f"<b>Situs :</b> <code>{site.capitalize()}</code>"
-            msg += f"\n<b>Metode :</b> <code>Plugins Search</code>"
+            msg += "\n<b>Metode :</b> <code>Plugins Search</code>"
             msg += f"\n<b>Kata Kunci :</b> <code>{key.title()}</code>"
             msg += "\n╾────────────╼\n"
             await editMessage(

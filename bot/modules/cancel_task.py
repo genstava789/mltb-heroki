@@ -87,7 +87,7 @@ def create_cancel_buttons(isSudo, userId=""):
     )
     buttons.ibutton("Uploading", f"canall ms {MirrorStatus.STATUS_UPLOADING} {userId}")
     buttons.ibutton("Seeding", f"canall ms {MirrorStatus.STATUS_SEEDING} {userId}")
-    buttons.ibutton("Spltting", f"canall ms {MirrorStatus.STATUS_SPLITTING} {userId}")
+    buttons.ibutton("Splitting", f"canall ms {MirrorStatus.STATUS_SPLITTING} {userId}")
     buttons.ibutton("Cloning", f"canall ms {MirrorStatus.STATUS_CLONING} {userId}")
     buttons.ibutton(
         "Extracting", f"canall ms {MirrorStatus.STATUS_EXTRACTING} {userId}"

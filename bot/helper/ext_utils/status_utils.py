@@ -9,7 +9,6 @@ from psutil import (
 from time import time
 
 from bot import (
-    DOWNLOAD_DIR,
     task_dict,
     task_dict_lock,
     botStartTime,
@@ -214,8 +213,8 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
         msg += f"\n<b>├ GID :</b> <code>{tgid}</code>"
         
         if task.listener.isPrivateChat: 
-            msg += f"\n<b>├ UID :</b> <code>PRIVATE</code>"
-            msg += f"\n<b>├ User :</b> <code>PRIVATE</code>" 
+            msg += "\n<b>├ UID :</b> <code>PRIVATE</code>"
+            msg += "\n<b>├ User :</b> <code>PRIVATE</code>" 
         else:
             msg += f"\n<b>├ UID :</b> <code>{task.listener.userId}</code>"
             msg += f"\n<b>├ User :</b> <code>{task.listener.user.first_name} {(task.listener.user.last_name or '')}</code>"

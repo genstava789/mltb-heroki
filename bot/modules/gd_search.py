@@ -143,8 +143,8 @@ async def select_type(_, query):
     item_type = data[2]
     isRecursive = eval(data[3])
     user_token = eval(data[4])
-    msg = f"<b>Mencari Google Drive...</b>"
-    msg += f"\n╾────────────╼\n"
+    msg = "<b>Mencari Google Drive...</b>"
+    msg += "\n╾────────────╼\n"
     msg += f"<b>Tipe :</b> <code>{item_type.capitalize()}</code>"
     msg += f"\n<b>Recursive :</b> <code>{'Yes' if isRecursive else 'No'}</code>"
     msg += f"\n<b>User Token :</b> <code>{'Yes' if user_token else 'No'}</code>"
