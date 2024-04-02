@@ -10,7 +10,7 @@ from re import compile, findall, match, search, sub
 from requests import Session, post
 from requests.adapters import HTTPAdapter
 from time import sleep
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 from urllib3.util.retry import Retry
 from uuid import uuid4
 
@@ -37,7 +37,6 @@ def direct_link_generator(link: str):
         for x in [
             "youtube.com",
             "youtu.be",
-            "instagram.com",
             "tiktok.com",
             "facebook.com",
         ]
@@ -66,14 +65,23 @@ def direct_link_generator(link: str):
     elif "1drv.ms" in domain:
         return onedrive(link)
     elif "pixeldrain.com" in domain:
-        return pixeldrain(link)
+        if (
+            len(config_dict["ALLDEBRID_API"]) != 0
+            or len(config_dict["DEBRIDLINK_API"]) != 0
+        ):
+            return debrid(link)
+        else:
+            return pixeldrain(link)
     elif "racaty" in domain:
         return racaty(link)
     elif "1fichier.com" in domain:
-        if len(config_dict["ALLDEBRID_API"]) == 0:
-            return fichier(link)
+        if (
+            len(config_dict["ALLDEBRID_API"]) != 0
+            or len(config_dict["DEBRIDLINK_API"]) != 0
+        ):
+            return debrid(link)
         else:
-            return alldebrid(link)
+            return fichier(link)
     elif "solidfiles.com" in domain:
         return solidfiles(link)
     elif "krakenfiles.com" in domain:
@@ -83,10 +91,13 @@ def direct_link_generator(link: str):
     elif "gofile.io" in domain:
         return gofile(link)
     elif "send.cm" in domain:
-        if len(config_dict["ALLDEBRID_API"]) == 0:
-            return send_cm(link)
+        if (
+            len(config_dict["ALLDEBRID_API"]) != 0
+            or len(config_dict["DEBRIDLINK_API"]) != 0
+        ):
+            return debrid(link)
         else:
-            return alldebrid(link)
+            return send_cm(link)
     elif "tmpsend.com" in domain:
         return tmpsend(link)
     elif "easyupload.io" in domain:
@@ -253,70 +264,271 @@ def direct_link_generator(link: str):
         return berkasdrive(link)
     elif "sharepoint.com" in domain:
         return sharepoint(link)
-    # Add AllDebrid supported link here
+    # Add Debrid supported link here
     elif any(
         x in domain
         for x in [
+            "1fichier.com",
             "4shared.com",
+            "4tube.com",
+            "academicearth.org",
+            "acast.com",
+            "add-anime.net",
+            "ahctv.com",
+            "air.mozilla.org",
             "alfafile.net",
+            "allocine.fr",
+            "alphaporno.com",
             "alterupload.com",
+            "animalist.com",
+            "animalplanet.com",
+            "anysex.com",
+            "aparat.com",
             "apkadmin.com",
+            "audi-mediacenter.com",
+            "audioboom.com",
+            "audiomack.com",
+            "beeg.com",
+            "camdemy.com",
+            "chilloutzone.net",
+            "cinema.arte.tv",
             "cjoint.net",
+            "clickndownload.click",
+            "clickndownload.link",
             "clickndownload.org",
+            "clickndownload.space",
+            "clicknupload.cc",
+            "clicknupload.club",
             "clicknupload.co",
+            "clicknupload.download",
+            "clicknupload.link",
+            "clicknupload.org",
+            "clicknupload.space",
             "clicknupload.vip",
             "clipwatching.com",
+            "clubic.com",
+            "clyp.it",
+            "concert.arte.tv",
+            "creative.arte.tv",
+            "daclips.in",
+            "dailymail.co.uk",
+            "dailymotion.com",
             "darkibox.com",
+            "ddc.arte.tv",
             "ddl.to",
+            "ddownload.com",
+            "democracynow.org",
             "desfichiers.com",
+            "destinationamerica.com",
             "dfichiers.com",
+            "discovery.com",
+            "discoverylife.com",
             "dl4free.com",
+            "dotsub.com",
             "drop.download",
             "dropapk.to",
+            "dropbox.com",
             "dropgalaxy.in",
+            "e.pcloud.link",
+            "ebaumsworld.com",
+            "eitb.tv",
+            "elfile.net",
+            "elitefile.net",
+            "ellentube.com",
+            "ellentv.com",
+            "embed.redtube.com",
+            "emload.com",
             "fastbit.cc",
+            "fikper.com",
             "file-upload.com",
             "file.al",
+            "fileaxa.com",
+            "filecat.net",
             "filedot.to",
             "filedot.xyz",
+            "filenext.com",
+            "filer.net",
+            "filesfly.cc",
             "filespace.com",
+            "filestore.me",
             "flashbit.cc",
+            "flipagram.com",
+            "footyroom.com",
+            "formula1.com",
+            "franceculture.fr",
+            "future.arte.tv",
+            "gameinformer.com",
+            "gamersyde.com",
             "gigapeta.com",
+            "gofile.io",
+            "goloady.com",
+            "gorillavid.in",
             "gulf-up.com",
             "harefile.com",
+            "hbo.com",
+            "hellporno.com",
+            "hentai.animestigma.com",
             "hexupload.net",
             "hitf.cc",
             "hitf.to",
             "hitfile.net",
+            "hornbunny.com",
             "htfl.net",
+            "html5-player.libsyn.com",
+            "hulkshare.com",
+            "imdb.com",
+            "info.arte.tv",
+            "instagram.com",
+            "investigationdiscovery.com",
             "isra.cloud",
+            "itar-tass.com",
+            "jamendo.com",
+            "jove.com",
+            "jumploads.com",
+            "k.to",
+            "katfile.com",
+            "keek.com",
+            "keezmovies.com",
+            "khanacademy.org",
+            "kickstarter.com",
+            "krasview.ru",
+            "kshared.com",
+            "la7.it",
+            "lci.fr",
+            "libsyn.com",
+            "liveleak.com",
+            "livestream.com",
             "load.to",
+            "m.mgoon.com",
+            "md3b0j6hj.com",
+            "mdy48tn97.com",
+            "mediafile.cc",
+            "mediafire.com",
+            "mega.co.nz",
+            "mega.nz",
             "megadl.fr",
+            "megadl.org",
+            "mesfichiers.fr",
             "mesfichiers.org",
+            "metacritic.com",
             "mexa.sh",
             "mexashare.com",
+            "mgoon.com",
+            "mixcloud.com",
+            "mixdrop.ag",
+            "mixdrop.club",
+            "mixdrop.co",
+            "mixdrop.si",
+            "mixdrop.sx",
+            "mixdrop.to",
+            "mixdrop.vc",
             "modsbase.com",
+            "mojvideo.com",
+            "movieclips.com",
+            "movpod.in",
             "mp4upload.com",
+            "musicplayon.com",
+            "mx-sh.net",
+            "myspass.de",
+            "myvidster.com",
+            "nelion.me",
+            "new.livestream.com",
+            "news.yahoo.com",
+            "odatv.com",
+            "onionstudios.com",
+            "opvid.online",
+            "opvid.org",
+            "ora.tv",
             "piecejointe.net",
+            "pixeldrain.com",
             "pjointe.com",
+            "play.fm",
+            "play.lcp.fr",
+            "player.vimeo.com",
+            "player.vimeopro.com",
+            "plays.tv",
+            "playvid.com",
             "playvidto.com",
+            "pornhd.com",
+            "pornhub.com",
             "prefiles.com",
+            "pyvideo.org",
             "rapidfileshare.net",
+            "rapidgator.asia",
             "rapidgator.net",
+            "redtube.com",
+            "reverbnation.com",
+            "revision3.com",
             "rg.to",
+            "rts.ch",
+            "rtve.es",
+            "salefiles.com",
+            "sbs.com.au",
+            "sciencechannel.com",
+            "screen.yahoo.com",
+            "screencast.com",
             "scribd.com",
+            "seeker.com",
             "sendit.cloud",
+            "sendspace.com",
             "sharemods.com",
             "simfileshare.net",
+            "sites.arte.tv",
+            "skysports.com",
+            "slutload.com",
+            "soundcloud.com",
+            "soundgasm.net",
+            "sports.yahoo.com",
+            "steamcommunity.com",
+            "steampowered.com",
+            "store.steampowered.com",
+            "stream.cz",
+            "streamable.com",
+            "streamcloud.eu",
+            "streamtape.com",
+            "streamtape.net",
+            "subyshare.com",
+            "sunporno.com",
+            "supervideo.tv",
+            "tass.ru",
+            "teachertube.com",
+            "teamcoco.com",
+            "ted.com",
             "tenvoi.com",
+            "terabox.app",
+            "terabox.com",
+            "terabytez.org",
+            "tezfiles.com",
+            "tfo.org",
+            "thescene.com",
+            "thesixtyone.com",
+            "tlc.com",
+            "tnaflix.com",
+            "touch.dailymotion.com",
             "trbbt.net",
+            "trubobit.com",
+            "trutv.com",
+            "tu.tv",
             "turb.cc",
             "turb.pw",
+            "turb.to",
+            "turbabit.com",
+            "turbo.cc",
+            "turbo.fr",
             "turbo.to",
             "turbobif.com",
             "turbobit.cc",
             "turbobit.cloud",
+            "turbobit.live",
             "turbobit.net",
+            "turbobit.online",
+            "turbobit.pw",
+            "turbobit.ru",
+            "turboblt.co",
+            "turboget.net",
+            "tweakers.net",
+            "u.pcloud.link",
+            "unsafespeech.com",
             "up-4ever.net",
             "up-load.io",
             "upload-4ever.com",
@@ -327,20 +539,65 @@ def direct_link_generator(link: str):
             "uploadrar.com",
             "uploadydl.com",
             "uppit.com",
+            "upvid.biz",
+            "upvid.cloud",
+            "upvid.co",
+            "upvid.host",
+            "upvid.live",
+            "upvid.pro",
+            "uqload.co",
+            "uqload.com",
+            "uqload.io",
+            "uqload.to",
             "userscloud.com",
+            "usersdrive.com",
             "userupload.net",
+            "ustream.tv",
+            "vbox7.com",
+            "veehd.com",
+            "velocity.com",
+            "veoh.com",
             "vev.io",
+            "vid.me",
+            "video.arte.tv",
+            "video.foxbusiness.com",
+            "video.foxnews.com",
+            "video.insider.foxnews.com",
+            "video.yahoo.com",
+            "videodetective.com",
+            "videos.sapo.ao",
+            "videos.sapo.cv",
+            "videos.sapo.mz",
+            "videos.sapo.pt",
+            "videos.sapo.tl",
+            "videzz.net",
             "vidoza.net",
             "vidoza.org",
             "vidto-do.com",
             "vidtodo.com",
+            "vimeo.com",
+            "vimeopro.com",
             "vipfile.cc",
+            "wat.tv",
             "wayupload.com",
+            "wdupload.com",
+            "wimp.com",
             "world-files.com",
             "worldbytez.com",
+            "wupfile.com",
+            "www.arte.tv",
+            "www.dailymail.co.uk",
+            "www.pornhub.com",
+            "www.redtube.com",
+            "www.sbs.com.au",
+            "xtube.com",
+            "yahoo.com",
+            "yodbox.com",
+            "youdbox.com",
+            "youporn.com",
         ]
     ):
-        return alldebrid(link)
+        return debrid(link)
     else:
         raise DirectDownloadLinkException(
             f"Tidak ada fungsi Generator Direct Link untuk {link}"
@@ -2032,45 +2289,93 @@ def hexupload(url: str):
 
 
 # Tested
-def alldebrid(url: str) -> str:
+def debrid(url: str) -> str:
     """
     Source :
     https://api.alldebrid.com/
+    https://debrid-link.com/api/v2/
 
     Documentation :
     https://docs.alldebrid.com/
+    https://debrid-link.com/api_doc/v2/introduction
 
     Supported Sites :
     https://alldebrid.com/hosts/
+    https://debrid-link.com/api_doc/v2/downloader-domains
     """
-    agent_name = "TelegramBot"  # Maybe we can add this on env? So its can customizable.
-    alldebrid_api = config_dict["ALLDEBRID_API"]
-    if len(alldebrid_api) == 0:
-        raise DirectDownloadLinkException("ERROR: ALLDEBRID_API tidak ditemukan!")
-    with Session() as session:
-        r = session.get(
-            "https://api.alldebrid.com/v4/link/unlock",
-            params={
-                "agent": agent_name,
-                "apikey": alldebrid_api,
-                "link": url,
-            },
-        )
+    if len(config_dict["ALLDEBRID_API"]) != 0:      
+        with Session() as session:
+            r = session.get(
+                "https://api.alldebrid.com/v4/link/unlock",
+                params={
+                    "agent": "TelegramBot",
+                    "apikey": config_dict["ALLDEBRID_API"],
+                    "link": url,
+                },
+            )
 
-        if not r.ok:
-            raise DirectDownloadLinkException(f"ERROR: [{r.status_code}] {r.text}")
+            if not r.ok:
+                raise DirectDownloadLinkException(f"ERROR: [{r.status_code}] {r.text}")
 
-        data = r.json()
+            data = r.json()
 
-        if data["status"] == "success":
+            if data["status"] != "success":
+                raise DirectDownloadLinkException(f"ERROR: {data['error']['message']}")
+
             if data["data"]["host"] == "stream":
                 raise DirectDownloadLinkException(
                     "ERROR: Tidak support stream! Gunakan perintah YT-DLP!"
                 )
-            return data["data"]["link"]
+            
+            return data["data"]["link"]               
+    
+    elif len(config_dict["DEBRIDLINK_API"]) != 0:
+        with Session() as session:
+            r = session.post(
+                "https://debrid-link.com/api/v2/downloader/add",
+                params={
+                    "access_token": config_dict["DEBRIDLINK_API"]
+                },
+                data={
+                    "url": url
+                },
+            )
 
-        else:
-            raise DirectDownloadLinkException(f"ERROR: {data['error']['message']}")
+            if not r.ok:
+                raise DirectDownloadLinkException(f"ERROR: [{r.status_code}] {r.text}")
+
+            data = r.json()
+
+            if not data["success"]:
+                raise DirectDownloadLinkException(f"ERROR: {data['error']}")
+            
+            if isinstance(data["value"], dict):
+                return data["value"]["downloadUrl"]
+            
+            elif isinstance(data["value"], list):
+                details = {
+                    "contents": [],
+                    "title": unquote(url.rstrip("/").split("/")[-1]),
+                    "total_size": 0
+                }
+
+                for item in data["value"]:
+                    if item.get("expired", False):
+                        continue
+
+                    details["contents"].append({
+                        "filename": item["name"],
+                        "path": ospath.join(details["title"]),
+                        "url": ["downloadUrl"]
+                    })
+
+                    if "size" in item:
+                        details["total_size"] += item["size"]
+
+                return details
+    
+    else:
+        raise DirectDownloadLinkException("ERROR: Debrid Api tidak ditemukan!")
 
 
 def pake(url: str) -> dict:
@@ -2083,35 +2388,31 @@ def pake(url: str) -> dict:
     - All sites based Vidstream
     """
     with Session() as session:
-        try:
-            r = session.get(
-                "https://api.pake.tk/dood",
-                params={
-                    "url": url,
-                },
-            )
+        r = session.get(
+            "https://api.pake.tk/dood",
+            params={
+                "url": url,
+            },
+        )
 
-            if not r.ok:
-                raise DirectDownloadLinkException(f"ERROR: [{r.status_code}] {r.text}")
+        if not r.ok:
+            raise DirectDownloadLinkException(f"ERROR: [{r.status_code}] {r.text}")
 
-            data = r.json()
+        data = r.json()
 
-            details = {"contents": [], "title": "", "total_size": 0}
+        details = {
+            "contents": [],
+            "title": f"{data['data']['title']}.mp4",
+            "total_size": 0,
+        }
 
-            details["title"] = f"{data['data']['title']}.mp4"
+        details["contents"].append({
+            "filename": details["title"],
+            "path": ospath.join(details["title"]),
+            "url": f"https://dd-cdn.pakai.eu.org/download?url={data['data']['direct_link']}&title={details['title']}.mp4",
+        })
 
-            item = {
-                "path": ospath.join(details["title"]),
-                "filename": details["title"],
-                "url": f"https://dd-cdn.pakai.eu.org/download?url={data['data']['direct_link']}&title={details['title']}.mp4",
-            }
-
-            details["contents"].append(item)
-
-            return details
-
-        except:
-            raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
+        return details
 
 
 def bigota(url: str) -> str:
@@ -2148,6 +2449,7 @@ def yandex_disk(url: str) -> str:
             raise DirectDownloadLinkException(f"ERROR: [{r.status_code}] {r.text}")
 
         data = r.json()
+
         return data["href"]
 
 
@@ -2170,10 +2472,10 @@ def sfile(url: str) -> tuple:
         r = session.get(
             download_link,
             headers={
-                "Referer": url,
-                "User-Agent": userAgent,
                 "Cache-Control": "max-age=0",
+                "Referer": url,
                 "Upgrade-Insecure-Requests": "1",
+                "User-Agent": userAgent,
             },
         )
 
@@ -2309,10 +2611,12 @@ def sharepoint(url: str) -> str:
     """
     url = sub("e=[\w]+", "", url)
     url = url.replace("??", "?")
+    
     if not search(r"download=1", url):
         if "?" in url:
             url += "&"
         else:
             url += "?"
         url += "download=1"
+
     return url

@@ -827,6 +827,10 @@ async def load_config():
     if len(ALLDEBRID_API) != 0:
         ALLDEBRID_API = ""
 
+    DEBRIDLINK_API = environ.get("DEBRIDLINK_API", "")
+    if len(DEBRIDLINK_API) == 0:
+        DEBRIDLINK_API = ""
+
     INDEX_URL = environ.get("INDEX_URL", "").rstrip("/")
     if len(INDEX_URL) == 0:
         INDEX_URL = ""
@@ -1036,11 +1040,12 @@ async def load_config():
             "ALLDEBRID_API": ALLDEBRID_API,
             "AS_DOCUMENT": AS_DOCUMENT,
             "AUTHORIZED_CHATS": AUTHORIZED_CHATS,
-            "BASE_URL": BASE_URL,
             "BASE_URL_PORT": BASE_URL_PORT,
+            "BASE_URL": BASE_URL,
             "BOT_TOKEN": BOT_TOKEN,
             "CMD_SUFFIX": CMD_SUFFIX,
             "DATABASE_URL": DATABASE_URL,
+            "DEBRIDLINK_API": DEBRIDLINK_API,
             "DEFAULT_UPLOAD": DEFAULT_UPLOAD,
             "DOWNLOAD_DIR": DOWNLOAD_DIR,
             "EQUAL_SPLITS": EQUAL_SPLITS,
@@ -1052,13 +1057,13 @@ async def load_config():
             "IS_TEAM_DRIVE": IS_TEAM_DRIVE,
             "JD_EMAIL": JD_EMAIL,
             "JD_PASS": JD_PASS,
-            "MEGA_EMAIL": MEGA_EMAIL,
-            "MEGA_PASS": MEGA_PASS,
             "LEECH_CHAT_ID": LEECH_CHAT_ID,
             "LEECH_FILENAME_PREFIX": LEECH_FILENAME_PREFIX,
             "LEECH_SPLIT_SIZE": LEECH_SPLIT_SIZE,
             "LOG_CHAT_ID": LOG_CHAT_ID,
             "MEDIA_GROUP": MEDIA_GROUP,
+            "MEGA_EMAIL": MEGA_EMAIL,
+            "MEGA_PASS": MEGA_PASS,
             "MIXED_LEECH": MIXED_LEECH,
             "NAME_SUBSTITUTE": NAME_SUBSTITUTE,
             "OWNER_ID": OWNER_ID,
@@ -1067,10 +1072,10 @@ async def load_config():
             "QUEUE_UPLOAD": QUEUE_UPLOAD,
             "RCLONE_FLAGS": RCLONE_FLAGS,
             "RCLONE_PATH": RCLONE_PATH,
-            "RCLONE_SERVE_URL": RCLONE_SERVE_URL,
-            "RCLONE_SERVE_USER": RCLONE_SERVE_USER,
             "RCLONE_SERVE_PASS": RCLONE_SERVE_PASS,
             "RCLONE_SERVE_PORT": RCLONE_SERVE_PORT,
+            "RCLONE_SERVE_URL": RCLONE_SERVE_URL,
+            "RCLONE_SERVE_USER": RCLONE_SERVE_USER,
             "RSS_CHAT_ID": RSS_CHAT_ID,
             "RSS_DELAY": RSS_DELAY,
             "SEARCH_API_LINK": SEARCH_API_LINK,
@@ -1081,17 +1086,17 @@ async def load_config():
             "STOP_DUPLICATE": STOP_DUPLICATE,
             "STREAMWISH_API": STREAMWISH_API,
             "SUDO_USERS": SUDO_USERS,
-            "TELEGRAM_API": TELEGRAM_API,
-            "TELEGRAM_HASH": TELEGRAM_HASH,
             "TELEGRAM_API_PREMIUM": TELEGRAM_API_PREMIUM,
+            "TELEGRAM_API": TELEGRAM_API,
             "TELEGRAM_HASH_PREMIUM": TELEGRAM_HASH_PREMIUM,
+            "TELEGRAM_HASH": TELEGRAM_HASH,
             "TORRENT_TIMEOUT": TORRENT_TIMEOUT,
-            "USER_TRANSMISSION": USER_TRANSMISSION,
-            "UPSTREAM_REPO": UPSTREAM_REPO,
             "UPSTREAM_BRANCH": UPSTREAM_BRANCH,
-            "USER_SESSION_STRING": USER_SESSION_STRING,
+            "UPSTREAM_REPO": UPSTREAM_REPO,
             "USE_SERVICE_ACCOUNTS": USE_SERVICE_ACCOUNTS,
             "USE_TELEGRAPH": USE_TELEGRAPH,
+            "USER_SESSION_STRING": USER_SESSION_STRING,
+            "USER_TRANSMISSION": USER_TRANSMISSION,
             "WEB_PINCODE": WEB_PINCODE,
             "YT_DLP_OPTIONS": YT_DLP_OPTIONS,
         }

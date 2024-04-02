@@ -792,17 +792,17 @@ def set_priority(id_):
 
 @app.route('/')
 def homepage():
-    return render_template('index.html')
+    return render_template("index.html")
 
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html')
+    return render_template("404.html")
 
 
 @app.errorhandler(Exception)
-def page_not_found(e):
-    return f"<h1>404: Torrent tidak ditemukan! <br><br>Error: {e}</h2>", 404
+def page_not_found_2(e):
+    return render_template("404.html")
 
 
 if __name__ == "__main__":
