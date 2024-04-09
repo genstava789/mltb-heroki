@@ -557,24 +557,33 @@ class TgUploader:
                 and await aiopath.exists(thumb)
             ):
                 await remove(thumb)
+            
+            # Log
             if (
-                not self._listener.isCancelled
+                config_dict["FORWARD_RESULT"]
+                and self._forwardChatId != ""
+                and not self._listener.isCancelled
                 and not self._is_corrupted
             ):
                 try:
-                    if self._forwardChatId != "":
-                        self._forwardMsg = await copyMessage(
-                            chat_id=self._forwardChatId, 
-                            from_chat_id=self._sent_msg.chat.id, 
-                            message_id=self._sent_msg.id, 
-                            message_thread_id=self._forwardThreadId,
-                            reply_to_message_id=(self._forwardMsg.id if self._forwardMsg is not None else self._listener.mid)
+                    self._forwardMsg = await copyMessage(
+                        chat_id=self._forwardChatId, 
+                        from_chat_id=self._sent_msg.chat.id, 
+                        message_id=self._sent_msg.id, 
+                        message_thread_id=self._forwardThreadId,
+                        reply_to_message_id=(
+                            self._forwardMsg.id
+                            if self._forwardMsg
+                            else self._listener.mid
                         )
-                except Exception as e:
-                    LOGGER.error(f"Failed to forward Message! ERROR: {e}")
+                    )
+
+                except Exception as error:
+                    LOGGER.error(f"Failed to forward Message! ERROR: {error}")
+
         except FloodWait as f:
             LOGGER.warning(str(f))
-            await sleep(f.value)
+            await sleep(f.value * 1.3)
         except Exception as err:
             if (
                 self._thumb is None

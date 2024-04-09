@@ -5,6 +5,20 @@ programming in Python.
 
 # Features
 
+## Free Hosting
+- Heroku
+- Render
+
+## Custom Apps Name
+- Aria2c : chrome
+- FFMPEG : opera
+- HandBrakeCLI : handbrake
+- Java : safari
+- N_m3u8DL-RE : m3u8
+- QBittorrent : nightly
+- QBittorrent-Nox : firefox
+- RClone : edge
+
 ## Custom Docker Images
 
 - arakurumi/mltb:heroku
@@ -27,24 +41,32 @@ Note : Sometimes I often change the Docker Image for testing purposes, maybe som
 
 ```
 Based on Alpine Latest with Heroku Bypass
-Include Python Packages and some cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MegaSDK, MKVToolnix, N_m3u8DL-RE (m3u8), PhantomJS, Shaka-Packager, VCSI, YT-DLP
+Include Python Packages and some cool updated Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MKVToolnix, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
 ```
 
 - arakurumi/mltb:ubuntu
 
 ```
 Based on Ubuntu 22.04 with Heroku Bypass
-Include Python Packages and some cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MegaSDK, MKVToolnix, N_m3u8DL-RE (m3u8), PhantomJS, Shaka-Packager, VCSI, YT-DLP
+Include Python Packages and some cool updated Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MKVToolnix, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
 ```
 
-## Custom Apps Name
-- Aria2c : chrome
-- FFMPEG : opera
-- HandBrakeCLI : handbrake
-- Java : safari
-- QBittorrent : nightly
-- QBittorrent-Nox : firefox
-- RClone : edge
+#### How to Delete Heroku Build Cache for Refresh Image
+- Install Plugin
+```
+heroku plugins:install heroku-builds
+```
+
+- Delete Cache
+```
+heroku builds:cache:purge -a app-name
+```
+
+- Rebuild Image
+```
+git commit --allow-empty -m "Purge cache"
+git push heroku master
+```
 
 ## qBittorrent
 

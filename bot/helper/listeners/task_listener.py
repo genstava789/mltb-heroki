@@ -320,42 +320,44 @@ class TaskListener(TaskConfig):
                 button = None
             msg += f"\n\n<b>Oleh :</b> {self.tag}"
             await sendMessage(self.message, msg, button)
-            # Log Chat
-            LOG_CHAT_ID = None
-            LOG_CHAT_THREAD_ID = None
-            if LOG_CHAT_ID := config_dict.get("LOG_CHAT_ID"):
-                if not isinstance(LOG_CHAT_ID, int):
-                    if ":" in LOG_CHAT_ID:
-                        LOG_CHAT_THREAD_ID = LOG_CHAT_ID.split(":")[1]
-                        LOG_CHAT_ID = LOG_CHAT_ID.split(":")[0]
-                        
-                if (
-                    LOG_CHAT_ID is not None
-                    and not isinstance(LOG_CHAT_ID, int)
-                    and (
-                        LOG_CHAT_ID.isdigit() 
-                        or LOG_CHAT_ID.startswith("-")
-                    )
-                ):
-                    LOG_CHAT_ID = int(LOG_CHAT_ID)
+            # Log
+            if config_dict["FORWARD_RESULT"]:
+                LOG_CHAT_ID = None
+                LOG_CHAT_THREAD_ID = None
+                if LOG_CHAT_ID := config_dict.get("LOG_CHAT_ID"):
+                    if not isinstance(LOG_CHAT_ID, int):
+                        if ":" in LOG_CHAT_ID:
+                            LOG_CHAT_THREAD_ID = LOG_CHAT_ID.split(":")[1]
+                            LOG_CHAT_ID = LOG_CHAT_ID.split(":")[0]
+                            
+                    if (
+                        LOG_CHAT_ID is not None
+                        and not isinstance(LOG_CHAT_ID, int)
+                        and (
+                            LOG_CHAT_ID.isdigit() 
+                            or LOG_CHAT_ID.startswith("-")
+                        )
+                    ):
+                        LOG_CHAT_ID = int(LOG_CHAT_ID)
 
-                if (
-                    LOG_CHAT_THREAD_ID is not None
-                    and not isinstance(LOG_CHAT_THREAD_ID, int)
-                    and LOG_CHAT_THREAD_ID.isdigit()
-                ):
-                    LOG_CHAT_THREAD_ID= int(LOG_CHAT_THREAD_ID)
-                        
-                try:
-                    await customSendMessage(
-                        client=bot,
-                        chat_id=LOG_CHAT_ID,
-                        text=msg,
-                        message_thread_id=LOG_CHAT_THREAD_ID,
-                        buttons=button
-                    )
-                except Exception as e:
-                    LOGGER.error(f"Failed to forward Message! ERROR: {e}")
+                    if (
+                        LOG_CHAT_THREAD_ID is not None
+                        and not isinstance(LOG_CHAT_THREAD_ID, int)
+                        and LOG_CHAT_THREAD_ID.isdigit()
+                    ):
+                        LOG_CHAT_THREAD_ID= int(LOG_CHAT_THREAD_ID)
+                            
+                    try:
+                        await customSendMessage(
+                            client=bot,
+                            chat_id=LOG_CHAT_ID,
+                            text=msg,
+                            message_thread_id=LOG_CHAT_THREAD_ID,
+                            buttons=button
+                        )
+
+                    except Exception as error:
+                        LOGGER.error(f"Failed to forward Message! ERROR: {error}")
         
         if self.seed:
             if self.newDir:

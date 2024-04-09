@@ -378,13 +378,16 @@ if len(YT_DLP_OPTIONS) == 0:
 SEARCH_LIMIT = environ.get("SEARCH_LIMIT", "")
 SEARCH_LIMIT = 0 if len(SEARCH_LIMIT) == 0 else int(SEARCH_LIMIT)
 
-LEECH_CHAT_ID = environ.get("LEECH_CHAT_ID", "")
-if len(LEECH_CHAT_ID) == 0:
-    LEECH_CHAT_ID = ""
+FORWARD_RESULT = environ.get("FORWARD_RESULT", "true")
+FORWARD_RESULT = FORWARD_RESULT.lower() == "true"
 
 LOG_CHAT_ID = environ.get("LOG_CHAT_ID", "")
 if len(LOG_CHAT_ID) == 0:
     LOG_CHAT_ID = ""
+
+LEECH_CHAT_ID = environ.get("LEECH_CHAT_ID", "")
+if len(LEECH_CHAT_ID) == 0:
+    LEECH_CHAT_ID = ""
 
 RSS_CHAT_ID = environ.get("RSS_CHAT_ID", "")
 if len(RSS_CHAT_ID) == 0:
@@ -490,7 +493,12 @@ if len(UPSTREAM_BRANCH) == 0:
 
 RCLONE_SERVE_URL = environ.get("RCLONE_SERVE_URL", "").rstrip("/")
 if len(RCLONE_SERVE_URL) == 0:
-    RCLONE_SERVE_URL = ""
+    if len(BASE_URL) == 0:
+        RCLONE_SERVE_URL = ""
+    else:
+        RCLONE_SERVE_URL = BASE_URL
+
+RCLONE_SERVE_URL = RCLONE_SERVE_URL.rstrip("/")
 
 RCLONE_SERVE_PORT = environ.get("RCLONE_SERVE_PORT", "")
 RCLONE_SERVE_PORT = 8080 if len(
@@ -525,6 +533,7 @@ config_dict = {
     "EQUAL_SPLITS": EQUAL_SPLITS,
     "EXTENSION_FILTER": EXTENSION_FILTER,
     "FILELION_API": FILELION_API,
+    "FORWARD_RESULT": FORWARD_RESULT,
     "GDRIVE_ID": GDRIVE_ID,
     "INCOMPLETE_TASK_NOTIFIER": INCOMPLETE_TASK_NOTIFIER,
     "INDEX_URL": INDEX_URL,
@@ -604,7 +613,7 @@ log_info("Set up Web Server...")
 Popen(
     f"gunicorn web.wserver:app --bind 0.0.0.0:{BASE_URL_PORT} --worker-class gevent", 
     shell=True
-    )
+)
 
 log_info("Set up Service Accounts...")
 if ospath.exists("accounts.zip"):

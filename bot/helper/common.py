@@ -228,7 +228,7 @@ class TaskConfig:
                 if self.isClone:
                     if not is_rclone_path(self.link):
                         raise ValueError(
-                            "<b>Kamu tidak bisa clone dari tipe tools yang berbeda!</b>"
+                            "<b>Kamu harus menggunakan tipe tools yang sama untuk Clone</b>"
                         )
                     config_path = self.getConfigPath(self.link)
                 else:
@@ -240,7 +240,7 @@ class TaskConfig:
                 if self.isClone:
                     if not is_gdrive_link(self.link):
                         raise ValueError(
-                            "<b>Kamu tidak bisa clone dari tipe tools yang berbeda!</b>"
+                            "<b>Kamu harus menggunakan tipe tools yang sama untuk Clone!</b>"
                         )
                     token_path = self.getTokenPath(self.link)
                 else:
@@ -252,11 +252,11 @@ class TaskConfig:
                 if is_gdrive_link(self.link) and self.getTokenPath(
                     self.link
                 ) != self.getTokenPath(self.upDest):
-                    raise ValueError("<b>Kamu harus menggunakan token yang sama untuk clone!</b>")
+                    raise ValueError("<b>Kamu harus menggunakan token yang sama untuk Clone!</b>")
                 elif is_rclone_path(self.link) and self.getConfigPath(
                     self.link
                 ) != self.getConfigPath(self.upDest):
-                    raise ValueError("<b>Kamu harus menggunakan config yang sama untuk clone!</b>")
+                    raise ValueError("<b>Kamu harus menggunakan config yang sama untuk Clone!</b>")
         else:
             self.upDest = (
                 self.upDest

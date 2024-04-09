@@ -92,11 +92,8 @@ class JDownloaderStatus:
 
     def status(self):
         async_to_sync(self._update)
-        state = self._info.get("status", "paused")
-        if state == "paused":
-            return MirrorStatus.STATUS_PAUSED
-        else:
-            return state
+        state = self._info.get("status", "jdlimit")
+        return MirrorStatus.STATUS_QUEUEDL if state == "jdlimit" else state
 
     def task(self):
         return self

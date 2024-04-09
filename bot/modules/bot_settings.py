@@ -364,6 +364,7 @@ async def sync_jdownloader():
         if not is_connected:
             LOGGER.error(jdownloader.error)
             return
+    jdownloader.boot()
     await jdownloader.connectToDevice()
     await (
         await create_subprocess_exec("7z", "a", "cfg.zip", "/JDownloader/cfg")
@@ -874,15 +875,18 @@ async def load_config():
     SEARCH_LIMIT = environ.get("SEARCH_LIMIT", "")
     SEARCH_LIMIT = 0 if len(SEARCH_LIMIT) == 0 else int(SEARCH_LIMIT)
 
-    LEECH_CHAT_ID = environ.get("LEECH_CHAT_ID", "")
-    LEECH_CHAT_ID = "" if len(LEECH_CHAT_ID) == 0 else LEECH_CHAT_ID
-    if LEECH_CHAT_ID.isdigit() or (LEECH_CHAT_ID.startswith("-") and ":" not in LEECH_CHAT_ID):
-        LEECH_CHAT_ID = int(LEECH_CHAT_ID)
+    FORWARD_RESULT = environ.get("FORWARD_RESULT", "true")
+    FORWARD_RESULT = FORWARD_RESULT.lower() == "true"
 
     LOG_CHAT_ID = environ.get("LOG_CHAT_ID", "")
     LOG_CHAT_ID = "" if len(LOG_CHAT_ID) == 0 else LOG_CHAT_ID
     if LOG_CHAT_ID.isdigit() or (LOG_CHAT_ID.startswith("-") and ":" not in LOG_CHAT_ID):
         LOG_CHAT_ID = int(LOG_CHAT_ID)
+
+    LEECH_CHAT_ID = environ.get("LEECH_CHAT_ID", "")
+    LEECH_CHAT_ID = "" if len(LEECH_CHAT_ID) == 0 else LEECH_CHAT_ID
+    if LEECH_CHAT_ID.isdigit() or (LEECH_CHAT_ID.startswith("-") and ":" not in LEECH_CHAT_ID):
+        LEECH_CHAT_ID = int(LEECH_CHAT_ID)
 
     RSS_CHAT_ID= environ.get("RSS_CHAT_ID", "")
     RSS_CHAT_ID = "" if len(RSS_CHAT_ID) == 0 else RSS_CHAT_ID
@@ -976,9 +980,40 @@ async def load_config():
     BASE_URL_PORT = environ.get("BASE_URL_PORT", "")
     BASE_URL_PORT = 80 if len(BASE_URL_PORT) == 0 else int(BASE_URL_PORT)
 
+    BASE_URL = environ.get("BASE_URL", "")
+    HEROKU_APP_NAME = environ.get("HEROKU_APP_NAME", "")
+    RENDER_APP_NAME = environ.get("RENDER_APP_NAME", "")
+    if len(BASE_URL) == 0:
+        if len(HEROKU_APP_NAME) != 0:
+            if "://" in HEROKU_APP_NAME:
+                BASE_URL = HEROKU_APP_NAME
+            else:
+                BASE_URL = f"https://{HEROKU_APP_NAME}.herokuapp.com"
+            
+        elif len(RENDER_APP_NAME) != 0:            
+            if "://" in RENDER_APP_NAME:
+                BASE_URL = RENDER_APP_NAME
+            else:
+                BASE_URL = f"https://{RENDER_APP_NAME}.onrender.com"
+            
+        else:
+            BASE_URL = ""
+
+    BASE_URL = BASE_URL.rstrip("/")
+    
+    if len(BASE_URL) != 0:
+        await create_subprocess_shell(
+            f"gunicorn web.wserver:app --bind 0.0.0.0:{BASE_URL_PORT} --worker-class gevent"
+        )
+
     RCLONE_SERVE_URL = environ.get("RCLONE_SERVE_URL", "")
     if len(RCLONE_SERVE_URL) == 0:
-        RCLONE_SERVE_URL = ""
+        if len(BASE_URL) == 0:
+            RCLONE_SERVE_URL = ""
+        else:
+            RCLONE_SERVE_URL = BASE_URL
+    
+    RCLONE_SERVE_URL = RCLONE_SERVE_URL.rstrip("/")
 
     RCLONE_SERVE_PORT = environ.get("RCLONE_SERVE_PORT", "")
     RCLONE_SERVE_PORT = 8080 if len(RCLONE_SERVE_PORT) == 0 else int(RCLONE_SERVE_PORT)
@@ -998,13 +1033,6 @@ async def load_config():
     MIXED_LEECH = MIXED_LEECH.lower() == "true" and IS_PREMIUM_USER
 
     await (await create_subprocess_exec("pkill", "-9", "-f", "gunicorn")).wait()
-    BASE_URL = environ.get("BASE_URL", "").rstrip("/")
-    if len(BASE_URL) == 0:
-        BASE_URL = ""
-    else:
-        await create_subprocess_shell(
-            f"gunicorn web.wserver:app --bind 0.0.0.0:{BASE_URL_PORT} --worker-class gevent"
-        )
 
     UPSTREAM_REPO = environ.get("UPSTREAM_REPO", "")
     if len(UPSTREAM_REPO) == 0:
@@ -1035,72 +1063,71 @@ async def load_config():
                 else:
                     INDEX_URLS.append("")
 
-    config_dict.update(
-        {
-            "ALLDEBRID_API": ALLDEBRID_API,
-            "AS_DOCUMENT": AS_DOCUMENT,
-            "AUTHORIZED_CHATS": AUTHORIZED_CHATS,
-            "BASE_URL_PORT": BASE_URL_PORT,
-            "BASE_URL": BASE_URL,
-            "BOT_TOKEN": BOT_TOKEN,
-            "CMD_SUFFIX": CMD_SUFFIX,
-            "DATABASE_URL": DATABASE_URL,
-            "DEBRIDLINK_API": DEBRIDLINK_API,
-            "DEFAULT_UPLOAD": DEFAULT_UPLOAD,
-            "DOWNLOAD_DIR": DOWNLOAD_DIR,
-            "EQUAL_SPLITS": EQUAL_SPLITS,
-            "EXTENSION_FILTER": EXTENSION_FILTER,
-            "FILELION_API": FILELION_API,
-            "GDRIVE_ID": GDRIVE_ID,
-            "INCOMPLETE_TASK_NOTIFIER": INCOMPLETE_TASK_NOTIFIER,
-            "INDEX_URL": INDEX_URL,
-            "IS_TEAM_DRIVE": IS_TEAM_DRIVE,
-            "JD_EMAIL": JD_EMAIL,
-            "JD_PASS": JD_PASS,
-            "LEECH_CHAT_ID": LEECH_CHAT_ID,
-            "LEECH_FILENAME_PREFIX": LEECH_FILENAME_PREFIX,
-            "LEECH_SPLIT_SIZE": LEECH_SPLIT_SIZE,
-            "LOG_CHAT_ID": LOG_CHAT_ID,
-            "MEDIA_GROUP": MEDIA_GROUP,
-            "MEGA_EMAIL": MEGA_EMAIL,
-            "MEGA_PASS": MEGA_PASS,
-            "MIXED_LEECH": MIXED_LEECH,
-            "NAME_SUBSTITUTE": NAME_SUBSTITUTE,
-            "OWNER_ID": OWNER_ID,
-            "QUEUE_ALL": QUEUE_ALL,
-            "QUEUE_DOWNLOAD": QUEUE_DOWNLOAD,
-            "QUEUE_UPLOAD": QUEUE_UPLOAD,
-            "RCLONE_FLAGS": RCLONE_FLAGS,
-            "RCLONE_PATH": RCLONE_PATH,
-            "RCLONE_SERVE_PASS": RCLONE_SERVE_PASS,
-            "RCLONE_SERVE_PORT": RCLONE_SERVE_PORT,
-            "RCLONE_SERVE_URL": RCLONE_SERVE_URL,
-            "RCLONE_SERVE_USER": RCLONE_SERVE_USER,
-            "RSS_CHAT_ID": RSS_CHAT_ID,
-            "RSS_DELAY": RSS_DELAY,
-            "SEARCH_API_LINK": SEARCH_API_LINK,
-            "SEARCH_LIMIT": SEARCH_LIMIT,
-            "SEARCH_PLUGINS": SEARCH_PLUGINS,
-            "STATUS_LIMIT": STATUS_LIMIT,
-            "STATUS_UPDATE_INTERVAL": STATUS_UPDATE_INTERVAL,
-            "STOP_DUPLICATE": STOP_DUPLICATE,
-            "STREAMWISH_API": STREAMWISH_API,
-            "SUDO_USERS": SUDO_USERS,
-            "TELEGRAM_API_PREMIUM": TELEGRAM_API_PREMIUM,
-            "TELEGRAM_API": TELEGRAM_API,
-            "TELEGRAM_HASH_PREMIUM": TELEGRAM_HASH_PREMIUM,
-            "TELEGRAM_HASH": TELEGRAM_HASH,
-            "TORRENT_TIMEOUT": TORRENT_TIMEOUT,
-            "UPSTREAM_BRANCH": UPSTREAM_BRANCH,
-            "UPSTREAM_REPO": UPSTREAM_REPO,
-            "USE_SERVICE_ACCOUNTS": USE_SERVICE_ACCOUNTS,
-            "USE_TELEGRAPH": USE_TELEGRAPH,
-            "USER_SESSION_STRING": USER_SESSION_STRING,
-            "USER_TRANSMISSION": USER_TRANSMISSION,
-            "WEB_PINCODE": WEB_PINCODE,
-            "YT_DLP_OPTIONS": YT_DLP_OPTIONS,
-        }
-    )
+    config_dict.update({
+        "ALLDEBRID_API": ALLDEBRID_API,
+        "AS_DOCUMENT": AS_DOCUMENT,
+        "AUTHORIZED_CHATS": AUTHORIZED_CHATS,
+        "BASE_URL_PORT": BASE_URL_PORT,
+        "BASE_URL": BASE_URL,
+        "BOT_TOKEN": BOT_TOKEN,
+        "CMD_SUFFIX": CMD_SUFFIX,
+        "DATABASE_URL": DATABASE_URL,
+        "DEBRIDLINK_API": DEBRIDLINK_API,
+        "DEFAULT_UPLOAD": DEFAULT_UPLOAD,
+        "DOWNLOAD_DIR": DOWNLOAD_DIR,
+        "EQUAL_SPLITS": EQUAL_SPLITS,
+        "EXTENSION_FILTER": EXTENSION_FILTER,
+        "FILELION_API": FILELION_API,
+        "FORWARD_RESULT": FORWARD_RESULT,
+        "GDRIVE_ID": GDRIVE_ID,
+        "INCOMPLETE_TASK_NOTIFIER": INCOMPLETE_TASK_NOTIFIER,
+        "INDEX_URL": INDEX_URL,
+        "IS_TEAM_DRIVE": IS_TEAM_DRIVE,
+        "JD_EMAIL": JD_EMAIL,
+        "JD_PASS": JD_PASS,
+        "LEECH_CHAT_ID": LEECH_CHAT_ID,
+        "LEECH_FILENAME_PREFIX": LEECH_FILENAME_PREFIX,
+        "LEECH_SPLIT_SIZE": LEECH_SPLIT_SIZE,
+        "LOG_CHAT_ID": LOG_CHAT_ID,
+        "MEDIA_GROUP": MEDIA_GROUP,
+        "MEGA_EMAIL": MEGA_EMAIL,
+        "MEGA_PASS": MEGA_PASS,
+        "MIXED_LEECH": MIXED_LEECH,
+        "NAME_SUBSTITUTE": NAME_SUBSTITUTE,
+        "OWNER_ID": OWNER_ID,
+        "QUEUE_ALL": QUEUE_ALL,
+        "QUEUE_DOWNLOAD": QUEUE_DOWNLOAD,
+        "QUEUE_UPLOAD": QUEUE_UPLOAD,
+        "RCLONE_FLAGS": RCLONE_FLAGS,
+        "RCLONE_PATH": RCLONE_PATH,
+        "RCLONE_SERVE_PASS": RCLONE_SERVE_PASS,
+        "RCLONE_SERVE_PORT": RCLONE_SERVE_PORT,
+        "RCLONE_SERVE_URL": RCLONE_SERVE_URL,
+        "RCLONE_SERVE_USER": RCLONE_SERVE_USER,
+        "RSS_CHAT_ID": RSS_CHAT_ID,
+        "RSS_DELAY": RSS_DELAY,
+        "SEARCH_API_LINK": SEARCH_API_LINK,
+        "SEARCH_LIMIT": SEARCH_LIMIT,
+        "SEARCH_PLUGINS": SEARCH_PLUGINS,
+        "STATUS_LIMIT": STATUS_LIMIT,
+        "STATUS_UPDATE_INTERVAL": STATUS_UPDATE_INTERVAL,
+        "STOP_DUPLICATE": STOP_DUPLICATE,
+        "STREAMWISH_API": STREAMWISH_API,
+        "SUDO_USERS": SUDO_USERS,
+        "TELEGRAM_API_PREMIUM": TELEGRAM_API_PREMIUM,
+        "TELEGRAM_API": TELEGRAM_API,
+        "TELEGRAM_HASH_PREMIUM": TELEGRAM_HASH_PREMIUM,
+        "TELEGRAM_HASH": TELEGRAM_HASH,
+        "TORRENT_TIMEOUT": TORRENT_TIMEOUT,
+        "UPSTREAM_BRANCH": UPSTREAM_BRANCH,
+        "UPSTREAM_REPO": UPSTREAM_REPO,
+        "USE_SERVICE_ACCOUNTS": USE_SERVICE_ACCOUNTS,
+        "USE_TELEGRAPH": USE_TELEGRAPH,
+        "USER_SESSION_STRING": USER_SESSION_STRING,
+        "USER_TRANSMISSION": USER_TRANSMISSION,
+        "WEB_PINCODE": WEB_PINCODE,
+        "YT_DLP_OPTIONS": YT_DLP_OPTIONS,
+    })
 
     if DATABASE_URL:
         await DbManager().update_config(config_dict)
