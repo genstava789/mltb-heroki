@@ -89,7 +89,7 @@ git push heroku master
 - Thumbnail (user and task option)
 - Leech filename prefix (user option)
 - Set upload as a document or as media (global and user option)
-- Upload all files to a specific superGroup/channel (global, user, and task option)
+- Upload all files to a specific chat (superGroup/channel/private) (global, user, and task option)
 - Equal split size settings (global and user option)
 - Ability to leech split file parts in a media group (global and user option)
 - Download restricted messages (document or link) by tg private/public/super links (task option)
