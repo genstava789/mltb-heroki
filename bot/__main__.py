@@ -118,18 +118,18 @@ async def stats(_, message):
 <b>Total Unggah :</b> <code>{get_readable_file_size(network.bytes_sent)}</code>
 
 <b>Versi</b>
-<b>Aria2c       :</b> <code>v{Version.ar}</code>
-<b>FFMPEG       :</b> <code>v{Version.ff}</code>
-<b>Google       :</b> <code>v{Version.ga}</code>
-<b>Java         :</b> <code>v{Version.jv}</code>
-<b>MegaSDK      :</b> <code>v{Version.mg}</code>
-<b>MyJD         :</b> <code>v{Version.jd}</code>
-<b>P7Zip        :</b> <code>v{Version.p7}</code> 
-<b>Pyro         :</b> <code>v{Version.pr}</code>
-<b>Python       :</b> <code>v{Version.py}</code>
+<b>Aria2c       :</b> <code>{Version.ar}</code>
+<b>FFMPEG       :</b> <code>{Version.ff}</code>
+<b>Google       :</b> <code>{Version.ga}</code>
+<b>Java         :</b> <code>{Version.jv}</code>
+<b>MegaSDK      :</b> <code>{Version.mg}</code>
+<b>MyJD         :</b> <code>{Version.jd}</code>
+<b>P7Zip        :</b> <code>{Version.p7}</code> 
+<b>Pyro         :</b> <code>{Version.pr}</code>
+<b>Python       :</b> <code>{Version.py}</code>
 <b>Qbittorrent  :</b> <code>{Version.qb}</code>
 <b>Rclone       :</b> <code>{Version.rc}</code>
-<b>YT-DLP       :</b> <code>v{Version.yt}</code>
+<b>YT-DLP       :</b> <code>{Version.yt}</code>
 
 <b>Lainnya</b>
 <b>Bot DC       :</b> <code>{bot.me.dc_id} ({DC_ID.get(bot.me.dc_id)})</code>

@@ -80,13 +80,12 @@ class Version:
     rc = ""
     yt = ""
 
-# Version Check
 try:
     Version.ar = check_output(["chrome --v"], shell=True).decode().split("\n")[0].split(" ")[2]
 except Exception as e:
     LOGGER.warning(f"Failed to get Aria2c version! ERROR: {e}")
 try:
-    Version.ff = check_output(["opera -version | grep 'ffmpeg version' | sed -e 's/ffmpeg version //' -e 's/[^0-9.].*//'"], shell=True).decode().replace("\n", "")
+    Version.ff = check_output(["opera -version | grep 'ffmpeg version' | sed -e 's/ffmpeg version //'"], shell=True).decode().split(" ", 1)[0].replace("\n", "") # -e 's/[^0-9.].*//'
 except Exception as e:
     LOGGER.warning(f"Failed to get FFMPEG version! ERROR: {e}")
 try:
@@ -112,11 +111,11 @@ try:
 except Exception as e:
     LOGGER.warning(f"Failed to get Python version! ERROR: {e}")
 try:
-    Version.qb = check_output(["firefox --version"], shell=True).decode().split(" ", 1)[1].replace("\n", "")
+    Version.qb = check_output(["firefox --version"], shell=True).decode().split(" ", 1)[1].replace("\n", "").replace("v", "")
 except Exception as e:
     LOGGER.warning(f"Failed to get QBittorrent version! ERROR: {e}")
 try:
-    Version.rc = check_output(["edge --version"], shell=True).decode().split("\n")[0].split(" ")[1]
+    Version.rc = check_output(["edge --version"], shell=True).decode().split("\n")[0].split(" ")[1].replace("v", "")
 except Exception as e:
     LOGGER.warning(f"Failed to get RClone version! ERROR: {e}")
 try:
