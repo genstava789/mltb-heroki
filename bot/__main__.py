@@ -307,13 +307,14 @@ async def restart_notification():
 
     async def send_incompelete_task_message(cid, msg):
         try:
-            if msg.startswith('<b>Bot berhasil dimulai ulang!</b>'):
+            if msg.startswith("<b>Bot berhasil dimulai ulang!</b>"):
                 await bot.edit_message_text(
                     chat_id=chat_id, 
                     message_id=msg_id, 
                     text=msg
                 )
                 await remove(".restartmsg")
+
             else:
                 await bot.send_message(
                     chat_id=cid, 
@@ -322,48 +323,53 @@ async def restart_notification():
                     disable_notification=True,
                     message_thread_id=thread_id,
                 )
-        except Exception as e:
-            LOGGER.error(e)
+
+        except Exception as error:
+            LOGGER.error(error)
 
     now = datetime.now(timezone("Asia/Jakarta"))
     if INCOMPLETE_TASK_NOTIFIER and DATABASE_URL:
         if notifier_dict := await DbManager().get_incomplete_tasks():
             for cid, data in notifier_dict.items():
-                msg = f"""
-{'<b>Bot berhasil dimulai ulang!</b>' if cid == chat_id else '<b>Bot dimulai ulang!</b>'}
-<pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
-<b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
-<b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
-</pre>           
-"""
+                msg = (
+                    "<b>Bot berhasil dimulai ulang!</b>"
+                    if cid == chat_id
+                    else "<b>Bot dimulai ulang!</b>"
+                )
+                msg += f"\n<pre languange='bash'><b>Jam     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>"
+                msg += f"\n<b>Hari    :</b> <code>{now.strftime('%A')}</code>"
+                msg += f"\n<b>Tanggal :</b> <code>{now.strftime('%d %B %Y')}</code></pre>"
+
                 if data.items():
                     msg += "<b>Tugas yang belum selesai :</b>"
+
                 for tag, links in data.items():
                     msg += f"\n{tag} :"
                     for index, link in enumerate(links, start=1):
                         msg += f"\n <a href='{link}'>Tugas ke {index}</a>"
                         if len(msg.encode()) > 4000:
                             await send_incompelete_task_message(cid, msg)
-                            msg = ''
+                            msg = ""
+
                 if msg:
                     await send_incompelete_task_message(cid, msg)
 
     if await aiopath.isfile(".restartmsg"):
         try:
-            msg = f"""
-<b>Bot berhasil dimulai ulang!</b>
-<pre languange="bash"><b>Hari      :</b> <code>{now.strftime('%A')}</code>
-<b>Tanggal   :</b> <code>{now.strftime('%d %B %Y')}</code>
-<b>Waktu     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>
-</pre>           
-"""
+            msg = "<b>Bot berhasil dimulai ulang!</b>"
+            msg += f"\n<pre languange='bash'><b>Jam     :</b> <code>{now.strftime('%H:%M:%S WIB')}</code>"
+            msg += f"\n<b>Hari    :</b> <code>{now.strftime('%A')}</code>"
+            msg += f"\n<b>Tanggal :</b> <code>{now.strftime('%d %B %Y')}</code></pre>"
+            
             await bot.edit_message_text(
                 chat_id=chat_id, 
                 message_id=msg_id, 
                 text=msg
             )
-        except:
-            pass
+
+        except Exception as error:
+            LOGGER.error(error)
+
         await remove(".restartmsg")
 
 

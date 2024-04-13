@@ -224,10 +224,10 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
                    
         if task.listener.isPrivateChat: 
             msg += "\n<b>├ UID :</b> <code>PRIVATE</code>"
-            msg += "\n<b>├ User :</b> <code>PRIVATE</code>" 
+            msg += "\n<b>├ UName :</b> <code>PRIVATE</code>" 
         else:
             msg += f"\n<b>├ UID :</b> <code>{task.listener.userId}</code>"
-            msg += f"\n<b>├ User :</b> <code>{task.listener.user.first_name} {(task.listener.user.last_name or '')}</code>"
+            msg += f"\n<b>├ UName :</b> <code>{task.listener.user.first_name} {(task.listener.user.last_name or '')}</code>"
 
         gid = task.gid()
         msg += f"\n├<code>/{BotCommands.CancelTaskCommand[1]} {gid}</code>"
