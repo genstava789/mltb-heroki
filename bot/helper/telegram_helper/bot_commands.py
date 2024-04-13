@@ -7,13 +7,11 @@ class _BotCommands:
         self.MirrorCommand = [f"mirror{CMD_SUFFIX}", f"m{CMD_SUFFIX}"]
         self.QbMirrorCommand = [f"qbmirror{CMD_SUFFIX}", f"qm{CMD_SUFFIX}"]
         self.JdMirrorCommand = [f"jdmirror{CMD_SUFFIX}", f"jm{CMD_SUFFIX}"]
-        self.YtdlCommand = [
-            f"ytdl{CMD_SUFFIX}", f"y{CMD_SUFFIX}", f"watch{CMD_SUFFIX}", f"w{CMD_SUFFIX}"]
+        self.YtdlCommand = [f"ytdl{CMD_SUFFIX}", f"y{CMD_SUFFIX}", f"watch{CMD_SUFFIX}", f"w{CMD_SUFFIX}"]
         self.LeechCommand = [f"leech{CMD_SUFFIX}", f"l{CMD_SUFFIX}"]
         self.QbLeechCommand = [f"qbleech{CMD_SUFFIX}", f"ql{CMD_SUFFIX}"]
         self.JdLeechCommand = [f"jdleech{CMD_SUFFIX}", f"jl{CMD_SUFFIX}"]
-        self.YtdlLeechCommand = [
-            f"ytdlleech{CMD_SUFFIX}", f"yl{CMD_SUFFIX}", f"watchleech{CMD_SUFFIX}", f"wl{CMD_SUFFIX}"]
+        self.YtdlLeechCommand = [f"ytdlleech{CMD_SUFFIX}", f"yl{CMD_SUFFIX}", f"watchleech{CMD_SUFFIX}", f"wl{CMD_SUFFIX}"]
         self.CloneCommand = [f"clone{CMD_SUFFIX}", f"cl{CMD_SUFFIX}"]
         self.CountCommand = [f"count{CMD_SUFFIX}", f"co{CMD_SUFFIX}"]
         self.DeleteCommand = [f"delete{CMD_SUFFIX}", f"del{CMD_SUFFIX}"]
@@ -23,10 +21,9 @@ class _BotCommands:
         self.ListCommand = [f"list{CMD_SUFFIX}", f"li{CMD_SUFFIX}"]
         self.SearchCommand = [f"search{CMD_SUFFIX}", f"se{CMD_SUFFIX}"]
         self.StatusCommand = [f"status{CMD_SUFFIX}", f"sta{CMD_SUFFIX}"]
-        self.UsersCommand = [f"users{CMD_SUFFIX}", f"us{CMD_SUFFIX}"]
+        self.UsersCommand = [f"user{CMD_SUFFIX}", f"us{CMD_SUFFIX}"]
         self.AuthorizeCommand = [f"authorize{CMD_SUFFIX}", f"au{CMD_SUFFIX}"]
-        self.UnAuthorizeCommand = [
-            f"unauthorize{CMD_SUFFIX}", f"ua{CMD_SUFFIX}"]
+        self.UnAuthorizeCommand = [f"unauthorize{CMD_SUFFIX}", f"ua{CMD_SUFFIX}"]
         self.AddSudoCommand = [f"addsudo{CMD_SUFFIX}", f"as{CMD_SUFFIX}"]
         self.RmSudoCommand = [f"rmsudo{CMD_SUFFIX}", f"rs{CMD_SUFFIX}"]
         self.PingCommand = [f"ping{CMD_SUFFIX}", f"p{CMD_SUFFIX}"]
@@ -39,8 +36,8 @@ class _BotCommands:
         self.ExecCommand = [f"exec{CMD_SUFFIX}", f"ex{CMD_SUFFIX}"]
         self.AExecCommand = [f"aexec{CMD_SUFFIX}", f"aex{CMD_SUFFIX}"]
         self.ClearLocalsCommand = [f"clearlocal{CMD_SUFFIX}", f"clo{CMD_SUFFIX}"]
-        self.BotSetCommand = [f"bsetting{CMD_SUFFIX}", f"bset{CMD_SUFFIX}", f"bs{CMD_SUFFIX}"]
-        self.UserSetCommand = [f"usetting{CMD_SUFFIX}", f"uset{CMD_SUFFIX}", f"us{CMD_SUFFIX}"]
+        self.BotSetCommand = [f"botsetting{CMD_SUFFIX}", f"bset{CMD_SUFFIX}", f"bs{CMD_SUFFIX}"]
+        self.UserSetCommand = [f"usersetting{CMD_SUFFIX}", f"uset{CMD_SUFFIX}", f"us{CMD_SUFFIX}"]
         self.BtSelectCommand = [f"btsel{CMD_SUFFIX}", f"bts{CMD_SUFFIX}"]
         self.RssCommand = f"rss{CMD_SUFFIX}"
 

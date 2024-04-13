@@ -15,11 +15,12 @@ from urllib3.util.retry import Retry
 from uuid import uuid4
 
 from bot import config_dict
+from bot.helper.ext_utils.bot_utils import async_to_sync, get_content_type
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.help_messages import PASSWORD_ERROR_MESSAGE
-from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.ext_utils.links_utils import is_share_link
 from bot.helper.ext_utils.status_utils import speed_string_to_bytes, get_readable_time
+from bot.helper.telegram_helper.bot_commands import BotCommands
 
 
 userAgent = (
@@ -825,27 +826,11 @@ def osdn(url):
         return f"https://osdn.net{direct_link[0]}"
 
 
-# def yandex_disk(url: str) -> str:
-#     """Yandex.Disk direct link generator
-#     Based on https://github.com/wldhx/yadisk-direct"""
-#     try:
-#         link = findall(r"\b(https?://(yadi\.sk|disk\.yandex\.(com|ru))\S+)", url)[0][0]
-#     except IndexError:
-#         return "ERROR: Link File tidak ditemukan!"
-#     api = "https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key={}"
-#     try:
-#         return get(api.format(link)).json()["href"]
-#     except KeyError as e:
-#         raise DirectDownloadLinkException(
-#             "ERROR: Link File tidak ditemukan!"
-#         ) from e
-
-
 def github(url):
     try:
         findall(r"\bhttps?://.*github\.com.*releases\S+", url)[0]
     except IndexError:
-        raise DirectDownloadLinkException("Link Github Release tidak ditemukan!")
+        raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
     with create_scraper() as session:
         _res = session.get(url, stream=True, allow_redirects=False)
         if "location" in _res.headers:
@@ -855,7 +840,7 @@ def github(url):
 
 def hxfile(url):
     if not ospath.isfile("hxfile.txt"):
-        raise DirectDownloadLinkException("ERROR: hxfile.txt (cookies) Not Found!")
+        raise DirectDownloadLinkException("ERROR: Cookies (hxfile.txt) tidak ditemukan!")
     try:
         jar = MozillaCookieJar()
         jar.load("hxfile.txt")
@@ -1129,16 +1114,29 @@ def terabox(url):
                     if not details["title"]:
                         details["title"] = content["server_filename"]
                     folderPath = details["title"]
+
+                direct_link = content["dlink"].replace("https://d.1024tera.com", "https://d4.1024tera.com")
+
+                content_type = async_to_sync(get_content_type, direct_link)
+
+                if (
+                    content_type is None
+                    or match(r"text/html|text/plain|text/json", content_type)
+                ):
+                    direct_link = content["dlink"]
+                
                 item = {
-                    "url": content["dlink"].replace("https://d.1024tera.com", "https://d4.1024tera.com"),
+                    "url": direct_link,
                     "filename": content["server_filename"],
                     "path": ospath.join(folderPath),
                 }
+
                 if "size" in content:
                     size = content["size"]
                     if isinstance(size, str) and size.isdigit():
                         size = float(size)
                     details["total_size"] += size
+
                 details["contents"].append(item)
 
     with Session() as session:
@@ -1157,8 +1155,10 @@ def terabox(url):
             __fetch_links(session)
         except Exception as e:
             raise DirectDownloadLinkException (f"ERROR: {e}")
+        
     if len(details["contents"]) == 1:
-        return details["contents"][0]["url"].replace("https://d.1024tera.com", "https://d4.1024tera.com")
+        return details["contents"][0]["url"]
+    
     return details
 
 
@@ -2031,7 +2031,6 @@ def pcloud(url):
     raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
 
 
-# Added from other repositories
 # Untested
 def androiddatahost(url: str):
     with create_scraper() as session:
