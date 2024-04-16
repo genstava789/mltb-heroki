@@ -29,12 +29,14 @@ async def cancel_task(_, message):
             if task is None:
                 await sendMessage(message, f"<b>Tugas dengan GID</b> <code>{gid}</code> <b>tidak ditemukan!</b>")
                 return
+    
     elif reply_to_id := message.reply_to_message_id:
         async with task_dict_lock:
             task = task_dict.get(reply_to_id)
         if task is None:
             await sendMessage(message, "<b>Bukan Tugas Aktif!</b>")
             return
+    
     elif len(msg) == 1:
         msg = (
         "<b>Balas ke pesan perintah saat digunakan untuk memulai Tugas</b>" \
@@ -42,6 +44,7 @@ async def cancel_task(_, message):
         )
         await sendMessage(message, msg)
         return
+    
     if (
         OWNER_ID != user_id
         and task.listener.userId != user_id
@@ -49,6 +52,7 @@ async def cancel_task(_, message):
     ):
         await sendMessage(message, "<b>Bukan Tugas darimu!</b>")
         return
+    
     obj = task.task()
     await obj.cancel_task()
 
@@ -131,20 +135,26 @@ async def cancel_all_update(_, query):
     isSudo = await CustomFilters.sudo("", query)
     if not isSudo and userId and userId != query.from_user.id:
         await query.answer("Bukan tugas darimu!", show_alert=True)
+    
     else:
         await query.answer()
+    
     if data[1] == "close":
         await deleteMessage(reply_to)
         await deleteMessage(message)
+    
     elif data[1] == "back":
         button = create_cancel_buttons(isSudo, userId)
         await editMessage(message, "<b>Pilih jenis Tugas yang ingin dibatalkan :</b>", button)
+    
     elif data[1] == "bot":
         button = create_cancel_buttons(isSudo, "")
         await editMessage(message, "<b>Pilih jenis Tugas yang ingin dibatalkan :</b>", button)
+    
     elif data[1] == "user":
         button = create_cancel_buttons(isSudo, query.from_user.id)
         await editMessage(message, "<b>Pilih jenis Tugas yang ingin dibatalkan :</b>", button)
+    
     elif data[1] == "ms":
         buttons = button_build.ButtonMaker()
         buttons.ibutton("Yes!", f"canall {data[2]} confirm {userId}")
@@ -154,6 +164,7 @@ async def cancel_all_update(_, query):
         await editMessage(
             message, f"<b>Apa kamu yakin ingin membatalkan semua Tugas</b> <code>{data[2]}</code><b>?</b>", button
         )
+    
     else:
         button = create_cancel_buttons(isSudo, userId)
         await editMessage(message, "<b>Pilih jenis Tugas yang ingin dibatalkan :</b>", button)

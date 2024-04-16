@@ -185,7 +185,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
             else task.progress()
         )
 
-        msg += f"\n<b>┌┤{get_progress_bar_string(progress)} <code>{progress}</code>├┐</b>"
+        msg += f"\n<b>┌┤{get_progress_bar_string(progress)}</b> <code>{progress}</code>"
 
         if task.listener.isSuperChat:
             msg += f"\n<b>├ Status :</b> <a href='{task.listener.message.link}'>{tstatus}</a>"
@@ -200,7 +200,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
             MirrorStatus.STATUS_CONVERTING,
             MirrorStatus.STATUS_QUEUEUP,
         ]:
-            msg += f"\n<b>├ Proses :</b> <code>{task.processed_bytes()}</code> dari <code>{task.size()}</code>"
+            msg += f"\n<b>├ Proses :</b> <code>{task.processed_bytes()}</code> | <code>{task.size()}</code>"
             msg += f"\n<b>├ Perkiraan :</b> <code>{task.eta()}</code>"
             msg += f"\n<b>├ Kecepatan :</b> <code>{task.speed()}</code>"
 

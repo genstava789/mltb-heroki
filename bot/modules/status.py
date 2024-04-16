@@ -74,6 +74,7 @@ async def status_pages(_, query):
     if data[2] == "ref":
         await query.answer()
         await update_status_message(key, force=True)
+    
     elif data[2] in ["nex", "pre"]:
         await query.answer()
         async with task_dict_lock:
@@ -81,15 +82,18 @@ async def status_pages(_, query):
                 status_dict[key]["page_no"] += status_dict[key]["page_step"]
             else:
                 status_dict[key]["page_no"] -= status_dict[key]["page_step"]
+    
     elif data[2] == "ps":
         await query.answer()
         async with task_dict_lock:
             status_dict[key]["page_step"] = int(data[3])
+    
     elif data[2] == "st":
         await query.answer()
         async with task_dict_lock:
             status_dict[key]["status"] = data[3]
         await update_status_message(key, force=True)
+    
     elif data[2] == "ov":
         # message = query.message
         tasks = {

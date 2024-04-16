@@ -35,12 +35,14 @@ async def select(_, message):
         if task is None:
             await sendMessage(message, f"<b>Tugas dengan ID</b> <code>{gid}</code> <b>tidak ditemukan!</b>")
             return
+    
     elif reply_to_id := message.reply_to_message_id:
         async with task_dict_lock:
             task = task_dict.get(reply_to_id)
         if task is None:
             await sendMessage(message, "<b>Bukan Tugas Aktif!</b>")
             return
+    
     elif len(msg) == 1:
         msg = (
             "<b>Balas ke Tugas Aktif dengan perintah atau tambahkan ID Tugas setelah perintah!</b>\n\n"
@@ -57,6 +59,7 @@ async def select(_, message):
     ):
         await sendMessage(message, "<b>Bukan Tugas darimu!</b>")
         return
+    
     if await sync_to_async(task.status) not in [
         MirrorStatus.STATUS_DOWNLOADING,
         MirrorStatus.STATUS_PAUSED,
@@ -67,6 +70,7 @@ async def select(_, message):
             "<b>Tugas ini baru diunduh, dihentikan atau menunggu antrian!</b>",
         )
         return
+    
     if task.name().startswith("[METADATA]"):
         await sendMessage(message, "<b>Coba lagi setelah metadata selesai diunduh!</b>")
         return
@@ -105,10 +109,13 @@ async def get_confirm(_, query):
         await query.answer("Tugas dibatalkan oleh User!", show_alert=True)
         await deleteMessage(message)
         return
+    
     if user_id != task.listener.userId:
         await query.answer("Bukan Tugas darimu!", show_alert=True)
+    
     elif data[1] == "pin":
         await query.answer(data[3], show_alert=True)
+    
     elif data[1] == "done":
         await query.answer()
         if hasattr(task, "seeding"):
@@ -147,6 +154,7 @@ async def get_confirm(_, query):
                         )
         await sendStatusMessage(message)
         await deleteMessage(message)
+    
     else:
         await deleteMessage(message)
         obj = task.task()

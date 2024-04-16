@@ -13,26 +13,30 @@ from bot.helper.telegram_helper.message_utils import sendMessage, sendFile
 async def shell(_, message):
     cmd = message.text.split(maxsplit=1)
     if len(cmd) == 1:
-        await sendMessage(message, '<b>Tidak ada perintah untuk dieksekusi!</b>')
+        await sendMessage(message, "<b>Tidak ada perintah untuk dieksekusi!</b>")
         return
+    
     cmd = cmd[1]
     stdout, stderr, _ = await cmd_exec(cmd, shell=True)
-    reply = ''
+    reply = ""
     if len(stdout) != 0:
         reply += f"<b>Stdout</b>\n<pre language='bash'>{stdout}</pre>\n"
         LOGGER.info(f"Shell - {cmd} - {stdout}")
+
     if len(stderr) != 0:
         reply += f"<b>Stderr</b>\n<pre language='bash'>{stderr}</pre>"
         LOGGER.error(f"Shell - {cmd} - {stderr}")
+
     if len(reply) > 3000:
         with BytesIO(str.encode(reply)) as out_file:
             out_file.name = "shell_output.txt"
             await sendFile(message, out_file)
+
     elif len(reply) != 0:
         await sendMessage(message, reply)
-    else:
-        await sendMessage(message, '<b>Tidak ada balasan!</b>')
 
+    else:
+        await sendMessage(message, "<b>Tidak ada balasan!</b>")
 
 
 bot.add_handler(

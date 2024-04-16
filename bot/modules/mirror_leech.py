@@ -25,14 +25,20 @@ from bot.helper.ext_utils.links_utils import (
     is_url,
 )
 from bot.helper.listeners.task_listener import TaskListener
-from bot.helper.mirror_leech_utils.download_utils.aria2_download import add_aria2c_download
-from bot.helper.mirror_leech_utils.download_utils.direct_downloader import add_direct_download
+from bot.helper.mirror_leech_utils.download_utils.aria2_download import (
+    add_aria2c_download,
+)
+from bot.helper.mirror_leech_utils.download_utils.direct_downloader import (
+    add_direct_download,
+)
 from bot.helper.mirror_leech_utils.download_utils.direct_link_generator import direct_link_generator
 from bot.helper.mirror_leech_utils.download_utils.gd_download import add_gd_download
 from bot.helper.mirror_leech_utils.download_utils.jd_download import add_jd_download
 from bot.helper.mirror_leech_utils.download_utils.mega_download import add_mega_download
 from bot.helper.mirror_leech_utils.download_utils.qbit_download import add_qb_torrent
-from bot.helper.mirror_leech_utils.download_utils.rclone_download import add_rclone_download
+from bot.helper.mirror_leech_utils.download_utils.rclone_download import (
+    add_rclone_download,
+)
 from bot.helper.mirror_leech_utils.download_utils.telegram_download import TelegramDownloadHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
@@ -362,9 +368,13 @@ class Mirror(TaskListener):
                         return
 
         if file_ is not None:
-            await TelegramDownloadHelper(self).add_download(reply_to, f"{path}/", session)
+            await TelegramDownloadHelper(self).add_download(
+                reply_to, f"{path}/", session
+            )
+        
         elif isinstance(self.link, dict):
             await add_direct_download(self, path)
+        
         elif self.isJd:
             try:
                 await add_jd_download(self, path)
@@ -375,14 +385,19 @@ class Mirror(TaskListener):
             finally:
                 if await aiopath.exists(self.link):
                     await remove(self.link)
+        
         elif self.isQbit:
             await add_qb_torrent(self, path, ratio, seed_time)
+        
         elif is_gdrive_link(self.link) or is_gdrive_id(self.link):
             await add_gd_download(self, path)
+        
         elif is_mega_link(self.link):
             await add_mega_download(self, f"{path}/")
+        
         elif is_rclone_path(self.link):
             await add_rclone_download(self, f"{path}/")
+        
         else:
             ussr = args["-au"]
             pssw = args["-ap"]

@@ -17,7 +17,9 @@ async def countNode(_, message):
         message.text 
         or message.caption
     ).split()
+    
     user = message.from_user or message.sender_chat
+    
     if username := user.username:
         tag = f"@{username}"
     else:
@@ -32,6 +34,7 @@ async def countNode(_, message):
                     reply_to.reply_markup.inline_keyboard[0][0].url
                     or ""
                 )
+    
     if is_gdrive_link(link):
         msg = await sendMessage(message, f"<b>Menghitung :</b>\n<code>{link}</code>")
         name, mime_type, size, files, folders = await sync_to_async(
@@ -40,9 +43,11 @@ async def countNode(_, message):
             user.id
         )
         await deleteMessage(msg)
+        
         if mime_type is None:
             await sendMessage(message, f"<b>{name}</b>")
             return
+        
         msg = f"<b>Nama :</b> <code>{name}</code>"
         msg += f"\n\n<b>Ukuran :</b> <code>{get_readable_file_size(size)}</code>"
         msg += f"\n\n<b>Tipe :</b> <code>{mime_type}</code>"
@@ -50,8 +55,10 @@ async def countNode(_, message):
             msg += f"\n\n<b>Sub Folders :</b> <code>{folders}</code>"
             msg += f"\n\n<b>Files :</b> <code>{files}</code>"
         msg += f"\n\n<b>Oleh :</b> {tag}"
+    
     else:
         msg = "<b>Kirim perintah dengan Link Google Drive atau balas Link Google Drive dengan perintah!</b>"
+    
     await sendMessage(message, msg)
 
 

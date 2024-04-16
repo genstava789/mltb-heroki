@@ -17,8 +17,10 @@ async def deletefile(_, message):
         or message.caption
     ).split()
     user = message.from_user or message.sender_chat
+    
     if len(args) > 1:
         link = args[1]
+    
     elif reply_to := message.reply_to_message:
         if reply_to.text:
             link = reply_to.text.split(maxsplit=1)[0].strip()
@@ -27,8 +29,10 @@ async def deletefile(_, message):
                     reply_to.reply_markup.inline_keyboard[0][0].url
                     or ""
                 )
+    
     else:
         link = ""
+    
     if is_gdrive_link(link):
         LOGGER.info(link)
         msg = await sync_to_async(
@@ -36,8 +40,10 @@ async def deletefile(_, message):
             link, 
             user.id
         )
+    
     else:
         msg = "Kirim perintah dengan Link Google Drive atau balas Link Google Drive dengan perintah!"
+    
     reply_message = await sendMessage(message, f"<b>{msg}</b>")
     await auto_delete_message(message, reply_message)
 

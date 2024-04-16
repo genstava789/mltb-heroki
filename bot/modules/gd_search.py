@@ -126,19 +126,23 @@ async def select_type(_, query):
     data = query.data.split()
     if user_id != int(data[1]):
         return await query.answer(text="Bukan Tugas darimu!", show_alert=True)
+    
     elif data[2] == "rec":
         await query.answer()
         isRecursive = not bool(eval(data[3]))
         buttons = await list_buttons(user_id, isRecursive, eval(data[4]))
         return await editMessage(message, "<b>Pilih opsi :</b>", buttons)
+    
     elif data[2] == "ut":
         await query.answer()
         user_token = not bool(eval(data[4]))
         buttons = await list_buttons(user_id, eval(data[3]), user_token)
         return await editMessage(message, "<b>Pilih tipe yang mau dicari :</b>", buttons)
+    
     elif data[2] == "cancel":
         await query.answer()
         return await editMessage(message, "<b>Pencarian dibatalkan!</b>")
+    
     await query.answer()
     item_type = data[2]
     isRecursive = eval(data[3])

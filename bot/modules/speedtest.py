@@ -24,10 +24,8 @@ async def speedtest(_, message):
     test.upload()
     test.results.share()
     result = test.results.dict()
-    caption = f"""
-<pre languange='bash'>
-<b>Hasil SpeedTest</b>
-<b>Ping         :</b> <code>{result['ping']} ms</code>
+    caption = f"""<b>Hasil SpeedTest</b>
+<pre languange='bash'><b>Ping         :</b> <code>{result['ping']} ms</code>
 <b>Waktu        :</b> <code>{result['timestamp']}</code>
 <b>Unggah       :</b> <code>{get_readable_file_size(result['upload'] / 8)}/s</code>
 <b>Upload       :</b> <code>{get_readable_file_size(result['download'] / 8)}/s</code>
@@ -48,8 +46,7 @@ async def speedtest(_, message):
 <b>Latency      :</b> <code>{result['server']['latency']}</code>
 <b>Negara       :</b> <code>{result['server']['country']} ({result['server']['cc']})</code>
 <b>Latitude     :</b> <code>{result['server']['lat']}</code>
-<b>Longitude    :</b> <code>{result['server']['lon']}</code>
-</pre>
+<b>Longitude    :</b> <code>{result['server']['lon']}</code></pre>
 """
     try:
         await sendPhoto(
@@ -58,6 +55,7 @@ async def speedtest(_, message):
             caption
         )
         await deleteMessage(msg)
+
     except Exception as e:
         LOGGER.error(str(e))
         await editMessage(msg, caption)

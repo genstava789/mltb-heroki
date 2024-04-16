@@ -84,6 +84,7 @@ async def do(func, message):
             exec(f"def func():\n{indent(body, '  ')}", env)
         else:
             exec(f"async def func():\n{indent(body, '  ')}", env)
+
     except Exception as e:
         return f"{e.__class__.__name__}: {e}"
 
@@ -94,9 +95,11 @@ async def do(func, message):
             func_return = (
                 await sync_to_async(rfunc) if func == "exec" else await rfunc()
             )
-    except Exception as e:
+
+    except Exception:
         value = stdout.getvalue()
         return f"{value}{format_exc()}"
+    
     else:
         value = stdout.getvalue()
         result = None
@@ -110,6 +113,7 @@ async def do(func, message):
                     pass
         else:
             result = f"{value}{func_return}"
+
         if result:
             return result
 

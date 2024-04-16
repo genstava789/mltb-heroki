@@ -28,12 +28,14 @@ async def remove_from_queue(_, message):
         if task is None:
             await sendMessage(message, f"<b>Tugas dengan GID</b> <code>{gid}</code> <b>tidak ditemukan!</b>")
             return
+    
     elif reply_to_id := message.reply_to_message_id:
         async with task_dict_lock:
             task = task_dict.get(reply_to_id)
         if task is None:
             await sendMessage(message, "<b>Bukan Tugas Aktif!</b>")
             return
+    
     elif len(msg) in {1, 2}:
         msg = (
             "<b>Balas ke pesan perintah saat digunakan untuk memulai Tugas</b>" \
@@ -42,6 +44,7 @@ async def remove_from_queue(_, message):
         )
         await sendMessage(message, msg)
         return
+    
     if (
         OWNER_ID != user_id
         and task.listener.userId != user_id
@@ -49,6 +52,7 @@ async def remove_from_queue(_, message):
     ):
         await sendMessage(message, "<b>Bukan Tugas darimu!</b>")
         return
+    
     obj = task.task()
     listener = obj.listener
     msg = ""
@@ -58,26 +62,28 @@ async def remove_from_queue(_, message):
             if listener.mid in queued_up:
                 await start_up_from_queued(listener.mid)
                 msg = "<b>Tugas berhasil dimulai secara paksa untuk Unggah!</b>"
+        
         elif status == "fd":
             listener.forceDownload = True
             if listener.mid in queued_dl:
                 await start_dl_from_queued(listener.mid)
                 msg = "<b>Tugas berhasil dimulai secara paksa untuk Unduh!</b>"
+        
         else:
             listener.forceDownload = True
             listener.forceUpload = True
             if listener.mid in queued_up:
                 await start_up_from_queued(listener.mid)
                 msg = "<b>Tugas berhasil dimulai secara paksa untuk Unggah!</b>"
+            
             elif listener.mid in queued_dl:
                 await start_dl_from_queued(listener.mid)
                 msg = "<b>Tugas berhasil dimulai paksa untuk Unduh dan akan Unggah setelah proses Unduh selesai!</b>"
+    
     if msg:
         await sendMessage(message, msg)
 
         
-
-
 bot.add_handler(
     MessageHandler(
         remove_from_queue,

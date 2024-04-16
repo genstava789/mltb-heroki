@@ -361,7 +361,10 @@ async def sync_jdownloader():
         if not is_connected:
             LOGGER.error(jdownloader.error)
             return
-        await jdownloader.connectToDevice()
+        isDeviceConnected = await jdownloader.connectToDevice()
+        if not isDeviceConnected:
+            LOGGER.error(jdownloader.error)
+            return
     await jdownloader.device.system.exit_jd()
     if await aiopath.exists("cfg.zip"):
         await remove("cfg.zip")
@@ -369,7 +372,9 @@ async def sync_jdownloader():
     if not is_connected:
         LOGGER.error(jdownloader.error)
         return
-    await jdownloader.connectToDevice()
+    isDeviceConnected = await jdownloader.connectToDevice()
+    if not isDeviceConnected:
+        LOGGER.error(jdownloader.error)
     await (
         await create_subprocess_exec("7z", "a", "cfg.zip", "/JDownloader/cfg")
     ).wait()

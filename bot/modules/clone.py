@@ -162,6 +162,7 @@ class Clone(TaskListener):
                 if e.startswith("ERROR:"):
                     await sendMessage(self.message, f"<b>ERROR :</b> <code>{e.replace('ERROR: ', '')}</code>")
                     return
+        
         if is_gdrive_link(self.link) or is_gdrive_id(self.link):
             self.name, mime_type, self.size, files, _ = await sync_to_async(
                 gdCount().count, self.link, self.userId
@@ -192,8 +193,10 @@ class Clone(TaskListener):
                         msg = msg[:4090] + "\n..."
                 await sendMessage(self.message, msg, button)
                 return
+            
             await self.onDownloadStart()
             LOGGER.info(f"Clone Started: Name: {self.name} - Source: {self.link}")
+            
             drive = gdClone(self)
             if files <= 10:
                 msg = await sendMessage(
@@ -211,8 +214,10 @@ class Clone(TaskListener):
                 await deleteMessage(msg)
             if not flink:
                 return
+            
             await self.onUploadComplete(flink, files, folders, mime_type, dir_id=dir_id)
             LOGGER.info(f"Cloning Done: {self.name}")
+        
         elif is_rclone_path(self.link):
             if self.link.startswith("mrcc:"):
                 self.link = self.link.replace("mrcc:", "", 1)
@@ -272,7 +277,9 @@ class Clone(TaskListener):
             )
             if not destination:
                 return
+            
             LOGGER.info(f"Cloning Done: {self.name}")
+            
             cmd1 = [
                 "edge",
                 "lsf",
@@ -324,6 +331,7 @@ class Clone(TaskListener):
                 await self.onUploadComplete(
                     flink, files, folders, mime_type, destination
                 )
+        
         else:
             await sendMessage(
                 self.message, COMMAND_USAGE["clone"][0], COMMAND_USAGE["clone"][1]

@@ -155,7 +155,7 @@ async def stats(_, message):
 async def start(client, message):
     buttons = ButtonMaker()
     buttons.ubutton(
-        "Owner", "https://t.me/save_usdt")
+        "Owner", "https://t.me/SaVe_USDT")
     buttons.ubutton("Channel", "https://t.me/arakurumi")
     reply_markup = buttons.build_menu(2)
     if await CustomFilters.authorized(client, message):
