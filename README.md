@@ -21,34 +21,36 @@ programming in Python.
 
 ## Custom Docker Images
 
-- arakurumi/mltb:heroku
+- arakurumi/mltb:latest
 
 ```
 Based on Alpine Latest with Heroku Bypass
-Small, Lightweight and Minimalist (Include Python Packages)
-Note : Sometimes I often change the Docker Image for testing purposes, maybe some apps are not running properly
-```
+Include :
+- Python Packages
+- Updated Apps which used by Mirror Leech Telegram Bot
 
-- arakurumi/mltb:dev
-
-```
-Based on Ubuntu 22.04 with Heroku Bypass
-Small, Lightweight and Minimalist (Include Python Packages)
-Note : Sometimes I often change the Docker Image for testing purposes, maybe some apps are not running properly
+Note :
+Automatically daily builds Docker Image and sometimes I often change the Docker Image for testing purposes. Maybe some Apps is not running properly
 ```
 
 - arakurumi/mltb:alpine
 
 ```
 Based on Alpine Latest with Heroku Bypass
-Include Python Packages and some cool updated Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MKVToolnix, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
+Include :
+- Python Packages
+- Updated Apps which used by Mirror Leech Telegram Bot
+- Cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MKVToolnix, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
 ```
 
 - arakurumi/mltb:ubuntu
 
 ```
 Based on Ubuntu 22.04 with Heroku Bypass
-Include Python Packages and some cool updated Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MKVToolnix, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
+Include :
+- Python Packages
+- Updated Apps which used by Mirror Leech Telegram Bot
+- Cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MKVToolnix, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
 ```
 
 #### How to Delete Heroku Build Cache for Refresh Image

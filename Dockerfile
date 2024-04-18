@@ -1,4 +1,4 @@
-FROM arakurumi/mltb:heroku
+FROM arakurumi/mltb:latest
 
 WORKDIR /usr/src/app
 
