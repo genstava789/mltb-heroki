@@ -92,11 +92,14 @@ if UPSTREAM_BRANCH is None:
     
 if UPSTREAM_REPO is not None:
     if os.path.exists(".git"):
-        subprocess.run([
-            "rm -rf .git"
-        ], shell=True)
+        subprocess.run(
+            [
+                "rm -rf .git"
+            ], shell=True
+        )
 
-    process = subprocess.run([
+    process = subprocess.run(
+        [
             f"git init -q \
             && git config --global user.email kqruumi@gmail.com \
             && git config --global user.name KQRM \
@@ -105,7 +108,8 @@ if UPSTREAM_REPO is not None:
             && git remote add origin {UPSTREAM_REPO} \
             && git fetch origin -q \
             && git reset --hard origin/{UPSTREAM_BRANCH} -q"
-        ], shell=True)
+        ], shell=True
+    )
 
     if process.returncode == 0:
         LOGGER.info("Successfully updated with latest commit from UPSTREAM_REPO!")
