@@ -21,7 +21,7 @@ class _BotCommands:
         self.ListCommand = [f"list{CMD_SUFFIX}", f"li{CMD_SUFFIX}"]
         self.SearchCommand = [f"search{CMD_SUFFIX}", f"se{CMD_SUFFIX}"]
         self.StatusCommand = [f"status{CMD_SUFFIX}", f"sta{CMD_SUFFIX}"]
-        self.UsersCommand = [f"user{CMD_SUFFIX}", f"us{CMD_SUFFIX}"]
+        self.UsersCommand = [f"user{CMD_SUFFIX}", f"u{CMD_SUFFIX}"]
         self.AuthorizeCommand = [f"authorize{CMD_SUFFIX}", f"au{CMD_SUFFIX}"]
         self.UnAuthorizeCommand = [f"unauthorize{CMD_SUFFIX}", f"ua{CMD_SUFFIX}"]
         self.AddSudoCommand = [f"addsudo{CMD_SUFFIX}", f"as{CMD_SUFFIX}"]
@@ -36,8 +36,8 @@ class _BotCommands:
         self.ExecCommand = [f"exec{CMD_SUFFIX}", f"ex{CMD_SUFFIX}"]
         self.AExecCommand = [f"aexec{CMD_SUFFIX}", f"aex{CMD_SUFFIX}"]
         self.ClearLocalsCommand = [f"clearlocal{CMD_SUFFIX}", f"clo{CMD_SUFFIX}"]
-        self.BotSetCommand = [f"botsetting{CMD_SUFFIX}", f"bset{CMD_SUFFIX}", f"bs{CMD_SUFFIX}"]
-        self.UserSetCommand = [f"usersetting{CMD_SUFFIX}", f"uset{CMD_SUFFIX}", f"us{CMD_SUFFIX}"]
+        self.BotSetCommand = [f"botsetting{CMD_SUFFIX}", f"bs{CMD_SUFFIX}", f"bset{CMD_SUFFIX}"]
+        self.UserSetCommand = [f"usersetting{CMD_SUFFIX}", f"us{CMD_SUFFIX}", f"uset{CMD_SUFFIX}"]
         self.BtSelectCommand = [f"btsel{CMD_SUFFIX}", f"bts{CMD_SUFFIX}"]
         self.RssCommand = f"rss{CMD_SUFFIX}"
 
