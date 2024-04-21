@@ -1113,8 +1113,9 @@ def terabox(url):
                 if not folderPath:
                     if not details["title"]:
                         details["title"] = content["server_filename"]
-                    folderPath = details["title"]
 
+                    folderPath = details["title"]
+            
                 direct_link = content["dlink"].replace("https://d.1024tera.com", "https://d4.1024tera.com")
 
                 content_type = async_to_sync(get_content_type, direct_link)
@@ -1225,7 +1226,7 @@ def gdtot(url):
         raise DirectDownloadLinkException(
             f"ERROR: {e.__class__.__name__} dengan {token_url}"
         ) from e
-    path = findall("\('(.*?)'\)", token_page.text)
+    path = findall(r"\('(.*?)'\)", token_page.text)
     if not path:
         raise DirectDownloadLinkException("ERROR: Tidak bisa membypass link!")
     path = path[0]
@@ -1243,7 +1244,7 @@ def sharer_scraper(url):
         res = cget("GET", url, headers=header)
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}") from e
-    key = findall("'key',\s+'(.*?)'", res.text)
+    key = findall(r"'key',\s+'(.*?)'", res.text)
     if not key:
         raise DirectDownloadLinkException("ERROR: Key tidak ditemukan!")
     key = key[0]
@@ -2027,7 +2028,7 @@ def pcloud(url):
         except Exception as e:
             raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}") from e
     if link := findall(r".downloadlink.:..(https:.*)..", res.text):
-        return link[0].replace("\/", "/")
+        return link[0].replace(r"\/", "/")
     raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
 
 
@@ -2608,7 +2609,7 @@ def sharepoint(url: str) -> str:
     Supported Sites :
     https://www.microsoft.com/ (SharePoint)
     """
-    url = sub("e=[\w]+", "", url)
+    url = sub(r"e=[\w]+", "", url)
     url = url.replace("??", "?")
     
     if not search(r"download=1", url):
