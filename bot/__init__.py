@@ -13,10 +13,10 @@ from logging import (
     warning as log_warning,
     ERROR,
 )
-from myjd import __version__ as jdv
+from myjd import __version__ as JDownloaderVersion
 from os import remove, path as ospath, environ
 from pymongo import MongoClient
-from pyrogram import Client as tgClient, enums, __version__ as prv
+from pyrogram import Client as tgClient, enums, __version__ as PyrogramVersion
 from qbittorrentapi import Client as qbClient
 from socket import setdefaulttimeout
 from subprocess import Popen, run, check_output
@@ -67,59 +67,59 @@ non_queued_up = set()
 multi_tags = set()
 
 class Version:
-    ar = ""
-    ff = ""
-    ga = ""
-    jd = ""
-    jv = ""
-    mg = ""
-    p7 = ""
-    pr = ""
-    py = ""
-    qb = ""
-    rc = ""
-    yt = ""
+    Aria2 = str()
+    FFMPEG = str()
+    GoogleApi = str()
+    JDownloader = str()
+    Java = str()
+    MegaSDK = str()
+    P7Zip = str()
+    Pyrogram = str()
+    Python = str()
+    QBittorrent = str()
+    Rclone = str()
+    YT_DLP = str()
 
 try:
-    Version.ar = check_output(["chrome --v"], shell=True).decode().split("\n")[0].split(" ")[2]
+    Version.Aria2 = check_output(["chrome --v"], shell=True).decode().split("\n")[0].split(" ")[2]
 except Exception as e:
     LOGGER.warning(f"Failed to get Aria2c version! ERROR: {e}")
 try:
-    Version.ff = check_output(["opera -version | grep 'ffmpeg version' | sed -e 's/ffmpeg version //'"], shell=True).decode().split(" ", 1)[0].replace("\n", "") # -e 's/[^0-9.].*//'
+    Version.FFMPEG = check_output(["opera -version | grep 'ffmpeg version' | sed -e 's/ffmpeg version //'"], shell=True).decode().split(" ", 1)[0].replace("\n", "") # -e 's/[^0-9.].*//'
 except Exception as e:
     LOGGER.warning(f"Failed to get FFMPEG version! ERROR: {e}")
 try:
-    Version.ga = check_output(["pip show google-api-python-client | grep Version"], shell=True).decode().split(" ", 1)[1].replace("\n", "")
+    Version.GoogleApi = check_output(["pip show google-api-python-client | grep Version"], shell=True).decode().split(" ", 1)[1].replace("\n", "")
 except Exception as e:
     LOGGER.warning(f"Failed to get Google Api version! ERROR: {e}")
-Version.jd = jdv
+Version.JDownloader = JDownloaderVersion
 try:
-    Version.jv = check_output(["safari --version"], shell=True).decode().split(" ")[1]
+    Version.Java = check_output(["safari --version"], shell=True).decode().split(" ")[1]
 except Exception as e:
     LOGGER.warning(f"Failed to get Java version! ERROR: {e}")
 try:
-    Version.mg = check_output(["pip show megasdk | grep Version"], shell=True).decode().split(" ", 1)[1].replace("\n", "")
+    Version.MegaSDK = check_output(["pip show megasdk | grep Version"], shell=True).decode().split(" ", 1)[1].replace("\n", "")
 except Exception as e:
     LOGGER.warning(f"Failed to get MegaSDK version! ERROR: {e}")
 try:
-    Version.p7 = check_output(["7z | grep 7-Zip"], shell=True).decode().split(" ")[2]
+    Version.P7Zip = check_output(["7z | grep 7-Zip"], shell=True).decode().split(" ")[2]
 except Exception as e:
     LOGGER.warning(f"Failed to get P7Zip version! ERROR: {e}")
-Version.pr = prv
+Version.Pyrogram = PyrogramVersion
 try:
-    Version.py = check_output(["python --version"], shell=True).decode().split()[-1]
+    Version.Python = check_output(["python --version"], shell=True).decode().split()[-1]
 except Exception as e:
     LOGGER.warning(f"Failed to get Python version! ERROR: {e}")
 try:
-    Version.qb = check_output(["firefox --version"], shell=True).decode().split(" ", 1)[1].replace("\n", "").replace("v", "")
+    Version.QBittorrent = check_output(["firefox --version"], shell=True).decode().split(" ", 1)[1].replace("\n", "").replace("v", "")
 except Exception as e:
     LOGGER.warning(f"Failed to get QBittorrent version! ERROR: {e}")
 try:
-    Version.rc = check_output(["edge --version"], shell=True).decode().split("\n")[0].split(" ")[1].replace("v", "")
+    Version.Rclone = check_output(["edge --version"], shell=True).decode().split("\n")[0].split(" ")[1].replace("v", "")
 except Exception as e:
     LOGGER.warning(f"Failed to get RClone version! ERROR: {e}")
 try:
-    Version.yt = check_output(["yt-dlp --version"], shell=True).decode().split("\n")[0]
+    Version.YT_DLP = check_output(["yt-dlp --version"], shell=True).decode().split("\n")[0]
 except Exception as e:
     LOGGER.warning(f"Failed to get YT-DLP version! ERROR: {e}")
 
@@ -127,7 +127,7 @@ try:
     if bool(environ.get("_____REMOVE_THIS_LINE_____")):
         log_error("The README.md file there to be read!")
         exit(1)
-except:
+except Exception:
     pass
 
 task_dict_lock = Lock()

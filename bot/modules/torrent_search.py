@@ -1,4 +1,4 @@
-from aiohttp import ClientSession
+from httpx import AsyncClient
 from asyncio import Lock
 from html import escape
 from math import ceil
@@ -43,9 +43,9 @@ async def initiate_search_tools():
     if SEARCH_API_LINK := config_dict["SEARCH_API_LINK"]:
         global SITES
         try:
-            async with ClientSession() as c:
-                async with c.get(f"{SEARCH_API_LINK}/api/v1/sites") as res:
-                    data = await res.json()
+            async with AsyncClient() as client:
+                response = await client.get(f"{SEARCH_API_LINK}/api/v1/sites")
+                data = response.json()
             SITES = {
                 str(site): str(site).capitalize() for site in data["supported_sites"]
             }
@@ -82,9 +82,9 @@ async def _search(key, site, message, method):
                     f"{SEARCH_API_LINK}/api/v1/recent?site={site}&limit={SEARCH_LIMIT}"
                 )
         try:
-            async with ClientSession() as c:
-                async with c.get(api) as res:
-                    search_results = await res.json()
+            async with AsyncClient() as client:
+                response = await client.get(api)
+                search_results = response.json()
             if "error" in search_results or search_results["total"] == 0:
                 await editMessage(
                     message,

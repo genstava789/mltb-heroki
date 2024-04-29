@@ -118,24 +118,24 @@ async def stats(_, message):
 <b>Total Unggah :</b> <code>{get_readable_file_size(network.bytes_sent)}</code>
 
 <b>Versi</b>
-<b>Aria2c       :</b> <code>{Version.ar}</code>
-<b>FFMPEG       :</b> <code>{Version.ff}</code>
-<b>Google       :</b> <code>{Version.ga}</code>
-<b>Java         :</b> <code>{Version.jv}</code>
-<b>MegaSDK      :</b> <code>{Version.mg}</code>
-<b>MyJD         :</b> <code>{Version.jd}</code>
-<b>P7Zip        :</b> <code>{Version.p7}</code> 
-<b>Pyro         :</b> <code>{Version.pr}</code>
-<b>Python       :</b> <code>{Version.py}</code>
-<b>Qbittorrent  :</b> <code>{Version.qb}</code>
-<b>Rclone       :</b> <code>{Version.rc}</code>
-<b>YT-DLP       :</b> <code>{Version.yt}</code>
+<b>Aria2c       :</b> <code>{Version.Aria2}</code>
+<b>FFMPEG       :</b> <code>{Version.FFMPEG}</code>
+<b>Google       :</b> <code>{Version.GoogleApi}</code>
+<b>Java         :</b> <code>{Version.Java}</code>
+<b>MegaSDK      :</b> <code>{Version.MegaSDK}</code>
+<b>MyJD         :</b> <code>{Version.JDownloader}</code>
+<b>P7Zip        :</b> <code>{Version.P7Zip}</code> 
+<b>Pyro         :</b> <code>{Version.Pyrogram}</code>
+<b>Python       :</b> <code>{Version.Python}</code>
+<b>Qbittorrent  :</b> <code>{Version.QBittorrent}</code>
+<b>Rclone       :</b> <code>{Version.Rclone}</code>
+<b>YT-DLP       :</b> <code>{Version.YT_DLP}</code>
 
 <b>Lainnya</b>
 <b>Bot DC       :</b> <code>{bot.me.dc_id} ({DC_ID.get(bot.me.dc_id)})</code>
 <b>Bot ID       :</b> <code>{bot.me.id}</code>
 <b>Bot Name     :</b> <code>{bot.me.first_name} {(bot.me.last_name or '')}</code>
-<b>Bot Username :</b> <code>@{bot_name}</code>
+<b>Bot UserName :</b> <code>@{bot_name}</code>
 <b>User DC      :</b> <code>{user.me.dc_id if user else '-'} {('(' + DC_ID.get(user.me.dc_id) + ')' if user else '')}</code>
 <b>User ID      :</b> <code>{user.me.id if user else '-'}</code>
 <b>User Name    :</b> <code>{(user.me.first_name if user else '-')} {((user.me.last_name if user else '') or '')}</code>
