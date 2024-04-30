@@ -46,7 +46,7 @@ Include :
 - arakurumi/mltb:ubuntu
 
 ```
-Based on Ubuntu 22.04 with Heroku Bypass
+Based on Ubuntu Latest with Heroku Bypass
 Include :
 - Python Packages
 - Updated Apps which used by Mirror Leech Telegram Bot
@@ -67,6 +67,9 @@ heroku builds:cache:purge -a app-name
 - Rebuild Image
 ```
 git commit --allow-empty -m "Purge cache"
+```
+- Push Update
+```
 git push heroku master
 ```
 
