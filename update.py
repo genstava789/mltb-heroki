@@ -8,6 +8,7 @@ from pymongo.server_api import ServerApi
 from logging import (
     basicConfig,
     getLogger,
+    ERROR,
     INFO,
 )
 
@@ -19,6 +20,7 @@ basicConfig(
 )
 
 LOGGER = getLogger("update")
+getLogger("pymongo").setLevel(ERROR)
 
 if os.path.exists("log.txt"):
     with open("log.txt", "r+") as f:
