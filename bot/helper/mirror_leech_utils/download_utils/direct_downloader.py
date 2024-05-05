@@ -20,7 +20,7 @@ from bot.helper.telegram_helper.message_utils import sendStatusMessage
 async def add_direct_download(listener, path):
     details = listener.link
     if not (contents := details.get("contents")):
-        await listener.onDownloadError("<b>Tidak ada file untuk diunduh!</b>")
+        await listener.onDownloadError("Tidak ada file untuk diunduh!")
         return
     listener.size = details["total_size"]
 

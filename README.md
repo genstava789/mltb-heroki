@@ -6,20 +6,29 @@ programming in Python.
 # Features
 
 ## Free Hosting
-- Heroku
-- Render
+- [Heroku](https://www.heroku.com/)
+- [Render](https://www.heroku.com/)
+- [ToyStack](https://toystack.ai/)
 
 ## Custom Apps Name
+- AniDL : anidl
 - Aria2c : chrome
+- Bento4 : **Not Changed** [List Apps](https://www.bento4.com/#included-applications)
 - FFMPEG : opera
+- Gallery-DL : gallery-dl
 - HandBrakeCLI : handbrake
 - Java : safari
+- MKVToolNix : **Not Changed** [List Apps](https://mkvtoolnix.download/docs.html)
 - N_m3u8DL-RE : m3u8
+- Phantom-JS : phantomjs
 - QBittorrent : nightly
 - QBittorrent-Nox : firefox
-- RClone : edge
+- Rclone : edge
+- Shaka-Packager : shaka-packager
+- VCSI : vcsi
 
 ## Custom Docker Images
+[Docker.Io](https://hub.docker.com/repository/docker/arakurumi/mltb/general)
 
 - arakurumi/mltb:latest
 
@@ -40,7 +49,7 @@ Based on Alpine Latest with Heroku Bypass
 Include :
 - Python Packages
 - Updated Apps which used by Mirror Leech Telegram Bot
-- Cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MKVToolnix, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
+- Cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MKVToolNix, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
 ```
 
 - arakurumi/mltb:ubuntu
@@ -50,7 +59,7 @@ Based on Ubuntu Latest with Heroku Bypass
 Include :
 - Python Packages
 - Updated Apps which used by Mirror Leech Telegram Bot
-- Cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MKVToolnix, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
+- Cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MKVToolNix, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
 ```
 
 #### How to Delete Heroku Build Cache for Refresh Image
@@ -59,7 +68,7 @@ Include :
 heroku plugins:install heroku-builds
 ```
 
-- Delete Cache
+- Delete Cache (Change app-name to Yours app-name without Random Number (Example : MLTB))
 ```
 heroku builds:cache:purge -a app-name
 ```

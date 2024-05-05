@@ -1,5 +1,4 @@
 aiofiles
-aiohttp
 aioshutil
 anytree
 apscheduler

@@ -190,7 +190,7 @@ This will effect on all files. Formate: wordToReplace : wordToReplaceWith : sens
 """
 
 mixed_leech = """Mixed leech: -ml
-/cmd link -ml (leech by user and bot sessionwith respect to size)"""
+/cmd link -ml (leech by user and bot session with respect to size)"""
 
 YT_HELP_DICT = {
     "main": yt,
