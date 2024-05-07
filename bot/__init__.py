@@ -280,29 +280,37 @@ if len(EXTENSION_FILTER) > 0:
 USER_SESSION_STRING = environ.get("USER_SESSION_STRING", "")
 if len(USER_SESSION_STRING) != 0:
     log_info(f"Creating client from USER_SESSION_STRING ({USER_SESSION_STRING[:10]}***{USER_SESSION_STRING[-10:]})...")
-    if len(TELEGRAM_API_PREMIUM) != 0 and len(TELEGRAM_HASH_PREMIUM) != 0:
-        log_info("Using another Telegram Api & Telegram Hash for User Session...")
-        TELEGRAM_API_PREMIUM = int(TELEGRAM_API_PREMIUM)
-        user = tgClient(
-            "user", 
-            TELEGRAM_API_PREMIUM, 
-            TELEGRAM_HASH_PREMIUM, 
-            session_string=USER_SESSION_STRING,
-            parse_mode=enums.ParseMode.HTML, 
-            workers=100, 
-            max_concurrent_transmissions=100
-        ).start()
-    else:
-        user = tgClient(
-            "user", 
-            TELEGRAM_API, 
-            TELEGRAM_HASH, 
-            session_string=USER_SESSION_STRING,
-            parse_mode=enums.ParseMode.HTML, 
-            workers=100, 
-            max_concurrent_transmissions=100
-        ).start()
-    IS_PREMIUM_USER = user.me.is_premium
+    try:
+        if len(TELEGRAM_API_PREMIUM) != 0 and len(TELEGRAM_HASH_PREMIUM) != 0:
+            log_info("Using another Telegram Api & Telegram Hash for User Session...")
+            TELEGRAM_API_PREMIUM = int(TELEGRAM_API_PREMIUM)
+            user = tgClient(
+                name="User", 
+                api_id=TELEGRAM_API_PREMIUM, 
+                api_hash=TELEGRAM_HASH_PREMIUM, 
+                session_string=USER_SESSION_STRING,
+                parse_mode=enums.ParseMode.HTML, 
+                workers=20, 
+                max_concurrent_transmissions=20,
+            ).start()
+        else:
+            user = tgClient(
+                name="User", 
+                api_id=TELEGRAM_API, 
+                api_hash=TELEGRAM_HASH, 
+                session_string=USER_SESSION_STRING,
+                parse_mode=enums.ParseMode.HTML, 
+                workers=20, 
+                max_concurrent_transmissions=20,
+            ).start()
+
+        IS_PREMIUM_USER = user.me.is_premium
+    
+    except Exception as error:
+        user = ""
+        IS_PREMIUM_USER = False
+        log_error(f"Failed to create client from USER_SESSION_STRING ({error}).")
+
 else:
     user = ""
     IS_PREMIUM_USER = False
@@ -656,20 +664,19 @@ aria2c_global = [
 
 log_info(f"Creating client from BOT_TOKEN ({BOT_TOKEN[:10]}***{BOT_TOKEN[-10:]})...")
 bot = tgClient(
-    "bot", 
-    TELEGRAM_API, 
-    TELEGRAM_HASH,
+    name="bot", 
+    api_id=TELEGRAM_API, 
+    api_hash=TELEGRAM_HASH,
     bot_token=BOT_TOKEN, 
     parse_mode=enums.ParseMode.HTML, 
-    workers=1000, 
-    max_concurrent_transmissions=100
+    workers=20, 
+    max_concurrent_transmissions=20,
 ).start()
 
 bot_loop = bot.loop
 bot_name = bot.me.username
 
-scheduler = AsyncIOScheduler(timezone=str(
-    get_localzone()), event_loop=bot_loop)
+scheduler = AsyncIOScheduler(timezone=str(get_localzone()), event_loop=bot_loop)
 
 if not qbit_options:
     qbit_options = dict(get_qb_client().app_preferences())
