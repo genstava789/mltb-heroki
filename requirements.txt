@@ -20,7 +20,7 @@ pillow
 psutil
 pycryptodome
 pymongo
-pyrotgfork
+pyrofork
 python-dotenv
 python-magic
 qbittorrent-api
@@ -28,7 +28,7 @@ requests
 speedtest-cli
 telegraph
 tenacity
-PyTgCrypto
+TgCrypto-pyrofork
 urllib3
 uvloop
 xattr
