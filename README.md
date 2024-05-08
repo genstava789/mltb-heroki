@@ -35,7 +35,6 @@ programming in Python.
 ```
 Based on Alpine Latest with Heroku Bypass
 Include :
-- Python Packages
 - Updated Apps which used by Mirror Leech Telegram Bot
 
 Note :
@@ -47,8 +46,7 @@ Automatically daily builds Docker Image and sometimes I often change the Docker 
 ```
 Based on Alpine Latest with Heroku Bypass
 Include :
-- Python Packages
-- Updated Apps which used by Mirror Leech Telegram Bot
+- Stable Apps which used by Mirror Leech Telegram Bot
 - Cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MKVToolNix, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
 ```
 
@@ -57,8 +55,7 @@ Include :
 ```
 Based on Ubuntu Latest with Heroku Bypass
 Include :
-- Python Packages
-- Updated Apps which used by Mirror Leech Telegram Bot
+- Stable Apps which used by Mirror Leech Telegram Bot
 - Cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MKVToolNix, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
 ```
 
