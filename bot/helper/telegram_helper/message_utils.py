@@ -1,7 +1,18 @@
 from asyncio import sleep
 from pyrogram.errors import FloodWait
+from pyrogram.types import (
+    ForceReply,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    MenuButtonWebApp,
+    Message,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove,
+    WebAppInfo,
+)
 from re import match as re_match
 from time import time
+from typing import Any, Optional, Union
 
 from bot import config_dict, LOGGER, status_dict, task_dict_lock, Intervals, bot, user
 from bot.helper.ext_utils.bot_utils import setInterval
@@ -328,7 +339,13 @@ async def sendStatusMessage(msg, user_id=0):
 
 
 # NOTE: Custom by Me, if You dont need it, just ignore or delete from this line ^^
-async def customSendMessage(client, chat_id:int, text:str, message_thread_id=None, buttons=None):
+async def customSendMessage(
+    client: Any,
+    chat_id: int,
+    text: str,
+    message_thread_id: Optional[int] = None,
+    reply_markup: Optional[Union[ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]] = None,
+) -> Message:
     try:
         return await client.send_message(
             chat_id=chat_id,
@@ -336,18 +353,32 @@ async def customSendMessage(client, chat_id:int, text:str, message_thread_id=Non
             disable_web_page_preview=True,
             disable_notification=True,
             message_thread_id=message_thread_id,
-            reply_markup=buttons
+            reply_markup=reply_markup,
         )
+    
     except FloodWait as f:
         LOGGER.warning(str(f))
         await sleep(f.value * 1.2)
-        return await customSendMessage(client, chat_id, text, message_thread_id, buttons)
+        return await customSendMessage(
+            client=client,
+            chat_id=chat_id,
+            text=text,
+            message_thread_id=message_thread_id,
+            reply_markup=reply_markup,
+        )
+    
     except Exception as e:
         LOGGER.error(str(e))
         raise Exception(e)
 
 
-async def customSendRss(text, image=None, image_caption=None, reply_markup=None):
+async def customSendRss(
+    text: str,
+    photo: Union[str, bytes],
+    caption: Optional[str] = str(),
+    has_spoiler: bool = None,
+    reply_markup: Optional[Union[ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]] = None,
+) -> Message:
     chat_id = None
     message_thread_id = None
     if chat_id := config_dict.get("RSS_CHAT_ID"):
@@ -371,15 +402,18 @@ async def customSendRss(text, image=None, image_caption=None, reply_markup=None)
         return "RSS_CHAT_ID tidak ditemukan!"
         
     try:
-        if image:
+        if photo:
             if len(text) > 1024:
                 reply_photo = await bot.send_photo(
                     chat_id=chat_id,
-                    photo=image,
-                    caption=f"<code>{image_caption}</code>",
+                    photo=photo,
+                    caption=caption,
+                    has_spoiler=has_spoiler,
                     disable_notification=True,
-                    message_thread_id=message_thread_id
+                    message_thread_id=message_thread_id,
+                    reply_markup=reply_markup,
                 )
+
                 return await bot.send_message(
                     chat_id=chat_id,
                     text=text,
@@ -387,17 +421,20 @@ async def customSendRss(text, image=None, image_caption=None, reply_markup=None)
                     disable_notification=True,
                     message_thread_id=message_thread_id,
                     reply_to_message_id=reply_photo.id,
-                    reply_markup=reply_markup
+                    reply_markup=reply_markup,
                 )
+            
             else:
                 return await bot.send_photo(
                     chat_id=chat_id,
-                    photo=image,
+                    photo=photo,
                     caption=text,
+                    has_spoiler=has_spoiler,
                     disable_notification=True,
                     message_thread_id=message_thread_id,
-                    reply_markup=reply_markup
+                    reply_markup=reply_markup,
                 )
+            
         else:
             return await bot.send_message(
                 chat_id=chat_id,
@@ -407,38 +444,128 @@ async def customSendRss(text, image=None, image_caption=None, reply_markup=None)
                 message_thread_id=message_thread_id,
                 reply_markup=reply_markup
             )
+        
     except FloodWait as f:
         LOGGER.warning(str(f))
         await sleep(f.value * 1.2)
-        return await customSendRss(text)
+        return await customSendRss(
+            text=text,
+            photo=photo,
+            caption=caption,
+            has_spoiler=has_spoiler,
+            reply_markup=reply_markup,
+        )
+    
     except Exception as e:
         LOGGER.error(str(e))
         return str(e)
 
 
-async def customSendDocument(client, document, thumb, caption, progress):
+async def customSendDocument(
+    message: Message,
+    document: Union[str, bytes],
+    thumb: Optional[Union[str, bytes]] = None,
+    caption: Optional[str] = str(),
+    file_name: Optional[str] = None,
+    reply_markup: Optional[Union[ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]] = None,
+    progress: Optional[Any] = None,
+    progress_args: Optional[tuple] = None,
+) -> Message:
     try:
-        return await client.reply_document(
+        return await message.reply_document(
             document=document,
             quote=True,
             thumb=thumb,
             caption=caption,
-            force_document=True,
+            file_name=file_name,
+            # force_document=True,
             disable_notification=True,
-            progress=progress
+            reply_markup=reply_markup,
+            progress=progress,
+            progress_args=progress_args,
         )
+    
     except FloodWait as f:
         LOGGER.warning(str(f))
         await sleep(f.value * 1.2)
-        return await customSendDocument(client, document, thumb, caption, progress)
+        return await customSendDocument(
+            message=message,
+            document=document,
+            thumb=thumb,
+            caption=caption,
+            file_name=file_name,
+            reply_markup=reply_markup,
+            progress=progress,
+            progress_args=progress_args,
+        )
+    
     except Exception as e:
         LOGGER.error(str(e))
         raise Exception(e)
 
 
-async def customSendVideo(client, video, caption, duration, width, height, thumb, progress):
+async def customSendAudio(
+    message: Message,
+    audio: Union[str, bytes],
+    caption: Optional[str] = str(),
+    duration: Optional[int] = 0,
+    performer: Optional[str] = None,
+    title: Optional[str] = None,
+    thumb: Optional[Union[str, bytes]] = None,
+    reply_markup: Optional[Union[ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]] = None,
+    progress: Optional[Any] = None,
+    progress_args: Optional[tuple] = None,
+) -> Message:
     try:
-        return await client.reply_video(
+        return await message.reply_audio(
+            audio=audio,
+            quote=True,
+            caption=caption,
+            duration=duration,
+            performer=performer,
+            title=title,
+            thumb=thumb,
+            disable_notification=True,
+            reply_markup=reply_markup,
+            progress=progress,
+            progress_args=progress_args,
+        )
+    
+    except FloodWait as f:
+        LOGGER.warning(str(f))
+        await sleep(f.value * 1.2)
+        return await customSendAudio(
+            message=message,
+            audio=audio,
+            caption=caption,
+            duration=duration,
+            performer=performer,
+            title=title,
+            thumb=thumb,
+            reply_markup=reply_markup,
+            progress=progress,
+            progress_args=progress_args,
+        )
+    
+    except Exception as e:
+        LOGGER.error(str(e))
+        raise Exception(e)
+    
+
+async def customSendVideo(
+    message: Message,
+    video: Union[str, bytes],
+    caption: Optional[str] = str(),
+    duration: Optional[int] = 0,
+    width: Optional[int] = None,
+    height: Optional[int] = None,
+    thumb: Optional[Union[str, bytes]] = None,
+    reply_markup: Optional[Union[ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]] = None,
+    progress: Optional[Any] = None,
+    progress_args: Optional[tuple] = None,
+) -> Message:
+    try:
+        return await message.reply_video(
             video=video,
             quote=True,
             caption=caption,
@@ -448,52 +575,66 @@ async def customSendVideo(client, video, caption, duration, width, height, thumb
             thumb=thumb,
             supports_streaming=True,
             disable_notification=True,
-            progress=progress
+            reply_markup=reply_markup,
+            progress=progress,
+            progress_args=progress_args,
         )
+    
     except FloodWait as f:
         LOGGER.warning(str(f))
         await sleep(f.value * 1.2)
-        return await customSendVideo(client, video, caption, duration, width, height, thumb, progress)
-    except Exception as e:
-        LOGGER.error(str(e))
-        raise Exception(e)
-
-
-async def customSendAudio(client, audio, caption, duration, performer, title, thumb, progress):
-    try:
-        return await client.reply_audio(
-            audio=audio,
-            quote=True,
+        return await customSendVideo(
+            message=message,
+            video=video,
             caption=caption,
             duration=duration,
-            performer=performer,
-            title=title,
+            width=width,
+            height=height,
             thumb=thumb,
-            disable_notification=True,
-            progress=progress
+            reply_markup=reply_markup,
+            progress=progress,
+            progress_args=progress_args,
         )
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await customSendAudio(client, audio, caption, duration, performer, title, thumb, progress)
+    
     except Exception as e:
         LOGGER.error(str(e))
         raise Exception(e)
 
 
-async def customSendPhoto(client, photo, caption, progress):
+async def customSendPhoto(
+    message: Message,
+    photo: Union[str, bytes],
+    caption: Optional[str] = str(),
+    has_spoiler: bool = None,
+    reply_markup: Optional[Union[ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]] = None,
+    progress: Optional[Any] = None,
+    progress_args: Optional[tuple] = None,
+) -> Message:
     try:
-        return await client.reply_photo(
+        return await message.reply_photo(
             photo=photo,
             quote=True,
             caption=caption,
+            has_spoiler=has_spoiler,
             disable_notification=True,
-            progress=progress
+            reply_markup=reply_markup,
+            progress=progress,
+            progress_args=progress_args,
         )
+    
     except FloodWait as f:
         LOGGER.warning(str(f))
         await sleep(f.value * 1.2)
-        return await customSendPhoto(client, photo, caption, progress)
+        return await customSendPhoto(
+            message=message,
+            photo=photo,
+            caption=caption,
+            has_spoiler=has_spoiler,
+            reply_markup=reply_markup,
+            progress=progress,
+            progress_args=progress_args,
+        )
+    
     except Exception as e:
         LOGGER.error(str(e))
         raise Exception(e)

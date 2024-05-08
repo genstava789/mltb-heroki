@@ -353,7 +353,7 @@ class TaskListener(TaskConfig):
                         chat_id=LOG_CHAT_ID,
                         text=msg,
                         message_thread_id=LOG_CHAT_THREAD_ID,
-                        buttons=button
+                        reply_markup=button,
                     )
 
                 except Exception as error:

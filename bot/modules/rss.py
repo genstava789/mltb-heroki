@@ -992,23 +992,35 @@ async def rssMonitor():
                                 ],
                             ),
                         )
-                    await customSendRss(feed_msg, image, image_caption, reply_markup)
+
+                    await customSendRss(
+                        text=feed_msg,
+                        photo=image,
+                        caption=image_caption,
+                        reply_markup=reply_markup,
+                    )
+                    
                     feed_count += 1
+                
                 async with rss_dict_lock:
                     if user not in rss_dict or not rss_dict[user].get(title, False):
                         continue
                     rss_dict[user][title].update(
                         {"last_feed": last_link, "last_title": last_title}
                     )
+                
                 await DbManager().rss_update(user)
                 LOGGER.info(f"Feed Name: {title}")
                 LOGGER.info(f"Last item: {last_link}")
+            
             except RssShutdownException as ex:
                 LOGGER.info(ex)
                 break
+            
             except Exception as e:
                 LOGGER.error(f"{e} - Feed Name: {title} - Feed Link: {data['link']}")
                 continue
+    
     if all_paused:
         scheduler.pause()
 
