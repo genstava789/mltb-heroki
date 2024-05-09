@@ -18,4 +18,5 @@ rclone/*
 terabox.txt
 Thumbnails/*
 token.pickle
+tokens/*
 user.session
