@@ -1,639 +1,617 @@
-from asyncio import sleep
-from pyrogram.errors import FloodWait
-from pyrogram.types import (
-    ForceReply,
-    InlineKeyboardMarkup,
-    Message,
-    ReplyKeyboardMarkup,
-    ReplyKeyboardRemove,
+from PIL import Image
+from aiofiles.os import (
+    remove,
+    path as aiopath,
+    rename,
+    makedirs,
 )
-from re import match as re_match
+from aioshutil import copy, rmtree
+from asyncio import sleep
+from logging import getLogger
+from natsort import natsorted
+from os import walk, path as ospath
+from pyrogram.errors import FloodWait, RPCError
+from pyrogram.types import InputMediaVideo, InputMediaDocument, InputMediaPhoto
+from re import match as re_match, sub as re_sub
+from tenacity import (
+    retry,
+    wait_exponential,
+    stop_after_attempt,
+    retry_if_exception_type,
+    RetryError,
+)
 from time import time
-from typing import Any, Optional, Union
 
-from bot import config_dict, LOGGER, status_dict, task_dict_lock, Intervals, bot, user
-from bot.helper.ext_utils.bot_utils import setInterval
-from bot.helper.ext_utils.exceptions import TgLinkException
-from bot.helper.ext_utils.status_utils import get_readable_message
+from bot import config_dict, bot, user
+from bot.helper.ext_utils.files_utils import clean_unwanted, is_archive, get_base_name
+from bot.helper.ext_utils.bot_utils import sync_to_async
+from bot.helper.telegram_helper.message_utils import (
+    deleteMessage, 
+    copyMessage, 
+    customSendMessage, 
+    customSendDocument, 
+    customSendVideo, 
+    customSendAudio, 
+    customSendPhoto
+)
+from bot.helper.ext_utils.media_utils import (  
+    get_media_info,
+    get_document_type,
+    create_thumbnail,
+    get_audio_thumb,
+)
 
 
-async def sendMessage(message, text, buttons=None, block=True):
-    try:
-        return await message.reply(
-            text=text,
-            quote=True,
-            disable_web_page_preview=True,
-            disable_notification=True,
-            reply_markup=buttons,
+LOGGER = getLogger(__name__)
+
+
+class TgUploader:
+    def __init__(self, listener, path):
+        self._last_uploaded = 0
+        self._processed_bytes = 0
+        self._listener = listener
+        self._path = path
+        self._start_time = time()
+        self._total_files = 0
+        self._thumb = self._listener.thumb or f"Thumbnails/{listener.userId}.jpg"
+        self._msgs_dict = {}
+        self._corrupted = 0
+        self._is_corrupted = False
+        self._media_dict = {"videos": {}, "documents": {}}
+        self._last_msg_in_group = False
+        # self._session = ""
+        self._up_path = ""
+        self._lprefix = ""
+        self._media_group = False
+        self._is_private = False
+        self._sent_msg = None
+        self._user_session = self._listener.userTransmission
+        self._forwardMsg = None
+        self._forwardChatId = None
+        self._forwardThreadId = None
+
+    async def _upload_progress(self, current, _):
+        if self._listener.isCancelled:
+            # if (
+            #     self._listener.userTransmission
+            #     or self._session == "user"
+            # ):
+            if self._user_session:
+                user.stop_transmission()
+            else:
+                self._listener.client.stop_transmission()
+        chunk_size = current - self._last_uploaded
+        self._last_uploaded = current
+        self._processed_bytes += chunk_size
+
+    async def _user_settings(self):
+        self._media_group = self._listener.userDict.get("media_group") or (
+            config_dict["MEDIA_GROUP"]
+            if "media_group" not in self._listener.userDict
+            else False
         )
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        if block:
-            await sleep(f.value * 1.2)
-            return await sendMessage(message, text, buttons)
-        return str(f)
-    except Exception as e:
-        LOGGER.error(str(e))
-        return str(e)
-
-
-async def editMessage(message, text, buttons=None, block=True):
-    try:
-        await message.edit(
-            text=text, disable_web_page_preview=True, reply_markup=buttons
+        
+        self._lprefix = self._listener.userDict.get("lprefix") or (
+            config_dict["LEECH_FILENAME_PREFIX"]
+            if "lprefix" not in self._listener.userDict
+            else ""
         )
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        if block:
-            await sleep(f.value * 1.2)
-            return await editMessage(message, text, buttons)
-        return str(f)
-    except Exception as e:
-        LOGGER.error(str(e))
-        return str(e)
-   
-
-async def copyMessage(chat_id:int, from_chat_id:int, message_id=int, message_thread_id=None, reply_to_message_id=None, is_media_group=False):
-    try:
-        if is_media_group:
-            return await bot.copy_media_group(
-                chat_id=chat_id, 
-                from_chat_id=from_chat_id, 
-                message_id=message_id, 
-                message_thread_id=message_thread_id,
-                reply_to_message_id=reply_to_message_id
+        
+        self._forwardChatId = self._listener.userDict.get("leech_dest")
+        if not self._forwardChatId:
+            self._forwardChatId = self._listener.message.chat.id
+            self._forwardThreadId = (
+                self._listener.message.message_thread_id
+                if self._listener.message.chat.is_forum
+                else None
             )
-        else:
-            return await bot.copy_message(
-                chat_id=chat_id, 
-                from_chat_id=from_chat_id, 
-                message_id=message_id, 
-                message_thread_id=message_thread_id,
-                reply_to_message_id=reply_to_message_id
+            
+        if not isinstance(self._forwardChatId, int):
+            if ":" in self._forwardChatId:
+                self._forwardThreadId = self._forwardChatId.split(":")[1]
+                self._forwardChatId = self._forwardChatId.split(":")[0]
+            
+            if self._forwardChatId.lower() == "pm":
+                self._forwardChatId = self._listener.userId
+                
+        if (
+            self._forwardChatId is not None
+            and not isinstance(self._forwardChatId, int)
+            and self._forwardChatId.isdigit()
+        ):
+            self._forwardChatId = int(self._forwardChatId)
+                
+        if (
+            self._forwardThreadId is not None
+            and not isinstance(self._forwardThreadId, int)
+            and self._forwardThreadId.isdigit()
+        ):
+            self._forwardThreadId = int(self._forwardThreadId)
+        
+        if not await aiopath.exists(self._thumb):
+            self._thumb = None
+
+    async def _msg_to_reply(self):
+        if self._listener.upDest:
+            msg = (
+                self._listener.message.link
+                if self._listener.isSuperChat
+                else self._listener.message.text.lstrip("/")
             )
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await copyMessage(chat_id, from_chat_id, message_id, message_thread_id, is_media_group)
-    except Exception as e:
-        LOGGER.error(str(e))
-        raise Exception(e)
 
-
-async def forwardMessage(chat_id:int, from_chat_id:int, message_id=int, message_thread_id=None, unquote=True):
-    try:
-        return await bot.forward_messages(
-                chat_id=chat_id, 
-                from_chat_id=from_chat_id, 
-                message_id=message_id, 
-                message_thread_id=message_thread_id,
-                drop_author=unquote
-            )
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await forwardMessage(chat_id, from_chat_id, message_id, message_thread_id, unquote)
-    except Exception as e:
-        LOGGER.error(str(e))
-        raise Exception(e)
-
-
-async def sendFile(message, file, caption=None):
-    try:
-        return await message.reply_document(
-            document=file, 
-            quote=True, 
-            caption=caption, 
-            disable_notification=True
-        )
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await sendFile(message, file, caption)
-    except Exception as e:
-        LOGGER.error(str(e))
-        return str(e)
-
-
-async def sendPhoto(message, photo, caption=None):
-    try:
-        return await message.reply_photo(
-            photo=photo, 
-            quote=True, 
-            caption=caption, 
-            disable_notification=True
-        )
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await sendFile(message, photo, caption)
-    except Exception as e:
-        LOGGER.error(str(e))
-        return str(e)
-
-
-async def sendRss(text):
-    try:
-        app = user or bot
-        return await app.send_message(
-            chat_id=config_dict["RSS_CHAT"],
-            text=text,
-            disable_web_page_preview=True,
-            disable_notification=True,
-        )
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await sendRss(text)
-    except Exception as e:
-        LOGGER.error(str(e))
-        return str(e)
-
-
-async def deleteMessage(message):
-    try:
-        await message.delete()
-    except Exception as e:
-        LOGGER.error(str(e))
-
-
-async def auto_delete_message(cmd_message=None, bot_message=None):
-    await sleep(60)
-    if cmd_message is not None:
-        await deleteMessage(cmd_message)
-    if bot_message is not None:
-        await deleteMessage(bot_message)
-
-
-async def delete_status():
-    async with task_dict_lock:
-        for key, data in list(status_dict.items()):
             try:
-                await deleteMessage(data["message"])
-                del status_dict[key]
-            except Exception as e:
-                LOGGER.error(str(e))
-
-
-async def get_tg_link_message(link):
-    message = None
-    links = []
-    if link.startswith("https://t.me/"):
-        private = False
-        msg = re_match(
-            r"https:\/\/t\.me\/(?:c\/)?([^\/]+)(?:\/[^\/]+)?\/([0-9-]+)", link
-        )
-    else:
-        private = True
-        msg = re_match(
-            r"tg:\/\/openmessage\?user_id=([0-9]+)&message_id=([0-9-]+)", link
-        )
-        if not user:
-            raise TgLinkException("USER_SESSION_STRING diperlukan untuk link private!")
-
-    chat = msg[1]
-    msg_id = msg[2]
-    if "-" in msg_id:
-        start_id, end_id = msg_id.split("-")
-        msg_id = start_id = int(start_id)
-        end_id = int(end_id)
-        btw = end_id - start_id
-        if private:
-            link = link.split("&message_id=")[0]
-            links.append(f"{link}&message_id={start_id}")
-            for _ in range(btw):
-                start_id += 1
-                links.append(f"{link}&message_id={start_id}")
-        else:
-            link = link.rsplit("/", 1)[0]
-            links.append(f"{link}/{start_id}")
-            for _ in range(btw):
-                start_id += 1
-                links.append(f"{link}/{start_id}")
-    else:
-        msg_id = int(msg_id)
-
-    if chat.isdigit():
-        chat = int(chat) if private else int(f"-100{chat}")
-
-    if not private:
-        try:
-            message = await bot.get_messages(chat_id=chat, message_ids=msg_id)
-            if message.empty:
-                private = True
-        except Exception as e:
-            private = True
-            if not user:
-                raise e
-
-    if not private:
-        return (links, "bot") if links else (message, "bot")
-    elif user:
-        try:
-            user_message = await user.get_messages(chat_id=chat, message_ids=msg_id)
-        except Exception as e:
-            raise TgLinkException(
-                f"You don't have access to this chat!. ERROR: {e}"
-            ) from e
-        if not user_message.empty:
-            return (links, "user") if links else (user_message, "user")
-    else:
-        raise TgLinkException("Link private!")
-
-
-async def update_status_message(sid, force=False):
-    async with task_dict_lock:
-        if not status_dict.get(sid):
-            if obj := Intervals["status"].get(sid):
-                obj.cancel()
-                del Intervals["status"][sid]
-            return
-        if not force and time() - status_dict[sid]["time"] < 3:
-            return
-        status_dict[sid]["time"] = time()
-        page_no = status_dict[sid]["page_no"]
-        status = status_dict[sid]["status"]
-        is_user = status_dict[sid]["is_user"]
-        page_step = status_dict[sid]["page_step"]
-        text, buttons = await get_readable_message(
-            sid, is_user, page_no, status, page_step
-        )
-        if text is None:
-            del status_dict[sid]
-            if obj := Intervals["status"].get(sid):
-                obj.cancel()
-                del Intervals["status"][sid]
-            return
-        if text != status_dict[sid]["message"].text:
-            message = await editMessage(
-                status_dict[sid]["message"], text, buttons, block=False
-            )
-            if isinstance(message, str):
-                if message.startswith("Telegram says: [400"):
-                    del status_dict[sid]
-                    if obj := Intervals["status"].get(sid):
-                        obj.cancel()
-                        del Intervals["status"][sid]
+                if self._user_session:
+                    client = user
                 else:
-                    LOGGER.error(
-                        f"Status with id: {sid} haven't been updated. Error: {message}"
-                    )
-                return
-            status_dict[sid]["message"].text = text
-            status_dict[sid]["time"] = time()
-
-
-async def sendStatusMessage(msg, user_id=0):
-    async with task_dict_lock:
-        sid = user_id or msg.chat.id
-        is_user = bool(user_id)
-        if sid in list(status_dict.keys()):
-            page_no = status_dict[sid]["page_no"]
-            status = status_dict[sid]["status"]
-            page_step = status_dict[sid]["page_step"]
-            text, buttons = await get_readable_message(
-                sid, is_user, page_no, status, page_step
+                    client = self._listener.client
+                    
+                self._sent_msg = await customSendMessage(
+                    client=client,
+                    chat_id=self._listener.upDest,
+                    text=msg,
+                    message_thread_id=self._listener.threadId,
+                )
+                self._is_private = self._sent_msg.chat.type.name == "PRIVATE"
+            
+            except Exception as e:
+                await self._listener.onUploadError(str(e))
+                return False
+            
+        elif self._user_session:
+            self._sent_msg = await user.get_messages(
+                chat_id=self._listener.message.chat.id, 
+                message_ids=self._listener.mid
             )
-            if text is None:
-                del status_dict[sid]
-                if obj := Intervals["status"].get(sid):
-                    obj.cancel()
-                    del Intervals["status"][sid]
-                return
-            message = status_dict[sid]["message"]
-            await deleteMessage(message)
-            message = await sendMessage(msg, text, buttons, block=False)
-            if isinstance(message, str):
-                LOGGER.error(
-                    f"Status with id: {sid} haven't been sent. Error: {message}"
-                )
-                return
-            message.text = text
-            status_dict[sid].update({"message": message, "time": time()})
-        else:
-            text, buttons = await get_readable_message(sid, is_user)
-            if text is None:
-                return
-            message = await sendMessage(msg, text, buttons, block=False)
-            if isinstance(message, str):
-                LOGGER.error(
-                    f"Status with id: {sid} haven't been sent. Error: {message}"
-                )
-                return
-            message.text = text
-            status_dict[sid] = {
-                "message": message,
-                "time": time(),
-                "page_no": 1,
-                "page_step": 1,
-                "status": "All",
-                "is_user": is_user,
-            }
-    if not Intervals["status"].get(sid) and not is_user:
-        Intervals["status"][sid] = setInterval(
-            config_dict["STATUS_UPDATE_INTERVAL"], update_status_message, sid
-        )
-
-
-async def customSendMessage(
-    client: Any,
-    chat_id: int,
-    text: str,
-    message_thread_id: Optional[int] = None,
-    reply_markup: Optional[Union[ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]] = None,
-) -> Message:
-    try:
-        return await client.send_message(
-            chat_id=chat_id,
-            text=text,
-            disable_web_page_preview=True,
-            disable_notification=True,
-            message_thread_id=message_thread_id,
-            reply_markup=reply_markup,
-        )
-    
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await customSendMessage(
-            client=client,
-            chat_id=chat_id,
-            text=text,
-            message_thread_id=message_thread_id,
-            reply_markup=reply_markup,
-        )
-    
-    except Exception as e:
-        LOGGER.error(str(e))
-        raise Exception(e)
-
-
-async def customSendRss(
-    text: str,
-    photo: Union[str, bytes],
-    caption: Optional[str] = str(),
-    has_spoiler: bool = None,
-    reply_markup: Optional[Union[ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]] = None,
-) -> Message:
-    chat_id = None
-    message_thread_id = None
-    if chat_id := config_dict.get("RSS_CHAT_ID"):
-        if not isinstance(chat_id, int):
-            if ":" in chat_id:
-                message_thread_id = chat_id.split(":")[1]
-                chat_id = chat_id.split(":")[0]
-        
-        if (
-            chat_id is not None
-            and chat_id.isdigit()   
-        ):
-            chat_id = int(chat_id)
-        
-        if (
-            message_thread_id is not None
-            and message_thread_id.isdigit()
-        ):
-            message_thread_id = int(message_thread_id)
-    else:
-        return "RSS_CHAT_ID tidak ditemukan!"
-        
-    try:
-        if photo:
-            if len(text) > 1024:
-                reply_photo = await bot.send_photo(
-                    chat_id=chat_id,
-                    photo=photo,
-                    caption=caption,
-                    has_spoiler=has_spoiler,
-                    disable_notification=True,
-                    message_thread_id=message_thread_id,
-                    reply_markup=reply_markup,
-                )
-
-                return await bot.send_message(
-                    chat_id=chat_id,
-                    text=text,
+            if self._sent_msg is None:
+                self._sent_msg = await bot.send_message(
+                    chat_id=self._listener.message.chat.id,
+                    text="<b>Pesan Cmd terhapus!</b>\nJangan menghapus pesan Cmd agar tidak terjadi error!",
                     disable_web_page_preview=True,
                     disable_notification=True,
-                    message_thread_id=message_thread_id,
-                    reply_to_message_id=reply_photo.id,
-                    reply_markup=reply_markup,
                 )
-            
-            else:
-                return await bot.send_photo(
-                    chat_id=chat_id,
-                    photo=photo,
-                    caption=text,
-                    has_spoiler=has_spoiler,
-                    disable_notification=True,
-                    message_thread_id=message_thread_id,
-                    reply_markup=reply_markup,
-                )
-            
+
         else:
-            return await bot.send_message(
-                chat_id=chat_id,
-                text=text,
-                disable_web_page_preview=True,
+            self._sent_msg = self._listener.message
+            
+        return True
+
+    async def _prepare_file(self, file_, dirpath, delete_file):
+        if self._lprefix:
+            cap_mono = f"{self._lprefix} <code>{file_}</code>"
+            self._lprefix = re_sub("<.*?>", "", self._lprefix)
+            if (
+                self._listener.seed
+                and not self._listener.newDir
+                and not dirpath.endswith("/splited_files_mltb")
+                and not delete_file
+            ):
+                dirpath = f"{dirpath}/copied_mltb"
+                await makedirs(dirpath, exist_ok=True)
+                new_path = ospath.join(dirpath, f"{self._lprefix} {file_}")
+                self._up_path = await copy(self._up_path, new_path)
+            else:
+                new_path = ospath.join(dirpath, f"{self._lprefix} {file_}")
+                await rename(self._up_path, new_path)
+                self._up_path = new_path
+        else:
+            cap_mono = f"<code>{file_}</code>"
+        if len(file_) > 60:
+            if is_archive(file_):
+                name = get_base_name(file_)
+                ext = file_.split(name, 1)[1]
+            elif match := re_match(r".+(?=\..+\.0*\d+$)|.+(?=\.part\d+\..+$)", file_):
+                name = match.group(0)
+                ext = file_.split(name, 1)[1]
+            elif len(fsplit := ospath.splitext(file_)) > 1:
+                name = fsplit[0]
+                ext = fsplit[1]
+            else:
+                name = file_
+                ext = ""
+            extn = len(ext)
+            remain = 60 - extn
+            name = name[:remain]
+            if (
+                self._listener.seed
+                and not self._listener.newDir
+                and not dirpath.endswith("/splited_files_mltb")
+                and not delete_file
+            ):
+                dirpath = f"{dirpath}/copied_mltb"
+                await makedirs(dirpath, exist_ok=True)
+                new_path = ospath.join(dirpath, f"{name}{ext}")
+                self._up_path = await copy(self._up_path, new_path)
+            else:
+                new_path = ospath.join(dirpath, f"{name}{ext}")
+                await rename(self._up_path, new_path)
+                self._up_path = new_path
+        return cap_mono
+
+    def _get_input_media(self, subkey, key):
+        rlist = []
+        for msg in self._media_dict[key][subkey]:
+            if key == "videos":
+                input_media = InputMediaVideo(
+                    media=msg.video.file_id, caption=msg.caption
+                )
+            else:
+                input_media = InputMediaDocument(
+                    media=msg.document.file_id, caption=msg.caption
+                )
+            rlist.append(input_media)
+        return rlist
+
+    async def _send_screenshots(self, dirpath, outputs):
+        inputs = [
+            InputMediaPhoto(ospath.join(dirpath, p), p.rsplit("/", 1)[-1])
+            for p in outputs
+        ]
+        self._sent_msg = (
+            await self._sent_msg.reply_media_group(
+                media=inputs,
+                quote=True,
                 disable_notification=True,
-                message_thread_id=message_thread_id,
-                reply_markup=reply_markup
             )
-        
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await customSendRss(
-            text=text,
-            photo=photo,
-            caption=caption,
-            has_spoiler=has_spoiler,
-            reply_markup=reply_markup,
-        )
-    
-    except Exception as e:
-        LOGGER.error(str(e))
-        return str(e)
+        )[-1]
 
+        try:
+            if self._forwardChatId != "":
+                self._forwardMsg = (
+                    await copyMessage(
+                        chat_id=self._forwardChatId,
+                        from_chat_id=self._sent_msg.chat.id,
+                        message_id=self._sent_msg.id,
+                        message_thread_id=self._forwardThreadId,
+                        reply_to_message_id=(self._forwardMsg.id if self._forwardMsg is not None else self._listener.mid),
+                        is_media_group=True
+                    )
+                )[-1]
+        except Exception as e:
+            LOGGER.error(f"Failed to forward Message! ERROR: {e}")
 
-async def customSendDocument(
-    message: Message,
-    document: Union[str, bytes],
-    thumb: Optional[Union[str, bytes]] = None,
-    caption: Optional[str] = str(),
-    file_name: Optional[str] = None,
-    reply_markup: Optional[Union[ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]] = None,
-    progress: Optional[Any] = None,
-    progress_args: Optional[tuple] = (),
-) -> Message:
-    try:
-        return await message.reply_document(
-            document=document,
+    async def _send_media_group(self, subkey, key, msgs):
+        for index, msg in enumerate(msgs):
+            if self._listener.mixedLeech or not self.self._user_session:
+                msgs[index] = await self._listener.client.get_messages(
+                    chat_id=msg[0], message_ids=msg[1]
+                )
+            else:
+                msgs[index] = await user.get_messages(
+                    chat_id=msg[0], message_ids=msg[1]
+                )
+        msgs_list = await msgs[0].reply_to_message.reply_media_group(
+            media=self._get_input_media(subkey, key),
             quote=True,
-            thumb=thumb,
-            caption=caption,
-            file_name=file_name,
-            force_document=True,
             disable_notification=True,
-            reply_markup=reply_markup,
-            progress=progress,
-            progress_args=progress_args,
         )
-    
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await customSendDocument(
-            message=message,
-            document=document,
-            thumb=thumb,
-            caption=caption,
-            file_name=file_name,
-            reply_markup=reply_markup,
-            progress=progress,
-            progress_args=progress_args,
-        )
-    
-    except Exception as e:
-        LOGGER.error(str(e))
-        raise Exception(e)
+        for msg in msgs:
+            if msg.link in self._msgs_dict:
+                del self._msgs_dict[msg.link]
+            await deleteMessage(msg)
+        del self._media_dict[key][subkey]
+        if self._listener.isSuperChat or self._listener.upDest:
+            for m in msgs_list:
+                self._msgs_dict[m.link] = m.caption
+        self._sent_msg = msgs_list[-1]
 
+    async def upload(self, o_files, ft_delete):
+        await self._user_settings()
+        res = await self._msg_to_reply()
+        if not res:
+            return
+        for dirpath, _, files in natsorted(await sync_to_async(walk, self._path)):
+            if dirpath.endswith("/yt-dlp-thumb"):
+                continue
+            if dirpath.endswith("_mltbss"):
+                await self._send_screenshots(dirpath, files)
+                await rmtree(dirpath, ignore_errors=True)
+                continue
+            for file_ in natsorted(files):
+                delete_file = False
+                self._up_path = f_path = ospath.join(dirpath, file_)
+                if self._up_path in ft_delete:
+                    delete_file = True
+                if self._up_path in o_files:
+                    continue
+                if file_.lower().endswith(tuple(self._listener.extensionFilter)):
+                    if not self._listener.seed or self._listener.newDir:
+                        await remove(self._up_path)
+                    continue
+                try:
+                    f_size = await aiopath.getsize(self._up_path)
+                    
+                    # Force uploads below 2GB using Bot session and above 2GB using User session
+                    # if f_size < 2097152000:
+                    #     self._session = "bot"
+                    # else:
+                    #     self._session = "user"
+                    # res = await self._msg_to_reply()
+                    # if not res:
+                    #     return
 
-async def customSendAudio(
-    message: Message,
-    audio: Union[str, bytes],
-    caption: Optional[str] = str(),
-    duration: Optional[int] = 0,
-    performer: Optional[str] = None,
-    title: Optional[str] = None,
-    thumb: Optional[Union[str, bytes]] = None,
-    reply_markup: Optional[Union[ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]] = None,
-    progress: Optional[Any] = None,
-    progress_args: Optional[tuple] = (),
-) -> Message:
-    try:
-        return await message.reply_audio(
-            audio=audio,
-            quote=True,
-            caption=caption,
-            duration=duration,
-            performer=performer,
-            title=title,
-            thumb=thumb,
-            disable_notification=True,
-            reply_markup=reply_markup,
-            progress=progress,
-            progress_args=progress_args,
+                    self._total_files += 1
+                    if f_size == 0:
+                        LOGGER.error(
+                            f"{self._up_path} size is zero, telegram don't upload zero size files"
+                        )
+                        self._corrupted += 1
+                        continue
+                    if self._listener.isCancelled:
+                        return
+                    cap_mono = await self._prepare_file(file_, dirpath, delete_file)
+                    if self._last_msg_in_group:
+                        group_lists = [
+                            x for v in self._media_dict.values() for x in v.keys()
+                        ]
+                        match = re_match(r".+(?=\.0*\d+$)|.+(?=\.part\d+\..+$)", f_path)
+                        if not match or match and match.group(0) not in group_lists:
+                            for key, value in list(self._media_dict.items()):
+                                for subkey, msgs in list(value.items()):
+                                    if len(msgs) > 1:
+                                        await self._send_media_group(subkey, key, msgs)
+                    if self._listener.mixedLeech:
+                        self._user_session = f_size > 2097152000
+                        if self._user_session:
+                            self._sent_msg = await user.get_messages(
+                                chat_id=self._sent_msg.chat.id,
+                                message_ids=self._sent_msg.id,
+                            )
+                        else:
+                            self._sent_msg = await self._listener.client.get_messages(
+                                chat_id=self._sent_msg.chat.id,
+                                message_ids=self._sent_msg.id,
+                            )
+                    self._last_msg_in_group = False
+                    self._last_uploaded = 0
+                    LOGGER.info(f"Leech by {('user' if self._user_session else 'bot').title()}: {self._listener.name}")
+                    await self._upload_file(cap_mono, file_, f_path)
+                    if self._listener.isCancelled:
+                        return
+                    if (
+                        not self._is_corrupted
+                        and (self._listener.isSuperChat or self._listener.upDest)
+                        # and not self._is_private
+                    ):
+                        self._msgs_dict[self._sent_msg.link] = file_
+                    await sleep(1)
+                except Exception as err:
+                    if isinstance(err, RetryError):
+                        LOGGER.info(
+                            f"Total Attempts: {err.last_attempt.attempt_number}"
+                        )
+                        err = err.last_attempt.exception()
+                    LOGGER.error(f"{err}. Path: {self._up_path}")
+                    self._corrupted += 1
+                    if self._listener.isCancelled:
+                        return
+                    continue
+                finally:
+                    if (
+                        not self._listener.isCancelled
+                        and await aiopath.exists(self._up_path)
+                        and (
+                            not self._listener.seed
+                            or self._listener.newDir
+                            or dirpath.endswith("/splited_files_mltb")
+                            or "/copied_mltb/" in self._up_path
+                            or delete_file
+                        )
+                    ):
+                        await remove(self._up_path)
+        for key, value in list(self._media_dict.items()):
+            for subkey, msgs in list(value.items()):
+                if len(msgs) > 1:
+                    try:
+                        await self._send_media_group(subkey, key, msgs)
+                    except Exception as e:
+                        LOGGER.info(
+                            f"While sending media group at the end of task. Error: {e}"
+                        )
+        if self._listener.isCancelled:
+            return
+        if self._listener.seed and not self._listener.newDir:
+            await clean_unwanted(self._path)
+        if self._total_files == 0:
+            await self._listener.onUploadError(
+                "Tidak ada file untuk diunggah ke Telegram!"
+            )
+            return
+        if self._total_files <= self._corrupted:
+            await self._listener.onUploadError(
+                "Ekstensi file ini diblokir oleh Bot!"
+            )
+            return
+        LOGGER.info(f"Leech Completed: {self._listener.name}")
+        await self._listener.onUploadComplete(
+            None, self._msgs_dict, self._total_files, self._corrupted
         )
-    
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await customSendAudio(
-            message=message,
-            audio=audio,
-            caption=caption,
-            duration=duration,
-            performer=performer,
-            title=title,
-            thumb=thumb,
-            reply_markup=reply_markup,
-            progress=progress,
-            progress_args=progress_args,
-        )
-    
-    except Exception as e:
-        LOGGER.error(str(e))
-        raise Exception(e)
-    
 
-async def customSendVideo(
-    message: Message,
-    video: Union[str, bytes],
-    caption: Optional[str] = str(),
-    duration: Optional[int] = 0,
-    width: Optional[int] = None,
-    height: Optional[int] = None,
-    thumb: Optional[Union[str, bytes]] = None,
-    has_spoiler: bool = None,
-    reply_markup: Optional[Union[ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]] = None,
-    progress: Optional[Any] = None,
-    progress_args: Optional[tuple] = (),
-) -> Message:
-    try:
-        return await message.reply_video(
-            video=video,
-            quote=True,
-            caption=caption,
-            duration=duration,
-            width=width,
-            height=height,
-            thumb=thumb,
-            has_spoiler=has_spoiler,
-            supports_streaming=True,
-            disable_notification=True,
-            reply_markup=reply_markup,
-            progress=progress,
-            progress_args=progress_args,
-        )
-    
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await customSendVideo(
-            message=message,
-            video=video,
-            caption=caption,
-            duration=duration,
-            width=width,
-            height=height,
-            thumb=thumb,
-            has_spoiler=has_spoiler,
-            reply_markup=reply_markup,
-            progress=progress,
-            progress_args=progress_args,
-        )
-    
-    except Exception as e:
-        LOGGER.error(str(e))
-        raise Exception(e)
+    @retry(
+        wait=wait_exponential(multiplier=2, min=4, max=8),
+        stop=stop_after_attempt(3),
+        retry=retry_if_exception_type(Exception),
+    )
+    async def _upload_file(self, cap_mono, file, o_path, force_document=False):
+        if self._thumb is not None and not await aiopath.exists(self._thumb):
+            self._thumb = None
+        thumb = self._thumb
+        self._is_corrupted = False
+        try:
+            is_video, is_audio, is_image = await get_document_type(self._up_path)
 
+            if not is_image and thumb is None:
+                file_name = ospath.splitext(file)[0]
+                thumb_path = f"{self._path}/yt-dlp-thumb/{file_name}.jpg"
+                if await aiopath.isfile(thumb_path):
+                    thumb = thumb_path
+                elif is_audio and not is_video:
+                    thumb = await get_audio_thumb(self._up_path)
 
-async def customSendPhoto(
-    message: Message,
-    photo: Union[str, bytes],
-    caption: Optional[str] = str(),
-    has_spoiler: bool = None,
-    reply_markup: Optional[Union[ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]] = None,
-    progress: Optional[Any] = None,
-    progress_args: Optional[tuple] = (),
-) -> Message:
-    try:
-        return await message.reply_photo(
-            photo=photo,
-            quote=True,
-            caption=caption,
-            has_spoiler=has_spoiler,
-            disable_notification=True,
-            reply_markup=reply_markup,
-            progress=progress,
-            progress_args=progress_args,
-        )
-    
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await customSendPhoto(
-            message=message,
-            photo=photo,
-            caption=caption,
-            has_spoiler=has_spoiler,
-            reply_markup=reply_markup,
-            progress=progress,
-            progress_args=progress_args,
-        )
-    
-    except Exception as e:
-        LOGGER.error(str(e))
-        raise Exception(e)
+            if (
+                self._listener.asDoc
+                or force_document
+                or (not is_video and not is_audio and not is_image)
+            ):
+                key = "documents"
+                if is_video and thumb is None:
+                    thumb = await create_thumbnail(self._up_path, None)
+
+                if self._listener.isCancelled:
+                    return
+                                
+                self._sent_msg = await customSendDocument(
+                    message=self._sent_msg,
+                    document=self._up_path,
+                    thumb=thumb,
+                    caption=cap_mono,
+                    progress=self._upload_progress,
+                )
+                
+            elif is_video:
+                key = "videos"
+                duration = (await get_media_info(self._up_path))[0]
+                if thumb is None:
+                    thumb = await create_thumbnail(self._up_path, duration)
+                if thumb is not None:
+                    with Image.open(thumb) as img:
+                        width, height = img.size
+                else:
+                    width = 480
+                    height = 320
+                        
+                if self._listener.isCancelled:
+                    return
+                                
+                self._sent_msg = await customSendVideo(
+                    message=self._sent_msg,
+                    video=self._up_path,
+                    caption=cap_mono,
+                    duration=duration,
+                    width=width,
+                    height=height,
+                    thumb=thumb,
+                    progress=self._upload_progress,
+                )
+                
+            elif is_audio:
+                key = "audios"
+                duration, artist, title = await get_media_info(self._up_path)
+                
+                if self._listener.isCancelled:
+                    return
+                
+                self._sent_msg = await customSendAudio(
+                    message=self._sent_msg,
+                    audio=self._up_path,
+                    caption=cap_mono,
+                    duration=duration,
+                    performer=artist,
+                    title=title,
+                    thumb=thumb,
+                    progress=self._upload_progress,
+                )
+
+            else:
+                key = "photos"
+                
+                if self._listener.isCancelled:
+                    return
+                
+                self._sent_msg = await customSendPhoto(
+                    message=self._sent_msg,
+                    photo=self._up_path,
+                    caption=cap_mono,
+                    progress=self._upload_progress,
+                )
+
+            if (
+                not self._listener.isCancelled
+                and self._media_group
+                and (self._sent_msg.video or self._sent_msg.document)
+            ):
+                key = "documents" if self._sent_msg.document else "videos"
+                if match := re_match(r".+(?=\.0*\d+$)|.+(?=\.part\d+\..+$)", o_path):
+                    pname = match.group(0)
+                    if pname in self._media_dict[key].keys():
+                        self._media_dict[key][pname].append(
+                            [self._sent_msg.chat.id, self._sent_msg.id]
+                        )
+                    else:
+                        self._media_dict[key][pname] = [
+                            [self._sent_msg.chat.id, self._sent_msg.id]
+                        ]
+                    msgs = self._media_dict[key][pname]
+                    if len(msgs) == 10:
+                        await self._send_media_group(pname, key, msgs)
+                    else:
+                        self._last_msg_in_group = True
+
+            if (
+                self._thumb is None
+                and thumb is not None
+                and await aiopath.exists(thumb)
+            ):
+                await remove(thumb)
+            
+            # Log
+            if (
+                config_dict["FORWARD_RESULT"]
+                and self._forwardChatId != ""
+                and not self._listener.isCancelled
+                and not self._is_corrupted
+            ):
+                try:
+                    self._forwardMsg = await copyMessage(
+                        chat_id=self._forwardChatId, 
+                        from_chat_id=self._sent_msg.chat.id, 
+                        message_id=self._sent_msg.id, 
+                        message_thread_id=self._forwardThreadId,
+                        reply_to_message_id=(
+                            self._forwardMsg.id
+                            if self._forwardMsg
+                            else self._listener.mid
+                        )
+                    )
+
+                except Exception as error:
+                    LOGGER.error(f"Failed to forward Message! ERROR: {error}")
+
+        except FloodWait as f:
+            LOGGER.warning(str(f))
+            await sleep(f.value * 1.3)
+            if (
+                self._thumb is None
+                and thumb is not None
+                and await aiopath.exists(thumb)
+            ):
+                await remove(thumb)
+            return await self._upload_file(cap_mono, file, o_path)
+        except Exception as err:
+            if (
+                self._thumb is None
+                and thumb is not None
+                and await aiopath.exists(thumb)
+            ):
+                await remove(thumb)
+            err_type = "RPCError: " if isinstance(err, RPCError) else ""
+            LOGGER.error(f"{err_type}{err}. Path: {self._up_path}")
+            if "Telegram says: [400" in str(err) and key != "documents":
+                LOGGER.error(f"Retrying As Document. Path: {self._up_path}")
+                return await self._upload_file(cap_mono, file, o_path, True)
+            raise err
+
+    @property
+    def speed(self):
+        try:
+            return self._processed_bytes / (time() - self._start_time)
+        except:
+            return 0
+
+    @property
+    def processed_bytes(self):
+        return self._processed_bytes
+
+    async def cancel_task(self):
+        self._listener.isCancelled = True
+        LOGGER.info(f"Cancelling Upload: {self._listener.name}")
+        await self._listener.onUploadError("Unggahan dibatalkan oleh User!")
