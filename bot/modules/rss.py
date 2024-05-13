@@ -735,8 +735,8 @@ async def rssMonitor():
                         if not feed_msg.startswith("/"):
                             feed_msg = f"/{feed_msg}"
                     else:
-                        image = None
-                        image_caption = None
+                        photo = None
+                        caption = None
                         
                         p2p_group = None
                         not_tracker = False
@@ -837,7 +837,7 @@ async def rssMonitor():
                         
                         # https://bangumi.moe/
                         elif "bangumi" in url.lower():
-                            image = re_findall(r"\bhttps?://\S+?\.(?:png|jpe?g)\b", description)[0]
+                            photo = re_findall(r"\bhttps?://\S+?\.(?:png|jpe?g)\b", description)[0]
                             if not category:
                                 category = "Anime"
                             description = None
@@ -853,13 +853,13 @@ async def rssMonitor():
                         elif "yts" in url.lower():
                             view = rss_d.entries[feed_count].get("guid")
                             if description:
-                                image = re_findall(r"\bhttps?://\S+?\.(?:png|jpe?g)\b", description)[0]
+                                photo = re_findall(r"\bhttps?://\S+?\.(?:png|jpe?g)\b", description)[0]
                                 description = re_sub(r"<.*?>", "", description)
                                 size = description.split("Size: ")[-1].split("Runtime: ")[0]
                                 category = description.split("Genre: ")[-1].split("Size: ")[0].replace(" /", ",")
                                 description = rss_d.entries[feed_count].get("description").split("<br />")[-1]
-                            if image:
-                                image_caption = item_title
+                            if photo:
+                                caption = item_title
                         
                         # https://avistaz.to/
                         elif "avistaz" in url.lower():
@@ -899,10 +899,10 @@ async def rssMonitor():
                             view = url
                             category = ", ".join(x["term"] for x in rss_d.entries[feed_count].get("tags"))
                             if description:
-                                image = re_findall(r"\bhttps?://\S+?\.(?:png|jpe?g)\b", description)[0]
+                                photo = re_findall(r"\bhttps?://\S+?\.(?:png|jpe?g)\b", description)[0]
                                 description = re_sub(r"<.*?>", "", description)
-                            if image:
-                                image_caption = item_title
+                            if photo:
+                                caption = item_title
                         
                         # https://pahe.ink/
                         elif "pahe" in url.lower():
@@ -995,8 +995,8 @@ async def rssMonitor():
 
                     await customSendRss(
                         text=feed_msg,
-                        photo=image,
-                        caption=image_caption,
+                        photo=photo,
+                        caption=caption,
                         reply_markup=reply_markup,
                     )
                     

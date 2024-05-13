@@ -2,13 +2,10 @@ from asyncio import sleep
 from pyrogram.errors import FloodWait
 from pyrogram.types import (
     ForceReply,
-    InlineKeyboardButton,
     InlineKeyboardMarkup,
-    MenuButtonWebApp,
     Message,
     ReplyKeyboardMarkup,
     ReplyKeyboardRemove,
-    WebAppInfo,
 )
 from re import match as re_match
 from time import time
@@ -469,7 +466,7 @@ async def customSendDocument(
     file_name: Optional[str] = None,
     reply_markup: Optional[Union[ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]] = None,
     progress: Optional[Any] = None,
-    progress_args: Optional[tuple] = None,
+    progress_args: Optional[tuple] = (),
 ) -> Message:
     try:
         return await message.reply_document(
@@ -478,7 +475,7 @@ async def customSendDocument(
             thumb=thumb,
             caption=caption,
             file_name=file_name,
-            # force_document=True,
+            force_document=True,
             disable_notification=True,
             reply_markup=reply_markup,
             progress=progress,
@@ -514,7 +511,7 @@ async def customSendAudio(
     thumb: Optional[Union[str, bytes]] = None,
     reply_markup: Optional[Union[ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]] = None,
     progress: Optional[Any] = None,
-    progress_args: Optional[tuple] = None,
+    progress_args: Optional[tuple] = (),
 ) -> Message:
     try:
         return await message.reply_audio(
@@ -560,9 +557,10 @@ async def customSendVideo(
     width: Optional[int] = None,
     height: Optional[int] = None,
     thumb: Optional[Union[str, bytes]] = None,
+    has_spoiler: bool = None,
     reply_markup: Optional[Union[ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]] = None,
     progress: Optional[Any] = None,
-    progress_args: Optional[tuple] = None,
+    progress_args: Optional[tuple] = (),
 ) -> Message:
     try:
         return await message.reply_video(
@@ -573,6 +571,7 @@ async def customSendVideo(
             width=width,
             height=height,
             thumb=thumb,
+            has_spoiler=has_spoiler,
             supports_streaming=True,
             disable_notification=True,
             reply_markup=reply_markup,
@@ -591,6 +590,7 @@ async def customSendVideo(
             width=width,
             height=height,
             thumb=thumb,
+            has_spoiler=has_spoiler,
             reply_markup=reply_markup,
             progress=progress,
             progress_args=progress_args,
@@ -608,7 +608,7 @@ async def customSendPhoto(
     has_spoiler: bool = None,
     reply_markup: Optional[Union[ForceReply, InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]] = None,
     progress: Optional[Any] = None,
-    progress_args: Optional[tuple] = None,
+    progress_args: Optional[tuple] = (),
 ) -> Message:
     try:
         return await message.reply_photo(
