@@ -1,6 +1,6 @@
 from aiofiles import open as aiopen
 from aiofiles.os import path as aiopath, remove
-from asyncio import gather, create_subprocess_exec, sleep
+from asyncio import gather, create_subprocess_exec
 from datetime import datetime
 from os import execl as osexecl, getpid
 from psutil import (
@@ -20,11 +20,12 @@ from signal import signal, SIGINT
 from sys import executable
 from time import time
 from bot import (
-    bot,
     bot_name,
+    bot,
     botStartTime,
     config_dict,
     DATABASE_URL,
+    get_sabnzb_client,
     INCOMPLETE_TASK_NOTIFIER,
     Intervals,
     IS_PREMIUM_USER,
@@ -46,25 +47,25 @@ from .helper.telegram_helper.button_build import ButtonMaker
 from .helper.telegram_helper.filters import CustomFilters
 from .helper.telegram_helper.message_utils import sendMessage, editMessage, sendFile
 from .modules import (
-    authorize,
-    bot_settings,
-    cancel_task,
-    clone,
-    exec,
-    force_start,
-    gd_count,
-    gd_delete,
-    gd_search,
-    help,
-    mirror_leech,
-    rss,
-    shell,
-    speedtest,
-    status,
-    torrent_search,
-    torrent_select,
-    users_settings,
-    ytdlp,
+    authorize,  # noqa: F401
+    bot_settings,  # noqa: F401
+    cancel_task,  # noqa: F401
+    clone,  # noqa: F401
+    exec,  # noqa: F401
+    file_selector,  # noqa: F401
+    force_start,  # noqa: F401
+    gd_count,  # noqa: F401
+    gd_delete,  # noqa: F401
+    gd_search,  # noqa: F401
+    help,  # noqa: F401
+    mirror_leech,  # noqa: F401
+    rss,  # noqa: F401
+    shell,  # noqa: F401
+    speedtest,  # noqa: F401
+    status,  # noqa: F401
+    torrent_search,  # noqa: F401
+    users_settings,  # noqa: F401
+    ytdlp,  # noqa: F401
 )
 
 
@@ -129,6 +130,7 @@ async def stats(_, message):
 <b>Python       :</b> <code>{Version.Python}</code>
 <b>Qbittorrent  :</b> <code>{Version.QBittorrent}</code>
 <b>Rclone       :</b> <code>{Version.Rclone}</code>
+<b>SABnzbd      :</b> <code>{Version.SABnzbd}</code>
 <b>YT-DLP       :</b> <code>{Version.YT_DLP}</code>
 
 <b>Lainnya</b>
@@ -197,10 +199,18 @@ async def restart(_, message):
     if st := Intervals["status"]:
         for intvl in list(st.values()):
             intvl.cancel()
-    await sleep(1)
+    nzb_client = get_sabnzb_client()
+    if nzb_client.LOGGED_IN:
+        await nzb_client.pause_all()
+        await nzb_client.purge_all(True)
+        await nzb_client.shutdown()
     await sync_to_async(clean_all)
-    await sleep(1)
-    proc1 = await create_subprocess_exec("pkill", "-9", "-f", "gunicorn|chrome|firefox|opera|edge|safari")
+    proc1 = await create_subprocess_exec(
+        "pkill",
+        "-9",
+        "-f",
+        "avaj|c2aira|enolcr|gepmff|gunicorn|sulpdbznbas|xon-tnerrottibq",
+    )
     proc2 = await create_subprocess_exec("python3", "update.py")
     await gather(proc1.wait(), proc2.wait())
     async with aiopen(".restartmsg", "w") as f:
@@ -230,20 +240,22 @@ async def bot_help(_, message):
 <b>Daftar Perintah</b> <code>@{bot_name}</code>
 <code>/{BotCommands.StartCommand}</code> : Mulai Bot.
 <code>/{BotCommands.HelpCommand[0]}</code> atau <code>/{BotCommands.HelpCommand[1]}</code> : Cek semua perintah Bot.
-<code>/{BotCommands.MirrorCommand[0]}</code> atau <code>/{BotCommands.MirrorCommand[1]}</code> : Mirror ke Google Drive/Cloud menggunakan Aria2.
-<code>/{BotCommands.QbMirrorCommand[0]}</code> atau <code>/{BotCommands.QbMirrorCommand[1]}</code> : Mirror ke Google Drive/Cloud menggunakan qBittorrent.
-<code>/{BotCommands.JdMirrorCommand[0]}</code> atau <code>/{BotCommands.JdMirrorCommand[1]}</code> : Mirror ke Google Drive/Cloud menggunakan JDownloader.
-<code>/{BotCommands.YtdlCommand[0]}</code> atau <code>/{BotCommands.YtdlCommand[1]}</code> : Mirror ke Google Drive/Cloud menggunakan YT-DLP.
+<code>/{BotCommands.MirrorCommand[0]}</code> atau <code>/{BotCommands.MirrorCommand[1]}</code> : Mirror ke Cloud menggunakan Aria2.
+<code>/{BotCommands.QbMirrorCommand[0]}</code> atau <code>/{BotCommands.QbMirrorCommand[1]}</code> : Mirror ke Cloud menggunakan qBittorrent.
+<code>/{BotCommands.JdMirrorCommand[0]}</code> atau <code>/{BotCommands.JdMirrorCommand[1]}</code> : Mirror ke Cloud menggunakan JDownloader.
+<code>/{BotCommands.NzbMirrorCommand[0]}</code> atau <code>/{BotCommands.NzbMirrorCommand[1]}</code> : Mirror ke Cloud menggunakan SABnzbd.
+<code>/{BotCommands.YtdlCommand[0]}</code> atau <code>/{BotCommands.YtdlCommand[1]}</code> : Mirror ke Cloud menggunakan YT-DLP.
 <code>/{BotCommands.LeechCommand[0]}</code> atau <code>/{BotCommands.LeechCommand[1]}</code> : Leech ke Telegram menggunakan Aria2.
 <code>/{BotCommands.QbLeechCommand[0]}</code> atau <code>/{BotCommands.QbLeechCommand[1]}</code> : Leech ke Telegram menggunakan qBittorrent.
 <code>/{BotCommands.JdLeechCommand[0]}</code> atau <code>/{BotCommands.JdLeechCommand[1]}</code> : Leech ke Telegram menggunakan JDownloader.
+<code>/{BotCommands.NzbLeechCommand[0]}</code> atau <code>/{BotCommands.NzbLeechCommand[1]}</code> : Leech ke Telegram menggunakan SABnzbd.
 <code>/{BotCommands.YtdlLeechCommand[0]}</code> atau <code>/{BotCommands.YtdlLeechCommand[1]}</code> : Leech ke Telegram menggunakan YT-DLP.
 <code>/{BotCommands.CloneCommand[0]}</code> atau <code>/{BotCommands.CloneCommand[1]}</code> [gdriveUrl] : Menggandakan file/folder Google Drive.
 <code>/{BotCommands.CountCommand[0]}</code> atau <code>/{BotCommands.CountCommand[1]}</code> [gdriveUrl] : Menghitung file/folder Google Drive.
 <code>/{BotCommands.DeleteCommand[0]}</code> atau <code>/{BotCommands.DeleteCommand[1]}</code> [gdriveUrl] : Menghapus file/folder Google Drive (Hanya Owner & Sudo).
 <code>/{BotCommands.UserSetCommand[0]}</code> atau <code>/{BotCommands.UserSetCommand[1]}</code> : Pengaturan User.
 <code>/{BotCommands.BotSetCommand[0]}</code> atau <code>/{BotCommands.BotSetCommand[1]}</code> : Pengaturan Bot (Hanya Owner & Sudo).
-<code>/{BotCommands.BtSelectCommand[0]}</code> atau <code>/{BotCommands.BtSelectCommand[1]}</code> : Memilih file dari torrent.
+<code>/{BotCommands.SelectCommand[0]}</code> atau <code>/{BotCommands.SelectCommand[1]}</code> : Memilih file dari Torrent atau NZB.
 <code>/{BotCommands.CancelTaskCommand[0]}</code> atau <code>/{BotCommands.CancelTaskCommand[1]}</code> [GID] : Membatalkan Tugas.
 <code>/{BotCommands.ForceStartCommand[0]}</code> atau <code>/{BotCommands.ForceStartCommand[1]}</code> [GID] : Memulai Tugas secara paksa.
 <code>/{BotCommands.CancelAllCommand[0]}</code> atau <code>/{BotCommands.CancelAllCommand[1]}</code> : Membatalkan semua Tugas (Hanya Owner & Sudo).

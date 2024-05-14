@@ -12,20 +12,25 @@ programming in Python.
 
 ## Custom Apps Name
 - AniDL : anidl
-- Aria2c : chrome
+- Aria2c : c2aira
 - Bento4 : **Not Changed** [List Apps](https://www.bento4.com/#included-applications)
-- FFMPEG : opera
+- FFMPEG : gepmff
+- FFPROBE : ffprobe
+- FFPLAY : ffplay
 - Gallery-DL : gallery-dl
 - HandBrakeCLI : handbrake
-- Java : safari
+- Java : avaj
+- MediaInfo : mediainfo
 - MKVToolNix : **Not Changed** [List Apps](https://mkvtoolnix.download/docs.html)
+- NeoFetch : neofetch
 - N_m3u8DL-RE : m3u8
 - Phantom-JS : phantomjs
-- QBittorrent : nightly
-- QBittorrent-Nox : firefox
-- Rclone : edge
+- QBittorrent : tnerrottibq
+- QBittorrent-Nox : xon-tnerrottibq
+- Rclone : enolcr
 - Shaka-Packager : shaka-packager
 - VCSI : vcsi
+- YT-DLP : yt-dlp
 
 ## Custom Docker Images
 [Docker.Io](https://hub.docker.com/r/arakurumi/mltb)
@@ -47,7 +52,7 @@ Automatically daily builds Docker Image and sometimes I often change the Docker 
 Based on Alpine Latest with Heroku Bypass
 Include :
 - Stable Apps which used by Mirror Leech Telegram Bot
-- Cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MKVToolNix, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
+- Cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MediaInfo, MKVToolNix, NeoFetch, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
 ```
 
 - arakurumi/mltb:ubuntu
@@ -56,7 +61,7 @@ Include :
 Based on Ubuntu Latest with Heroku Bypass
 Include :
 - Stable Apps which used by Mirror Leech Telegram Bot
-- Cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MKVToolNix, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
+- Cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MediaInfo, MKVToolNix, NeoFetch, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
 ```
 
 #### How to Delete Heroku Build Cache for Refresh Image
@@ -81,17 +86,22 @@ git push heroku master
 
 ## qBittorrent
 
-- Select files from a Torrent before and during downloading (Requires Base URL) (task option)
+- Select files from a Torrent before and during download (Requires Base URL) (task option)
 - Seed torrents to a specific ratio and time (task option)
 - Edit Global Options while the bot is running from bot settings (global option)
 
 ## Aria2c
 
-- Select files from a Torrent before and during downloading (Requires Base URL) (task option)
+- Select files from a Torrent before and during download (Requires Base URL) (task option)
 - Seed torrents to a specific ratio and time (task option)
 - Netrc support (global option)
 - Direct link authentication for a specific link while using the bot (it will work even if only the username or password
   is provided) (task option)
+- Edit Global Options while the bot is running from bot settings (global option)
+
+## Sabnzbd
+
+- Remove files from job before and during download (Requires Base URL) (task option)
 - Edit Global Options while the bot is running from bot settings (global option)
 
 ## TG Upload/Download
@@ -294,8 +304,8 @@ quotes, even if it's `Int`, `Bool` or `List`.
 **2. Optional Fields**
 
 - `USER_SESSION_STRING`: To download/upload from your telegram account if user is `PREMIUM` and to send rss. To generate
-  session string use this command `python3 generate_string_session.py` after mounting repo folder for sure. `Str`. \*
-  \*NOTE\*\*: You can't use bot with private message. Use it with superGroup.
+  session string use this command `python3 generate_string_session.py` after mounting repo folder for sure. `Str`. *
+  *NOTE**: You can't use bot with private message. Use it with superGroup.
 - `DATABASE_URL`: Your Mongo Database URL (Connection string). Follow
   this [Generate Database](https://github.com/anasty17/mirror-leech-telegram-bot/tree/master#generate-database) to
   generate database. Data will be saved in Database: auth and sudo users, users settings including thumbnails for each
@@ -322,7 +332,7 @@ quotes, even if it's `Int`, `Bool` or `List`.
   options [HERE](https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/YoutubeDL.py#L184) or use
   this [script](https://t.me/mltb_official_channel/177) to convert cli arguments to api options. Format: key:value|key:
   value|key:value. Add `^` before integer or float, some numbers must be numeric and some string. `str`
-  - Example: "format:bv\*+mergeall[vcodec=none]|nocheckcertificate:True"
+    - Example: "format:bv*+mergeall[vcodec=none]|nocheckcertificate:True"
 - `USE_SERVICE_ACCOUNTS`: Whether to use Service Accounts or not, with google-api-python-client. For this to work
   see [Using Service Accounts](https://github.com/anasty17/mirror-leech-telegram-bot#generate-service-accounts-what-is-service-account)
   section below. Default is `False`. `Bool`
@@ -332,8 +342,16 @@ quotes, even if it's `Int`, `Bool` or `List`.
     - mirror will get replaced by leech
     - tea will get removed with sensitive case
     - clone will get removed
+### Custom by This Repo
+**Note**: You can use : for separating ChatId and ThreadId (Topic Support) on LEECH_CHAT_ID, LOG_CHAT_ID and RSS_CHAT_ID variable. Example is `-100:-100`. `Int`|`Str`
+- `TELEGRAM_API_PREMIUM`: Same as TELEGRAM_API if you are using different account for Telegram Premium Session. `Int`
+- `TELEGRAM_HASH_PREMIUM`: Same as TELEGRAM_HASH if you are using different account for Telegram Premium Session. `Str`
+- `ALLDEBRID_API`: AllDebrid api key to mirror AllDebrid supported links. Get it from [AllDebrid](https://alldebrid.com/). `Str`
+- `DEBRIDLINK_API`: DebridLink api key to mirror AllDebrid supported links. Get it from [DebridLink](https://debrid-link.com/). `Str`
+- `LOG_CHAT_ID`: Same as LEECH_CHAT_ID but for Mirror results. `Int`|`Str`
+- `FORWARD_RESULT`: Enable or disable forward mirror or leech results. If using LEECH_CHAT_ID, and LOG_CHAT_ID. Default is `True`. `Bool`
 
-### GDrive Tools
+**3. GDrive Tools**
 
 - `GDRIVE_ID`: This is the Folder/TeamDrive ID of the Google Drive OR `root` to which you want to upload all the mirrors
   using google-api-python-client. `Str`
@@ -343,7 +361,7 @@ quotes, even if it's `Int`, `Bool` or `List`.
   then downloading or cloning will be stopped. (**NOTE**: Item will be checked using name and not hash, so this feature
   is not perfect yet). Default is `False`. `Bool`
 
-### Rclone
+**4. Rclone**
 
 - `RCLONE_PATH`: Default rclone path to which you want to upload all the files/folders using rclone. `Str`
 - `RCLONE_FLAGS`: key:value|key|key|key:value . Check here all [RcloneFlags](https://rclone.org/flags/). `Str`
@@ -354,18 +372,18 @@ quotes, even if it's `Int`, `Bool` or `List`.
 - `RCLONE_SERVE_USER`: Username for rclone serve authentication. `Str`
 - `RCLONE_SERVE_PASS`: Password for rclone serve authentication. `Str`
 
-### Update
+**5. Update**
 
 - `UPSTREAM_REPO`: Your github repository link, if your repo is private
   add `https://username:{githubtoken}@github.com/{username}/{reponame}` format. Get token
   from [Github settings](https://github.com/settings/tokens). So you can update your bot from filled repository on each
   restart. `Str`.
-  - **NOTE**: Any change in docker or requirements you need to deploy/build again with updated repo to take effect.
-    DON'T delete .gitignore file. For more information
-    read [THIS](https://github.com/anasty17/mirror-leech-telegram-bot/tree/master#upstream-repo-recommended).
+    - **NOTE**: Any change in docker or requirements you need to deploy/build again with updated repo to take effect.
+      DON'T delete .gitignore file. For more information
+      read [THIS](https://github.com/anasty17/mirror-leech-telegram-bot/tree/master#upstream-repo-recommended).
 - `UPSTREAM_BRANCH`: Upstream branch for update. Default is `master`. `Str`
 
-### Leech
+**6. Leech**
 
 - `LEECH_SPLIT_SIZE`: Size of split in bytes. Default is `2GB`. Default is `4GB` if your account is premium. `Int`
 - `AS_DOCUMENT`: Default type of Telegram file upload. Default is `False` mean as media. `Bool`
@@ -375,9 +393,9 @@ quotes, even if it's `Int`, `Bool` or `List`.
 - `USER_TRANSMISSION`: Upload/Download by user session. Only in superChat. Default is `False`. `Bool`
 - `MIXED_LEECH`: Upload by user and bot session with respect to file size. Only in superChat. Default is `False`. `Bool`
 - `LEECH_FILENAME_PREFIX`: Add custom word to leeched file name. `Str`
-- `LEECH_DUMP_CHAT`: ID or USERNAME or PM(private message) to where files would be uploaded. `Int`|`Str`. Add `-100` before channel/superGroup id.
+- `LEECH_CHAT_ID`: ID or USERNAME or PM (Private Message) to where files would be uploaded. `Int`|`Str`. Add `-100` before channel/superGroup id.
 
-### qBittorrent/Aria2c
+**7. qBittorrent/Aria2c**
 
 - `TORRENT_TIMEOUT`: Timeout of dead torrents downloading with qBittorrent and Aria2c in seconds. `Int`
 - `BASE_URL`: Valid BASE URL where the bot is deployed to use torrent web files selection. Format of URL should
@@ -386,28 +404,40 @@ quotes, even if it's `Int`, `Bool` or `List`.
 - `BASE_URL_PORT`: Which is the **BASE_URL** Port. Default is `80`. `Int`
 - `WEB_PINCODE`: Whether to ask for pincode before selecting files from torrent in web or not. Default
   is `False`. `Bool`.
-  - **Qbittorrent NOTE**: If your facing ram issues then set limit for `MaxConnections`,
-    decrease `AsyncIOThreadsCount`, set limit of `DiskWriteCacheSize` to `32` and decrease `MemoryWorkingSetLimit`
-    from qbittorrent.conf or bsetting command.
+    - **Qbittorrent NOTE**: If your facing ram issues then set limit for `MaxConnections`,
+      decrease `AsyncIOThreadsCount`, set limit of `DiskWriteCacheSize` to `32` and decrease `MemoryWorkingSetLimit`
+      from qbittorrent.conf or bsetting command.
 
-### JDownloader
+**8. JDownloader**
 
-- `JD_EMAIL`: jdownlaoder email sign up on [JDownloader](https://my.jdownloader.org/)
-- `JD_PASS`: jdownlaoder password
+- `JD_EMAIL`: JDownloader email sign up on [JDownloader](https://my.jdownloader.org/)
+- `JD_PASS`: JDownloader password
 
-### RSS
+**9. Sabnzbd**
+
+- `USENET_HOST`: usenet provider to grant access
+- `USENET_USERNAME`: usenet username
+- `USENET_PASSWORD`: usenet password
+  - **NOTE**: You can more servers from bsetting -> nzb settings -> Add Server
+
+**10. Mega**
+
+- `MEGA_EMAIL`: Mega email sign up on [Mega](https://mega.nz/register)
+- `MEGA_PASS`: Mega password
+
+**11. RSS**
 
 - `RSS_DELAY`: Time in seconds for rss refresh interval. Recommended `600` second at least. Default is `600` in
   sec. `Int`
-- `RSS_CHAT`: Chat ID/USERNAME where rss links will be sent. If you want message to be sent to the channel then add
+- `RSS_CHAT_ID`: Chat ID/USERNAME where rss links will be sent. If you want message to be sent to the channel then add
   channel id. Add `-100` before channel id. `Int`|`Str`
-  - **RSS NOTES**: `RSS_CHAT` is required, otherwise monitor will not work. You must use `USER_STRING_SESSION` --OR--
-    _CHANNEL_. If using channel then bot should be added in both channel and group(linked to channel) and `RSS_CHAT`
-    is the channel id, so messages sent by the bot to channel will be forwarded to group. Otherwise
-    with `USER_STRING_SESSION` add group id for `RSS_CHAT`. If `DATABASE_URL` not added you will miss the feeds while
-    bot offline.
+    - **RSS NOTES**: `RSS_CHAT` is required, otherwise monitor will not work. You must use `USER_STRING_SESSION` --OR--
+      *CHANNEL*. If using channel then bot should be added in both channel and group(linked to channel) and `RSS_CHAT`
+      is the channel id, so messages sent by the bot to channel will be forwarded to group. Otherwise
+      with `USER_STRING_SESSION` add group id for `RSS_CHAT`. If `DATABASE_URL` not added you will miss the feeds while
+      bot offline.
 
-### Queue System
+**12. Queue System**
 
 - `QUEUE_ALL`: Number of parallel tasks of downloads and uploads. For example if 20 task added and `QUEUE_ALL` is `8`,
   then the summation of uploading and downloading tasks are 8 and the rest in queue. `Int`. **NOTE**: if you want to
@@ -416,13 +446,12 @@ quotes, even if it's `Int`, `Bool` or `List`.
 - `QUEUE_DOWNLOAD`: Number of all parallel downloading tasks. `Int`
 - `QUEUE_UPLOAD`: Number of all parallel uploading tasks. `Int`
 
-### Torrent Search
+**13. Torrent Search**
 
 - `SEARCH_API_LINK`: Search api app link. Get your api from deploying
   this [repository](https://github.com/Ryuk-me/Torrent-Api-py). `Str`
-  - Supported Sites:
-    > 1337x, Piratebay, Nyaasi, Torlock, Torrent Galaxy, Zooqle, Kickass, Bitsearch, MagnetDL, Libgen, YTS, Limetorrent,
-    > TorrentFunk, Glodls, TorrentProject and YourBittorrent
+    - Supported Sites:
+  > 1337x, Piratebay, Nyaasi, Torlock, Torrent Galaxy, Zooqle, Kickass, Bitsearch, MagnetDL, Libgen, YTS, Limetorrent, TorrentFunk, Glodls, TorrentProject, YourBittorrent and many more (You can check by youself on config_sample.env)
 - `SEARCH_LIMIT`: Search limit for search api, limit for each site and not overall result limit. Default is zero (
   Default api limit for each site). `Int`
 - `SEARCH_PLUGINS`: List of qBittorrent search plugins (github raw links). I have added some plugins, you can remove/add
@@ -539,10 +568,12 @@ sudo docker compose logs --follow
 mirror - or /m Mirror
 qbmirror - or /qm Mirror torrent using qBittorrent
 jdmirror - or /jm Mirror torrent using jdownloader
+nzbmirror - or /nm Mirror using sabnzbd
 ytdl - or /y Mirror yt-dlp supported link
 leech - or /l Leech
 qbleech - or /ql Leech torrent using qBittorrent
 jdleech - or /jl Leech torrent using jdownloader
+nzbleech - or /nl Leech using sabnzbd
 ytdlleech - or /yl Leech through yt-dlp supported link
 clone - Copy file/folder to Drive
 count - Count file/folder from Drive

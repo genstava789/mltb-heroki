@@ -48,6 +48,7 @@ class Clone(TaskListener):
         __=None,
         ___=None,
         ____=None,
+        _____=None,
         bulk=None,
         multiTag=None,
         options="",
@@ -230,7 +231,7 @@ class Clone(TaskListener):
             src_path = src_path.strip("/")
 
             cmd = [
-                "edge",
+                "enolcr",
                 "lsjson",
                 "--fast-list",
                 "--stat",
@@ -281,7 +282,7 @@ class Clone(TaskListener):
             LOGGER.info(f"Cloning Done: {self.name}")
             
             cmd1 = [
-                "edge",
+                "enolcr",
                 "lsf",
                 "--fast-list",
                 "-R",
@@ -291,7 +292,7 @@ class Clone(TaskListener):
                 destination,
             ]
             cmd2 = [
-                "edge",
+                "enolcr",
                 "lsf",
                 "--fast-list",
                 "-R",
@@ -301,7 +302,7 @@ class Clone(TaskListener):
                 destination,
             ]
             cmd3 = [
-                "edge",
+                "enolcr",
                 "size",
                 "--fast-list",
                 "--json",

@@ -1,24 +1,26 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aria2p import API as ariaAPI, Client as ariaClient
-from asyncio import Lock
+from asyncio import Lock, run as aiorun
 from dotenv import load_dotenv, dotenv_values
 from logging import (
-    getLogger,
-    FileHandler,
-    StreamHandler,
-    INFO,
     basicConfig,
     error as log_error,
-    info as log_info,
-    warning as log_warning,
     ERROR,
+    FileHandler,
+    getLogger,
+    info as log_info,
+    INFO,
+    StreamHandler,
+    warning as log_warning,
 )
 from myjd import __version__ as JDownloaderVersion
 from os import remove, path as ospath, environ
+from platform import freedesktop_os_release
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from pyrogram import Client as tgClient, enums, __version__ as PyrogramVersion
 from qbittorrentapi import Client as qbClient
+from sabnzbdapi import sabnzbdClient
 from socket import setdefaulttimeout
 from subprocess import Popen, run, check_output
 from time import time
@@ -52,9 +54,10 @@ LOGGER = getLogger(__name__)
 
 load_dotenv("config.env", override=True)
 
-Intervals = {"status": {}, "qb": "", "jd": "", "stopAll": False}
+Intervals = {"status": {}, "qb": "", "jd": "", "nzb": "", "stopAll": False}
 QbTorrents = {}
 jd_downloads = {}
+nzb_jobs = {}
 DRIVES_NAMES = []
 DRIVES_IDS = []
 INDEX_URLS = []
@@ -62,6 +65,7 @@ GLOBAL_EXTENSION_FILTER = ["aria2", "!qB"]
 user_data = {}
 aria2_options = {}
 qbit_options = {}
+nzb_options = {}
 queued_dl = {}
 queued_up = {}
 non_queued_dl = set()
@@ -80,46 +84,69 @@ class Version:
     Python = str()
     QBittorrent = str()
     Rclone = str()
+    SABnzbd = str()
     YT_DLP = str()
 
 try:
-    Version.Aria2 = check_output(["chrome --v"], shell=True).decode().split("\n")[0].split(" ")[2]
+    Version.Aria2 = check_output(["c2aira --v"], shell=True).decode().split("\n")[0].split(" ")[2]
 except Exception as e:
     LOGGER.warning(f"Failed to get Aria2c version! ERROR: {e}")
+
 try:
-    Version.FFMPEG = check_output(["opera -version | grep 'ffmpeg version' | sed -e 's/ffmpeg version //'"], shell=True).decode().split(" ", 1)[0].replace("\n", "") # -e 's/[^0-9.].*//'
+    Version.FFMPEG = check_output(["gepmff -version | grep 'ffmpeg version' | sed -e 's/ffmpeg version //'"], shell=True).decode().split(" ", 1)[0].replace("\n", "") # -e 's/[^0-9.].*//'
 except Exception as e:
     LOGGER.warning(f"Failed to get FFMPEG version! ERROR: {e}")
+
 try:
     Version.GoogleApi = check_output(["pip show google-api-python-client | grep Version"], shell=True).decode().split(" ", 1)[1].replace("\n", "")
 except Exception as e:
     LOGGER.warning(f"Failed to get Google Api version! ERROR: {e}")
+
 Version.JDownloader = JDownloaderVersion
+
 try:
-    Version.Java = check_output(["safari --version"], shell=True).decode().split(" ")[1]
+    Version.Java = check_output(["avaj --version"], shell=True).decode().split(" ")[1]
 except Exception as e:
     LOGGER.warning(f"Failed to get Java version! ERROR: {e}")
+
 try:
     Version.MegaSDK = check_output(["pip show megasdk | grep Version"], shell=True).decode().split(" ", 1)[1].replace("\n", "")
 except Exception as e:
     LOGGER.warning(f"Failed to get MegaSDK version! ERROR: {e}")
+
 try:
     Version.P7Zip = check_output(["7z | grep 7-Zip"], shell=True).decode().split(" ")[2]
 except Exception as e:
     LOGGER.warning(f"Failed to get P7Zip version! ERROR: {e}")
+
 Version.Pyrogram = PyrogramVersion
+
 try:
     Version.Python = check_output(["python --version"], shell=True).decode().split()[-1]
 except Exception as e:
     LOGGER.warning(f"Failed to get Python version! ERROR: {e}")
+
 try:
-    Version.QBittorrent = check_output(["firefox --version"], shell=True).decode().split(" ", 1)[1].replace("\n", "").replace("v", "")
+    Version.QBittorrent = check_output(["xon-tnerrottibq --version"], shell=True).decode().split(" ", 1)[1].replace("\n", "").replace("v", "")
 except Exception as e:
     LOGGER.warning(f"Failed to get QBittorrent version! ERROR: {e}")
+
 try:
-    Version.Rclone = check_output(["edge --version"], shell=True).decode().split("\n")[0].split(" ")[1].replace("v", "")
+    Version.Rclone = check_output(["enolcr --version"], shell=True).decode().split("\n")[0].split(" ")[1].replace("v", "")
 except Exception as e:
-    LOGGER.warning(f"Failed to get RClone version! ERROR: {e}")
+    LOGGER.warning(f"Failed to get Rclone version! ERROR: {e}")
+
+try:
+    if freedesktop_os_release()["ID"].lower() == "alpine":
+        SABnzbd = "SABnzbd.py"
+        SABnzbdExecutable = "/SABnzbd/SABnzbd.py"
+    else:
+        SABnzbd = "sulpdbznbas"
+        SABnzbdExecutable = "sulpdbznbas"
+    Version.SABnzbd = check_output([f"{SABnzbdExecutable} --version | grep {SABnzbd}"], shell=True).decode().split("\n")[0].split("-")[1]
+except Exception as e:
+    LOGGER.warning(f"Failed to get SABnzbd version! ERROR: {e}")
+
 try:
     Version.YT_DLP = check_output(["yt-dlp --version"], shell=True).decode().split("\n")[0]
 except Exception as e:
@@ -135,6 +162,7 @@ except Exception:
 task_dict_lock = Lock()
 queue_dict_lock = Lock()
 qb_listener_lock = Lock()
+nzb_listener_lock = Lock()
 jd_lock = Lock()
 cpu_eater_lock = Lock()
 subprocess_lock = Lock()
@@ -190,6 +218,12 @@ if DATABASE_URL:
         if qbit_opt := db.settings.qbittorrent.find_one({"_id": bot_id}):
             del qbit_opt["_id"]
             qbit_options = qbit_opt
+        if nzb_opt := db.settings.nzb.find_one({"_id": bot_id}):
+            del nzb_opt["_id"]
+            (key, value), = nzb_opt.items()
+            file_ = key.replace("__", ".")
+            with open(f"sabnzbd/{file_}", "wb+") as f:
+                f.write(value)
         conn.close()
         BOT_TOKEN = environ.get("BOT_TOKEN", "")
         bot_id = BOT_TOKEN.split(":", 1)[0]
@@ -203,9 +237,9 @@ if not ospath.exists(".netrc"):
     with open(".netrc", "w"):
         pass
     
-log_info("Set up Aria2c & QBittorrent...")
+log_info("Set up Aria2c, QBittorrent-Nox and SABnzbd...")
 run(
-    "chmod 600 .netrc && cp .netrc /root/.netrc && chmod +x aria-nox.sh && ./aria-nox.sh",
+    "chmod 600 .netrc && cp .netrc /root/.netrc && chmod +x aria-nox-nzb.sh && ./aria-nox-nzb.sh",
     shell=True,
 )
 
@@ -250,7 +284,7 @@ if DEFAULT_UPLOAD != "rc":
 
 DOWNLOAD_DIR = environ.get("DOWNLOAD_DIR", "")
 if len(DOWNLOAD_DIR) == 0:
-    DOWNLOAD_DIR = "/usr/src/app/downloads/"
+    DOWNLOAD_DIR = "/usr/src/app/Downloads/"
 elif not DOWNLOAD_DIR.endswith("/"):
     DOWNLOAD_DIR = f"{DOWNLOAD_DIR}/"
 
@@ -320,6 +354,14 @@ JD_PASS = environ.get("JD_PASS", "")
 if len(JD_EMAIL) == 0 or len(JD_PASS) == 0:
     JD_EMAIL = ""
     JD_PASS = ""
+
+USENET_HOST = environ.get("USENET_HOST", "")
+USENET_USERNAME = environ.get("USENET_USERNAME", "")
+USENET_PASSWORD = environ.get("USENET_PASSWORD", "")
+if len(USENET_HOST) == 0 or len(USENET_USERNAME) == 0 or len(USENET_PASSWORD) == 0:
+    USENET_HOST = ""
+    USENET_USERNAME = ""
+    USENET_PASSWORD = ""
 
 MEGA_EMAIL = environ.get("MEGA_EMAIL", "")
 MEGA_PASS = environ.get("MEGA_PASS", "")
@@ -587,6 +629,9 @@ config_dict = {
     "UPSTREAM_REPO": UPSTREAM_REPO,
     "USE_SERVICE_ACCOUNTS": USE_SERVICE_ACCOUNTS,
     "USE_TELEGRAPH": USE_TELEGRAPH,
+    "USENET_HOST": USENET_HOST,
+    "USENET_PASSWORD": USENET_PASSWORD,
+    "USENET_USERNAME": USENET_USERNAME,
     "USER_SESSION_STRING": USER_SESSION_STRING,
     "USER_TRANSMISSION": USER_TRANSMISSION,
     "WEB_PINCODE": WEB_PINCODE,
@@ -639,11 +684,19 @@ def get_qb_client():
     return qbClient(
         host="localhost", 
         port=8090, 
-        # username="admin",
-        # password="adminadmin",
+        username="admin",
+        password="adminadmin",
         FORCE_SCHEME_FROM_HOST=False, 
         VERIFY_WEBUI_CERTIFICATE=False, 
-        REQUESTS_ARGS={"timeout": (30, 60)}
+        REQUESTS_ARGS={"timeout": (30, 60)},
+    )
+
+def get_sabnzb_client():
+    return sabnzbdClient(
+        host="http://localhost",
+        api_key="mltb",
+        port="8070",
+        HTTPX_REQUETS_ARGS={"timeout": 10},
     )
 
 aria2c_global = [
@@ -697,6 +750,15 @@ if not aria2_options:
 else:
     a2c_glo = {op: aria2_options[op] for op in aria2c_global if op in aria2_options}
     aria2.set_global_options(a2c_glo)
+
+async def get_nzb_options():
+    global nzb_options
+    zclient = get_sabnzb_client()
+    nzb_options = (await zclient.get_config())["config"]["misc"]
+    await zclient.log_out()
+
+
+aiorun(get_nzb_options())
 
 log_info("Set up auto Alive...")
 Popen(["python3", "alive.py"])

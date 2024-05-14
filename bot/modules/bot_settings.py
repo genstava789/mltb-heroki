@@ -26,6 +26,7 @@ from bot import (
     DRIVES_IDS,
     DRIVES_NAMES,
     get_qb_client,
+    get_sabnzb_client,
     GLOBAL_EXTENSION_FILTER,
     INDEX_URLS,
     Intervals,
@@ -33,6 +34,7 @@ from bot import (
     jd_downloads,
     LOGGER,
     MAX_SPLIT_SIZE,
+    nzb_options,
     qbit_options,
     task_dict,
     user_data,
@@ -65,7 +67,7 @@ START = 0
 STATE = "view"
 handler_dict = {}
 default_values = {
-    "DOWNLOAD_DIR": "/usr/src/app/downloads/",
+    "DOWNLOAD_DIR": "/usr/src/app/Downloads/",
     "LEECH_SPLIT_SIZE": MAX_SPLIT_SIZE,
     "RSS_DELAY": 600,
     "STATUS_UPDATE_INTERVAL": 15,
@@ -82,6 +84,7 @@ async def get_buttons(key=None, edit_type=None):
         buttons.ibutton("Private Files", "botset private")
         buttons.ibutton("Qbit Settings", "botset qbit")
         buttons.ibutton("Aria2c Settings", "botset aria")
+        buttons.ibutton("SABnzbd Settings", "botset nzb")
         buttons.ibutton("JDownloader Sync", "botset syncjd")
         buttons.ibutton("Close", "botset close")
         msg = "Bot Settings:"
@@ -113,7 +116,7 @@ async def get_buttons(key=None, edit_type=None):
                 buttons.ibutton("Empty String", f"botset emptyaria {key}")
             buttons.ibutton("Close", "botset close")
             msg = (
-                "Send a key with value. Example: https-proxy-user:value"
+                "Send a key with value. Example: https-proxy-user:value. Timeout: 60 sec"
                 if key == "newkey"
                 else f"Send a valid value for {key}. Current value is '{aria2_options[key]}'. Timeout: 60 sec"
             )
@@ -122,6 +125,16 @@ async def get_buttons(key=None, edit_type=None):
             buttons.ibutton("Empty String", f"botset emptyqbit {key}")
             buttons.ibutton("Close", "botset close")
             msg = f"Send a valid value for {key}. Current value is '{qbit_options[key]}'. Timeout: 60 sec"
+        elif edit_type == "nzbvar":
+            buttons.ibutton("Back", "botset nzb")
+            if key != "newserver":
+                buttons.ibutton("Default", f"botset resetnzb {key}")
+                buttons.ibutton("Empty String", f"botset emptynzb {key}")
+            buttons.ibutton("Close", "botset close")
+            if key == "newserver":
+                msg = "Send host : user : password. Example: xxx.xxx.xxx : myuser : my password. Timeout: 60 sec"
+            else:
+                msg = f"Send a valid value for {key}. Current value is '{nzb_options[key]}.\nIf the value is list then seperate them by space or ,\nExample: .exe,info or .exe .info\nTimeout: 60 sec"
     elif key == "var":
         for k in list(config_dict.keys())[START : 10 + START]:
             buttons.ibutton(k, f"botset botvar {k}")
@@ -172,6 +185,21 @@ Timeout: 60 sec"""
                 f"{int(x / 10)}", f"botset start qbit {x}", position="footer"
             )
         msg = f"Qbittorrent Options | Page: {int(START / 10)} | State: {STATE}"
+    elif key == "nzb":
+        for k in list(nzb_options.keys())[START : 10 + START]:
+            buttons.ibutton(k, f"botset nzbvar {k}")
+        if STATE == "view":
+            buttons.ibutton("Edit", "botset edit nzb")
+        else:
+            buttons.ibutton("View", "botset view nzb")
+        buttons.ibutton("Add Server", "botset nzbvar newserver")
+        buttons.ibutton("Back", "botset back")
+        buttons.ibutton("Close", "botset close")
+        for x in range(0, len(nzb_options), 10):
+            buttons.ibutton(
+                f"{int(x / 10)}", f"botset start nzb {x}", position="footer"
+            )
+        msg = f"SABnzbd Options | Page: {int(START / 10)} | State: {STATE}"
     elif edit_type == "editvar":
         msg = ""
         buttons.ibutton("Back", "botset back var")
@@ -303,6 +331,21 @@ async def edit_variable(_, message, pre_message, key):
         jdownloader.initiate()
     elif key == "RSS_DELAY":
         addJob()
+    elif key in ["USENET_HOST", "USENET_USERNAME", "USENET_PASSWORD"]:
+        nzb_client = get_sabnzb_client()
+        if key == "USENET_HOST":
+            items = {
+                "name": "main",
+                "displayname": value,
+                "host": value,
+                "connections": 8,
+            }
+        elif key == "USENET_USERNAME":
+            items = {"name": "main", "username": value}
+        elif key == "USENET_PASSWORD":
+            items = {"name": "main", "password": value}
+        await nzb_client.set_special_config("servers", items)
+        await nzb_client.log_out()
 
 async def edit_aria(_, message, pre_message, key):
     handler_dict[message.chat.id] = False
@@ -349,6 +392,28 @@ async def edit_qbit(_, message, pre_message, key):
     await deleteMessage(message)
     if DATABASE_URL:
         await DbManager().update_qbittorrent(key, value)
+
+
+async def edit_nzb(_, message, pre_message, key):
+    handler_dict[message.chat.id] = False
+    value = message.text
+    nzb_client = get_sabnzb_client()
+    if key == "newserver":
+        host, username, password = [x.strip() for x in value.split(" : ", 2)]
+        await nzb_client.login(host, host, username, password)
+    else:
+        if value.isdigit():
+            value = int(value)
+        elif value.startswith("[") and value.endswith("]"):
+            value = f"{eval(value).join(',')}"
+        res = await nzb_client.set_config("misc", key, value)
+        value = res["misc"][key]
+        nzb_options[key] = value
+    await nzb_client.log_out()
+    await update_buttons(pre_message, "nzb")
+    await deleteMessage(message)
+    if DATABASE_URL:
+        await DbManager().update_nzb_config()
 
 
 async def sync_jdownloader():
@@ -515,7 +580,7 @@ async def edit_bot_settings(client, query):
             show_alert=True,
         )
         await sync_jdownloader()
-    elif data[1] in ["var", "aria", "qbit"]:
+    elif data[1] in ["var", "aria", "qbit", "nzb"]:
         await query.answer()
         await update_buttons(message, data[1])
     elif data[1] == "resetvar":
@@ -591,6 +656,10 @@ async def edit_bot_settings(client, query):
             "RCLONE_SERVE_PASS",
         ]:
             await rclone_serve_booter()
+        elif data[2] in ["USENET_HOST", "USENET_USERNAME", "USENET_PASSWORD"]:
+            nzb_client = get_sabnzb_client()
+            await nzb_client.delete_config("servers", "main")
+            await nzb_client.log_out()
     elif data[1] == "resetaria":
         aria2_defaults = await sync_to_async(aria2.client.get_global_option)
         if aria2_defaults[data[2]] == aria2_options[data[2]]:
@@ -611,6 +680,15 @@ async def edit_bot_settings(client, query):
                     LOGGER.error(e)
         if DATABASE_URL:
             await DbManager().update_aria2(data[2], value)
+    elif data[1] == "resetnzb":
+        await query.answer()
+        nzb_client = get_sabnzb_client()
+        res = await nzb_client.set_config_default(data[2])
+        nzb_options[data[2]] = res["misc"][data[2]]
+        await nzb_client.log_out()
+        await update_buttons(message, "nzb")
+        if DATABASE_URL:
+            await DbManager().update_nzb_config()
     elif data[1] == "emptyaria":
         await query.answer()
         aria2_options[data[2]] = ""
@@ -633,6 +711,15 @@ async def edit_bot_settings(client, query):
         await update_buttons(message, "qbit")
         if DATABASE_URL:
             await DbManager().update_qbittorrent(data[2], "")
+    elif data[1] == "emptynzb":
+        await query.answer()
+        nzb_client = get_sabnzb_client()
+        res = await nzb_client.set_config("misc", data[2], "")
+        nzb_options[data[2]] = res["misc"][data[2]]
+        await nzb_client.log_out()
+        await update_buttons(message, "nzb")
+        if DATABASE_URL:
+            await DbManager().update_nzb_config()
     elif data[1] == "private":
         await query.answer()
         await update_buttons(message, data[1])
@@ -643,7 +730,7 @@ async def edit_bot_settings(client, query):
         await query.answer()
         await update_buttons(message, data[2], data[1])
         pfunc = partial(edit_variable, pre_message=message, key=data[2])
-        rfunc = partial(update_buttons, message, "var")
+        rfunc = partial(update_buttons, message, "qbit")
         await event_handler(client, query, pfunc, rfunc)
     elif data[1] == "botvar" and STATE == "view":
         value = config_dict[data[2]]
@@ -681,6 +768,23 @@ async def edit_bot_settings(client, query):
         await event_handler(client, query, pfunc, rfunc)
     elif data[1] == "qbitvar" and STATE == "view":
         value = qbit_options[data[2]]
+        if len(str(value)) > 200:
+            await query.answer()
+            with BytesIO(str.encode(value)) as out_file:
+                out_file.name = f"{data[2]}.txt"
+                await sendFile(message, out_file)
+            return
+        elif value == "":
+            value = None
+        await query.answer(f"{value}", show_alert=True)
+    elif data[1] == "nzbvar" and (STATE == "edit" or data[2] == "newserver"):
+        await query.answer()
+        await update_buttons(message, data[2], data[1])
+        pfunc = partial(edit_nzb, pre_message=message, key=data[2])
+        rfunc = partial(update_buttons, message, "nzb")
+        await event_handler(client, query, pfunc, rfunc)
+    elif data[1] == "nzbvar" and STATE == "view":
+        value = nzb_options[data[2]]
         if len(str(value)) > 200:
             await query.answer()
             with BytesIO(str.encode(value)) as out_file:
@@ -767,7 +871,7 @@ async def load_config():
 
     DOWNLOAD_DIR = environ.get("DOWNLOAD_DIR", "")
     if len(DOWNLOAD_DIR) == 0:
-        DOWNLOAD_DIR = "/usr/src/app/downloads/"
+        DOWNLOAD_DIR = "/usr/src/app/Downloads/"
     elif not DOWNLOAD_DIR.endswith("/"):
         DOWNLOAD_DIR = f"{DOWNLOAD_DIR}/"
 
@@ -818,6 +922,14 @@ async def load_config():
     if len(JD_EMAIL) == 0 or len(JD_PASS) == 0:
         JD_EMAIL = ""
         JD_PASS = ""
+
+    USENET_HOST = environ.get("USENET_HOST", "")
+    USENET_USERNAME = environ.get("USENET_USERNAME", "")
+    USENET_PASSWORD = environ.get("USENET_PASSWORD", "")
+    if len(USENET_HOST) == 0 or len(USENET_USERNAME) == 0 or len(USENET_PASSWORD) == 0:
+        USENET_HOST = ""
+        USENET_USERNAME = ""
+        USENET_PASSWORD = ""
 
     MEGA_EMAIL = environ.get("MEGA_EMAIL", "")
     MEGA_PASS = environ.get("MEGA_PASS", "")
@@ -1132,6 +1244,9 @@ async def load_config():
         "UPSTREAM_REPO": UPSTREAM_REPO,
         "USE_SERVICE_ACCOUNTS": USE_SERVICE_ACCOUNTS,
         "USE_TELEGRAPH": USE_TELEGRAPH,
+        "USENET_HOST": USENET_HOST,
+        "USENET_PASSWORD": USENET_PASSWORD,
+        "USENET_USERNAME": USENET_USERNAME,
         "USER_SESSION_STRING": USER_SESSION_STRING,
         "USER_TRANSMISSION": USER_TRANSMISSION,
         "WEB_PINCODE": WEB_PINCODE,

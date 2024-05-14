@@ -20,7 +20,7 @@ def sendRequest(url: str) -> None:
     request = get(
         url=url,
         headers=dict({
-            "User-Agent": "Not a Robot"
+            "User-Agent": "Not a RoBot"
         }),
         timeout=10
     )

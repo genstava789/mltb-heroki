@@ -7,10 +7,12 @@ class _BotCommands:
         self.MirrorCommand = [f"mirror{CMD_SUFFIX}", f"m{CMD_SUFFIX}"]
         self.QbMirrorCommand = [f"qbmirror{CMD_SUFFIX}", f"qm{CMD_SUFFIX}"]
         self.JdMirrorCommand = [f"jdmirror{CMD_SUFFIX}", f"jm{CMD_SUFFIX}"]
+        self.NzbMirrorCommand = [f"nzbmirror{CMD_SUFFIX}", f"nm{CMD_SUFFIX}"]
         self.YtdlCommand = [f"ytdl{CMD_SUFFIX}", f"y{CMD_SUFFIX}", f"watch{CMD_SUFFIX}", f"w{CMD_SUFFIX}"]
         self.LeechCommand = [f"leech{CMD_SUFFIX}", f"l{CMD_SUFFIX}"]
         self.QbLeechCommand = [f"qbleech{CMD_SUFFIX}", f"ql{CMD_SUFFIX}"]
         self.JdLeechCommand = [f"jdleech{CMD_SUFFIX}", f"jl{CMD_SUFFIX}"]
+        self.NzbLeechCommand = [f"nzbleech{CMD_SUFFIX}", f"nl{CMD_SUFFIX}"]
         self.YtdlLeechCommand = [f"ytdlleech{CMD_SUFFIX}", f"yl{CMD_SUFFIX}", f"watchleech{CMD_SUFFIX}", f"wl{CMD_SUFFIX}"]
         self.CloneCommand = [f"clone{CMD_SUFFIX}", f"cl{CMD_SUFFIX}"]
         self.CountCommand = [f"count{CMD_SUFFIX}", f"co{CMD_SUFFIX}"]
@@ -38,7 +40,7 @@ class _BotCommands:
         self.ClearLocalsCommand = [f"clearlocal{CMD_SUFFIX}", f"clo{CMD_SUFFIX}"]
         self.BotSetCommand = [f"botsetting{CMD_SUFFIX}", f"bs{CMD_SUFFIX}", f"bset{CMD_SUFFIX}"]
         self.UserSetCommand = [f"usersetting{CMD_SUFFIX}", f"us{CMD_SUFFIX}", f"uset{CMD_SUFFIX}"]
-        self.BtSelectCommand = [f"btsel{CMD_SUFFIX}", f"bts{CMD_SUFFIX}"]
+        self.SelectCommand = [f"select{CMD_SUFFIX}", f"sel{CMD_SUFFIX}"]
         self.RssCommand = f"rss{CMD_SUFFIX}"
 
 

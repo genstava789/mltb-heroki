@@ -91,6 +91,7 @@ class TaskConfig:
         self.size = 0
         self.isLeech = False
         self.isQbit = False
+        self.isNzb = False
         self.isJd = False
         self.isClone = False
         self.isYtDlp = False
@@ -429,6 +430,7 @@ class TaskConfig:
             self.isQbit,
             self.isLeech,
             self.isJd,
+            self.isNzb,
             self.sameDir,
             self.bulk,
             self.multiTag,

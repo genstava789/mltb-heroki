@@ -233,7 +233,7 @@ async def add_jd_download(listener, path):
         else:
             error = (
                 name 
-                or "Unduhan tidak ditambahkan!\nKemungkinan ada masalah pada Situs atau JDownloader!"
+                or "Tugas tidak ditambahkan!\nKemungkinan ada masalah pada Link atau JDownloader!"
             )
             await listener.onDownloadError(error)
             if corrupted_packages or online_packages:

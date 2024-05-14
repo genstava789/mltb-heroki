@@ -39,6 +39,7 @@ from bot.helper.mirror_leech_utils.download_utils.qbit_download import add_qb_to
 from bot.helper.mirror_leech_utils.download_utils.rclone_download import (
     add_rclone_download,
 )
+from bot.helper.mirror_leech_utils.download_utils.sabnzbd_downloader import add_nzb
 from bot.helper.mirror_leech_utils.download_utils.telegram_download import TelegramDownloadHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
@@ -58,6 +59,7 @@ class Mirror(TaskListener):
         isQbit=False,
         isLeech=False,
         isJd=False,
+        isNzb=False,
         sameDir=None,
         bulk=None,
         multiTag=None,
@@ -77,6 +79,7 @@ class Mirror(TaskListener):
         self.isQbit = isQbit
         self.isLeech = isLeech
         self.isJd = isJd
+        self.isNzb = isNzb
 
     @new_task
     async def newEvent(self):
@@ -289,7 +292,7 @@ class Mirror(TaskListener):
                     reply_to = None
             elif reply_to.document and (
                 file_.mime_type == "application/x-bittorrent"
-                or file_.file_name.endswith((".torrent", ".dlc"))
+                or file_.file_name.endswith((".torrent", ".dlc", ".nzb"))
             ):
                 self.link = await reply_to.download()
                 file_ = None
@@ -326,12 +329,15 @@ class Mirror(TaskListener):
 
         if (
             not self.isJd
+            and not self.isNzb
             and not self.isQbit
             and not is_magnet(self.link)
             and not is_rclone_path(self.link)
             and not is_gdrive_link(self.link)
             and not is_mega_link(self.link)
             and not self.link.endswith(".torrent")
+            and not self.link.endswith(".dlc")
+            and not self.link.endswith(".nzb")
             and file_ is None
             and not is_gdrive_id(self.link)
         ):
@@ -389,6 +395,9 @@ class Mirror(TaskListener):
         elif self.isQbit:
             await add_qb_torrent(self, path, ratio, seed_time)
         
+        elif self.isNzb:
+            await add_nzb(self, path)
+        
         elif is_gdrive_link(self.link) or is_gdrive_id(self.link):
             await add_gd_download(self, path)
         
@@ -417,6 +426,14 @@ async def qb_mirror(client, message):
     Mirror(client, message, isQbit=True).newEvent()
 
 
+async def jd_mirror(client, message):
+    Mirror(client, message, isJd=True).newEvent()
+
+
+async def nzb_mirror(client, message):
+    Mirror(client, message, isNzb=True).newEvent()
+
+
 async def leech(client, message):
     Mirror(client, message, isLeech=True).newEvent()
 
@@ -425,12 +442,12 @@ async def qb_leech(client, message):
     Mirror(client, message, isQbit=True, isLeech=True).newEvent()
 
 
-async def jd_mirror(client, message):
-    Mirror(client, message, isJd=True).newEvent()
-
-
 async def jd_leech(client, message):
     Mirror(client, message, isLeech=True, isJd=True).newEvent()
+
+
+async def nzb_leech(client, message):
+    Mirror(client, message, isLeech=True, isNzb=True).newEvent()
 
 
 bot.add_handler(
@@ -438,14 +455,6 @@ bot.add_handler(
         mirror, 
         filters=command(
             BotCommands.MirrorCommand
-        ) & CustomFilters.authorized
-    )
-)
-bot.add_handler(
-    MessageHandler(
-        leech, 
-        filters=command(
-            BotCommands.LeechCommand
         ) & CustomFilters.authorized
     )
 )
@@ -459,14 +468,6 @@ bot.add_handler(
 )
 bot.add_handler(
     MessageHandler(
-        qb_leech, 
-        filters=command(
-            BotCommands.QbLeechCommand
-        ) & CustomFilters.authorized
-    )
-)
-bot.add_handler(
-    MessageHandler(
         jd_mirror,
         filters=command(
             BotCommands.JdMirrorCommand
@@ -475,9 +476,41 @@ bot.add_handler(
 )
 bot.add_handler(
     MessageHandler(
+        nzb_mirror,
+        filters=command(
+            BotCommands.NzbMirrorCommand
+        ) & CustomFilters.authorized,
+    )
+)
+bot.add_handler(
+    MessageHandler(
+        leech, 
+        filters=command(
+            BotCommands.LeechCommand
+        ) & CustomFilters.authorized
+    )
+)
+bot.add_handler(
+    MessageHandler(
+        qb_leech, 
+        filters=command(
+            BotCommands.QbLeechCommand
+        ) & CustomFilters.authorized
+    )
+)
+bot.add_handler(
+    MessageHandler(
         jd_leech, 
         filters=command(
             BotCommands.JdLeechCommand
         ) & CustomFilters.authorized
+    )
+)
+bot.add_handler(
+    MessageHandler(
+        nzb_leech,
+        filters=command(
+            BotCommands.NzbLeechCommand
+        ) & CustomFilters.authorized,
     )
 )

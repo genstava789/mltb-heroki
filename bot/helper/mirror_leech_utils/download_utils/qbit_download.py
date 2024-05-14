@@ -40,11 +40,11 @@ def _get_hash_file(fpath):
 
 
 async def add_qb_torrent(listener, path, ratio, seed_time):
-    client = await sync_to_async(get_qb_client)
+    client = get_qb_client()
     try:
         url = listener.link
         tpath = None
-        if await aiopath.exists(listener.link):
+        if tpath and await aiopath.exists(listener.link):
             url = None
             tpath = listener.link
         add_to_queue, event = await check_running_tasks(listener)
@@ -115,7 +115,7 @@ async def add_qb_torrent(listener, path, ratio, seed_time):
             if not add_to_queue:
                 await sync_to_async(client.torrents_pause, torrent_hashes=ext_hash)
             SBUTTONS = bt_selection_buttons(ext_hash)
-            msg = "<b>Unduhan dihentikan...</b>\n<b>Pilih file yang mau diunduh lalu tekan tombol selesai untuk melanjutkan!</b>"
+            msg = "<b>Unduhan dihentikan...</b>\n<b>Pilih file yang mau diunduh lalu tekan tombol Selesai untuk melanjutkan!</b>"
             await sendMessage(listener.message, msg, SBUTTONS)
         elif listener.multi <= 1:
             await sendStatusMessage(listener.message)
@@ -140,4 +140,3 @@ async def add_qb_torrent(listener, path, ratio, seed_time):
         if await aiopath.exists(listener.link):
             await remove(listener.link)
         await sync_to_async(client.auth_log_out)
-        

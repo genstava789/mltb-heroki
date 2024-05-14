@@ -46,7 +46,7 @@ async def select(_, message):
     elif len(msg) == 1:
         msg = (
             "<b>Balas ke Tugas Aktif dengan perintah atau tambahkan ID Tugas setelah perintah!</b>\n\n"
-            + "<b>Perintah ini hanya untuk memilih file yang ingin diunduh dan hanya bisa digunakan untuk Torrent!</b>"
+            + "<b>Perintah ini hanya untuk memilih file yang ingin diunduh dan hanya bisa digunakan untuk Torrent atau NZB!</b>"
             + "<b>Kamu juga dapat menambahkan args -s sebelum memulai mengunduh!</b>"
         )
         await sendMessage(message, msg)
@@ -76,14 +76,16 @@ async def select(_, message):
         return
 
     try:
-        await sync_to_async(task.update)
-        if task.listener.isQbit:
-            id_ = task.hash()
-            if not task.queued:
+        id_ = task.gid()
+        if not task.queued:
+            if task.listener.isNzb:
+                await task.client.pause_job(id_)
+            elif task.listener.isQbit:
+                await sync_to_async(task.update)
+                id_ = task.hash()
                 await sync_to_async(task.client.torrents_pause, torrent_hashes=id_)
-        else:
-            id_ = task.gid()
-            if not task.queued:
+            else:
+                await sync_to_async(task.update)
                 try:
                     await sync_to_async(aria2.client.force_pause, id_)
                 except Exception as e:
@@ -92,7 +94,7 @@ async def select(_, message):
                     )
         task.listener.select = True
     except:
-        await sendMessage(message, "<b>Bukan Tugas bittorrent!</b>")
+        await sendMessage(message, "<b>Bukan Tugas Bittorrent atau SABnzbd!</b>")
         return
 
     SBUTTONS = bt_selection_buttons(id_)
@@ -118,9 +120,9 @@ async def get_confirm(_, query):
     
     elif data[1] == "done":
         await query.answer()
+        id_ = data[3]
         if hasattr(task, "seeding"):
-            id_ = data[3]
-            if len(id_) > 20:
+            if task.listener.isQbit:
                 tor_info = (
                     await sync_to_async(task.client.torrents_info, torrent_hash=id_)
                 )[0]
@@ -152,20 +154,21 @@ async def get_confirm(_, query):
                         LOGGER.error(
                             f"{e} Error in resume, this mostly happens after abuse aria2. Try to use select cmd again!"
                         )
+        elif task.listener.isNzb:
+            await task.client.resume_job(id_)
         await sendStatusMessage(message)
         await deleteMessage(message)
     
     else:
         await deleteMessage(message)
-        obj = task.task()
-        await obj.cancel_task()
+        await task.cancel_task()
 
 
 bot.add_handler(
     MessageHandler(
         select, 
         filters=command(
-            BotCommands.BtSelectCommand
+            BotCommands.SelectCommand
         ) & CustomFilters.authorized
     )
 )
@@ -173,7 +176,7 @@ bot.add_handler(
     CallbackQueryHandler(
         get_confirm, 
         filters=regex(
-            "^btsel"
+            "^sel"
         )
     )
 )

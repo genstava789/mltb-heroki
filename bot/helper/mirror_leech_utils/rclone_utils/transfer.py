@@ -198,7 +198,7 @@ class RcloneTransferHelper:
             destination = epath
 
         cmd = [
-            "edge",
+            "enolcr",
             "lsjson",
             "--fast-list",
             "--no-mimetype",
@@ -348,7 +348,7 @@ class RcloneTransferHelper:
             else:
                 destination = f"{oremote}:{self._listener.name}"
 
-            cmd = ["edge", "link", "--config", oconfig_path, destination]
+            cmd = ["enolcr", "link", "--config", oconfig_path, destination]
             res, err, code = await cmd_exec(cmd)
 
             if code == 0:
@@ -421,7 +421,7 @@ class RcloneTransferHelper:
                         f"/{self._listener.name}" if dst_path else self._listener.name
                     )
 
-                cmd = ["edge", "link", "--config", config_path, destination]
+                cmd = ["enolcr", "link", "--config", config_path, destination]
                 res, err, code = await cmd_exec(cmd)
 
                 if self._listener.isCancelled:
@@ -444,7 +444,7 @@ class RcloneTransferHelper:
             unwanted_files = []
         ext = "*.{" + ",".join(self._listener.extensionFilter) + "}"
         cmd = [
-            "edge",
+            "enolcr",
             method,
             "--fast-list",
             "--config",

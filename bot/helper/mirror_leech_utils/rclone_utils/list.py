@@ -218,7 +218,7 @@ class RcloneList:
         elif self.list_status == "rcu":
             self.item_type == "--dirs-only"
         cmd = [
-            "edge",
+            "enolcr",
             "lsjson",
             self.item_type,
             "--fast-list",

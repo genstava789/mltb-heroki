@@ -26,7 +26,7 @@ class JDownloader(Myjdapi):
         self._username = ""
         self._password = ""
         self._device_name = ""
-        self.error = "JDownloader Credentials tidak ditemukan!"
+        self.error = "Kredensial JDownloader tidak ditemukan!"
         self.device = None
         self.set_app_key("mltb")
 
@@ -41,7 +41,7 @@ class JDownloader(Myjdapi):
 
     @new_task
     async def boot(self):
-        await cmd_exec(["pkill", "-9", "-f", "safari"])
+        await cmd_exec(["pkill", "-9", "-f", "avaj"])
         self.device = None
         self.error = "Menghubungkan ke JDownloader...\nCoba lagi setelah beberapa detik!"
         self._device_name = f"{randint(0, 1000)}@{bot_name}"
@@ -76,7 +76,7 @@ class JDownloader(Myjdapi):
                     break
             await rmtree("/JDownloader/update")
             await rmtree("/JDownloader/tmp")
-        cmd = "safari -Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8 -Djava.awt.headless=true -jar /JDownloader/JDownloader.jar"
+        cmd = "avaj -Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8 -Djava.awt.headless=true -jar /JDownloader/JDownloader.jar"
         _, _, code = await cmd_exec(cmd, shell=True)
         if code not in [0, -9]:
             LOGGER.error(f"Failed to start JDownloader! Exited with Code {code}! Retrying...")
@@ -112,8 +112,8 @@ class JDownloader(Myjdapi):
         while True:
             self.device = None
             if not config_dict["JD_EMAIL"] or not config_dict["JD_PASS"]:
-                self.error = "JDownloader Credentials not provided!"
-                await cmd_exec(["pkill", "-9", "-f", "safari"])
+                self.error = "Kredensial JDownloader tidak ditemukan!"
+                await cmd_exec(["pkill", "-9", "-f", "avaj"])
                 return False
             try:
                 await self.update_devices()
