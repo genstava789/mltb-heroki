@@ -89,7 +89,7 @@ async def add_qb_torrent(listener, path, ratio, seed_time):
 
         if config_dict["BASE_URL"] and listener.select:
             if listener.link.startswith("magnet:"):
-                metamsg = "<b>Mengunduh Metadata...</b>\n<b>Gunakan file torrent untuk melewati proses ini!</b>"
+                metamsg = "<b>Mengunduh Metadata...</b>\n<b>Gunakan file Torrent untuk melewati proses ini!</b>"
                 meta = await sendMessage(listener.message, metamsg)
                 while True:
                     tor_info = await sync_to_async(

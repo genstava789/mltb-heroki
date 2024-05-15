@@ -71,7 +71,7 @@ async def select(_, message):
         )
         return
     
-    if task.name().startswith("[METADATA]"):
+    if task.name().startswith("[METADATA]") or task.name().startswith("Trying"):
         await sendMessage(message, "<b>Coba lagi setelah metadata selesai diunduh!</b>")
         return
 
