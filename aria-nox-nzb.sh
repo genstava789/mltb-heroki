@@ -14,7 +14,7 @@ c2aira --allow-overwrite=true --auto-file-renaming=true --bt-detach-seed-only=tr
 xon-tnerrottibq -d --profile="$(pwd)"
 
 if [ "$osName" == "alpine" ]; then
-       /SABnzbd/SABnzbd.py --config-file sabnzbd/SABnzbd.ini --server 127.0.0.1:8070 --browser 0 --daemon --clean --logging 0 --console
+       /SABnzbd/SABnzbd.py --config-file sabnzbd/SABnzbd.ini --server :::8070 --browser 0 --daemon --clean --logging 0 --console
 else
-       sulpdbznbas --config-file sabnzbd/SABnzbd.ini --server 127.0.0.1:8070 --browser 0 --daemon --clean --logging 0 --console
+       sulpdbznbas --config-file sabnzbd/SABnzbd.ini --server :::8070 --browser 0 --daemon --clean --logging 0 --console
 fi

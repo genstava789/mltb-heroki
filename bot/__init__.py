@@ -358,12 +358,16 @@ if len(JD_EMAIL) == 0 or len(JD_PASS) == 0:
     JD_PASS = ""
 
 USENET_SERVERS = environ.get("USENET_SERVERS", "")
-if len(USENET_SERVERS) == 0:
-    USENET_SERVERS = ""
-elif not eval(USENET_SERVERS)[0]['host']:
-    USENET_SERVERS = ""
-else:
-    USENET_SERVERS = eval(USENET_SERVERS)
+try:
+    if len(USENET_SERVERS) == 0:
+        USENET_SERVERS = []
+    elif not eval(USENET_SERVERS)[0]["host"]:
+        USENET_SERVERS = []
+    else:
+        USENET_SERVERS = eval(USENET_SERVERS)
+except:
+    log_error(f"Wrong USENET_SERVERS format: {USENET_SERVERS}")
+    USENET_SERVERS = []
 
 MEGA_EMAIL = environ.get("MEGA_EMAIL", "")
 MEGA_PASS = environ.get("MEGA_PASS", "")
@@ -404,7 +408,12 @@ if len(LEECH_FILENAME_PREFIX) == 0:
 SEARCH_PLUGINS = environ.get("SEARCH_PLUGINS", "")
 if len(SEARCH_PLUGINS) == 0:
     SEARCH_PLUGINS = ""
-SEARCH_PLUGINS = eval(SEARCH_PLUGINS)
+else:
+    try:
+        SEARCH_PLUGINS = eval(SEARCH_PLUGINS)
+    except:
+        log_error(f"Wrong SEARCH_PLUGINS format: {SEARCH_PLUGINS}")
+        SEARCH_PLUGINS = ""
 
 MAX_SPLIT_SIZE = 4194304000 if IS_PREMIUM_USER else 2097152000
 log_info(f"Max Split Size : {MAX_SPLIT_SIZE}")
