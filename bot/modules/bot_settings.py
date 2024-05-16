@@ -25,7 +25,9 @@ from bot import (
     DATABASE_URL,
     DRIVES_IDS,
     DRIVES_NAMES,
+    get_nzb_options,
     get_qb_client,
+    get_qb_options,
     get_sabnzb_client,
     GLOBAL_EXTENSION_FILTER,
     INDEX_URLS,
@@ -186,6 +188,7 @@ Timeout: 60 sec"""
             buttons.ibutton("Edit", "botset edit qbit")
         else:
             buttons.ibutton("View", "botset view qbit")
+        buttons.ibutton("Sync Qbittorrent", "botset syncqbit")
         buttons.ibutton("Back", "botset back")
         buttons.ibutton("Close", "botset close")
         for x in range(0, len(qbit_options), 10):
@@ -201,6 +204,7 @@ Timeout: 60 sec"""
         else:
             buttons.ibutton("View", "botset view nzb")
         buttons.ibutton("Servers", "botset nzbserver")
+        buttons.ibutton("Sync Sabnzbd", "botset syncnzb")
         buttons.ibutton("Back", "botset back")
         buttons.ibutton("Close", "botset close")
         for x in range(0, len(nzb_options), 10):
@@ -397,7 +401,7 @@ async def edit_nzb(_, message, pre_message, key):
     elif value.startswith("[") and value.endswith("]"):
         value = ",".join(eval(value))
     res = await nzb_client.set_config("misc", key, value)
-    value = res["misc"][key]
+    value = res["config"]["misc"][key]
     nzb_options[key] = value
     await nzb_client.log_out()
     await update_buttons(pre_message, "nzb")
@@ -670,7 +674,7 @@ async def edit_bot_settings(client, query):
         elif data[2] in ["JD_EMAIL", "JD_PASS"]:
             jdownloader.device = None
             jdownloader.error = "JDownloader Credentials not provided!"
-            await create_subprocess_exec(["pkill", "-9", "-f", "avaj"])
+            await create_subprocess_exec("pkill", "-9", "-f", "avaj")
         elif data[2] == "USENET_SERVERS":
             nzb_client = get_sabnzb_client()
             for s in config_dict["USENET_SERVERS"]:
@@ -715,11 +719,21 @@ async def edit_bot_settings(client, query):
         await query.answer()
         nzb_client = get_sabnzb_client()
         res = await nzb_client.set_config_default(data[2])
-        nzb_options[data[2]] = res["misc"][data[2]]
+        nzb_options[data[2]] = res["config"]["misc"][data[2]]
         await nzb_client.log_out()
         await update_buttons(message, "nzb")
         if DATABASE_URL:
             await DbManager().update_nzb_config()
+    elif data[1] == "syncnzb":
+        await query.answer("Syncronization Started. It takes up to 2 sec!", show_alert=True)
+        await get_nzb_options()
+        if DATABASE_URL:
+            await DbManager().update_nzb_config()
+    elif data[1] == "syncqbit":
+        await query.answer("Syncronization Started. It takes up to 2 sec!", show_alert=True)
+        await get_qb_options()
+        if DATABASE_URL:
+            await DbManager().save_qbit_settings()
     elif data[1] == "emptyaria":
         await query.answer()
         aria2_options[data[2]] = ""
@@ -746,7 +760,7 @@ async def edit_bot_settings(client, query):
         await query.answer()
         nzb_client = get_sabnzb_client()
         res = await nzb_client.set_config("misc", data[2], "")
-        nzb_options[data[2]] = res["misc"][data[2]]
+        nzb_options[data[2]] = res["config"]["misc"][data[2]]
         await nzb_client.log_out()
         await update_buttons(message, "nzb")
         if DATABASE_URL:

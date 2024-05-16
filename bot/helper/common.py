@@ -8,7 +8,6 @@ from re import sub, I
 from secrets import token_urlsafe
 
 from bot import (
-    bot,
     config_dict,
     cpu_eater_lock,
     DOWNLOAD_DIR,
@@ -168,7 +167,7 @@ class TaskConfig:
             else ""
         )
         if self.nameSub:
-            self.nameSub = [x.split(" : ") for x in self.nameSub.split("|")]
+            self.nameSub = [x.split(" : ") for x in self.nameSub.split(" | ")]
             self.seed = False
         self.extensionFilter = (
             self.userDict.get("excluded_extensions") or GLOBAL_EXTENSION_FILTER
