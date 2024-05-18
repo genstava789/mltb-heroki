@@ -45,9 +45,13 @@ async def add_servers(client):
             except LoginFailed as e:
                 raise e
     elif not res and (
-        not config_dict["USENET_SERVERS"][0]["host"]
-        or not config_dict["USENET_SERVERS"][0]["username"]
-        or not config_dict["USENET_SERVERS"][0]["password"]
+        config_dict["USENET_SERVERS"]
+        and (
+            not config_dict["USENET_SERVERS"][0]["host"]
+            or not config_dict["USENET_SERVERS"][0]["username"]
+            or not config_dict["USENET_SERVERS"][0]["password"]
+        )
+        or not config_dict["USENET_SERVERS"]
     ):
         raise NotLoggedIn("Kredensial USENET tidak ditemukan!")
     else:
@@ -68,6 +72,7 @@ async def add_nzb(listener, path):
             await add_servers(client)
         except Exception as e:
             await listener.onDownloadError(str(e))
+            return
     try:
         await client.create_category(f"{listener.mid}", path)
         url = listener.link

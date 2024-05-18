@@ -57,7 +57,7 @@ STATUSES = {
 
 async def getTaskByGid(gid: str):
     async with task_dict_lock:
-        for tk in list(task_dict.values()):
+        for tk in task_dict.values():
             if hasattr(tk, "seeding"):
                 await sync_to_async(tk.update)
             if tk.gid() == gid:
@@ -74,25 +74,24 @@ def getSpecificTasks(status, userId):
     elif userId:
         return [
             tk
-            for tk in list(task_dict.values())
+            for tk in task_dict.values()
             if tk.listener.userId == userId
             and (
                 (st := tk.status())
                 and st == status
                 or status == MirrorStatus.STATUS_DOWNLOADING
-                and st not in list(STATUSES.values())
+                and st not in STATUSES.values()
             )
         ]
     else:
         return [
             tk
-            for tk in list(task_dict.values())
+            for tk in task_dict.values()
             if (st := tk.status())
             and st == status
             or status == MirrorStatus.STATUS_DOWNLOADING
-            and st not in list(STATUSES.values())
+            and st not in STATUSES.values()
         ]
-
 
 
 async def getAllTasks(req_status: str, userId):
@@ -112,6 +111,7 @@ def get_readable_file_size(size_in_bytes: int):
         if index > 0
         else f"{size_in_bytes:.2f}B"
     )
+
 
 def get_readable_time(seconds: int):
     periods = [("d", 86400), ("h", 3600), ("m", 60), ("s", 1)]
@@ -154,7 +154,7 @@ def get_progress_bar_string(pct) -> str:
     return f"[{p_str}]"
 
 
-async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=1):
+async def get_readable_message(sid, is_user, page_no=1, status="All", _=1):
     msg = ""
     button = None
 

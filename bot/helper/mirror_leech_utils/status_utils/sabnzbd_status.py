@@ -55,7 +55,10 @@ class SabnzbdStatus:
         return f"{get_readable_file_size(self.speed_raw())}/s"
 
     def name(self):
-        return self._info["filename"]
+        if self._info:
+            return self._info["filename"]
+        else:
+            return ""
 
     def size(self):
         return self._info["size"]
