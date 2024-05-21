@@ -71,15 +71,16 @@ Include :
 heroku plugins:install heroku-builds
 ```
 
-- Delete Cache (Change app-name to Yours app-name without Random Number (Example : MLTB))
+- Delete Cache
 ```
 heroku builds:cache:purge -a app-name
 ```
 
-- Rebuild Image
+- Commit Update
 ```
 git commit --allow-empty -m "Purge cache"
 ```
+
 - Push Update
 ```
 git push heroku master
