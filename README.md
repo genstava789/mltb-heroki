@@ -44,7 +44,7 @@ Include :
 - Updated Apps which used by Mirror Leech Telegram Bot
 
 Note :
-Automatically daily builds Docker Image and sometimes I often change the Docker Image for testing purposes. Maybe some Apps is not running properly
+Automatically daily builds Docker Image and sometimes I often change the Docker Image for testing purposes. Maybe some Apps is not running properly!
 ```
 
 - arakurumi/mltb:alpine
@@ -405,7 +405,7 @@ quotes, even if it's `Int`, `Bool` or `List`.
 - `LEECH_FILENAME_PREFIX`: Add custom word to leeched file name. `Str`
 - `LEECH_CHAT_ID`: ID or USERNAME or PM (Private Message) to where files would be uploaded. `Int`|`Str`. Add `-100` before channel/superGroup id.
 
-**7. qBittorrent/Aria2c**
+**7. qBittorrent/Aria2c/Sabnzbd**
 
 - `TORRENT_TIMEOUT`: Timeout of dead torrents downloading with qBittorrent and Aria2c in seconds. `Int`
 - `BASE_URL`: Valid BASE URL where the bot is deployed to use torrent web files selection. Format of URL should
@@ -523,7 +523,7 @@ sudo docker stop id
 change it in [docker-compose.yml](https://github.com/anasty17/mirror-leech-telegram-bot/blob/master/docker-compose.yml)
 also.
 
-- Install docker-compose
+- Install docker compose plugin
 
 ```
 sudo apt install docker-compose-plugin
@@ -558,10 +558,6 @@ sudo docker compose start
 ```
 sudo docker compose logs --follow
 ```
-
-- Tutorial video from Tortoolkit repo for docker-compose and checking ports
-
-<p><a href="https://youtu.be/c8_TU1sPK08"> <img src="https://img.shields.io/badge/See%20Video-black?style=for-the-badge&logo=YouTube" width="160""/></a></p>
 
 ---
 
@@ -895,10 +891,6 @@ separated by a new line.
 
 <p> If you feel like showing your appreciation for this project, then how about buying me a coffee.</p>
 
-### Modification Repository
-
-[!["Trakteer"](https://trakteer-assets.sgp1.digitaloceanspaces.com/images/embed/trbtn-red-1.png?date=18-11-2023)](https://trakteer.id/kqrumi/tip)
-
 [!["Buy Me A Coffee"](https://storage.ko-fi.com/cdn/kofi2.png)](https://ko-fi.com/anasty17)
 
 Binance ID:
@@ -941,5 +933,9 @@ ETH Address:
 ```
 0xf798a8a1c72d593e16d8f3bb619ebd1a093c7309
 ```
+
+### Modification Repository
+
+[!["Trakteer"](https://trakteer-assets.sgp1.digitaloceanspaces.com/images/embed/trbtn-red-1.png?date=18-11-2023)](https://trakteer.id/kqrumi/tip)
 
 ---
