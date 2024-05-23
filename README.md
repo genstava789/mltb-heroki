@@ -88,8 +88,8 @@ git push heroku master
 
 ## qBittorrent
 
-- External access to webui, so you can remove files or edit settings
-- Select files from a Torrent before and during download (Requires Base URL) (task option)
+- External access to webui, so you can remove files or edit settings. Then you can sync settings in database with sync button in bsetting
+- Select files from a Torrent before and during download using mltb file selector (Requires Base URL) (task option)
 - Seed torrents to a specific ratio and time (task option)
 - Edit Global Options while the bot is running from bot settings (global option)
 
@@ -104,8 +104,8 @@ git push heroku master
 
 ## Sabnzbd
 
-- External access to web interface, so you can remove files or edit settings
-- Remove files from job before and during download (Requires Base URL) (task option)
+- External access to web interface, so you can remove files or edit settings. Then you can sync settings in database with sync button in bsetting
+- Remove files from job before and during download using mltb file selector (Requires Base URL) (task option)
 - Edit Global Options while the bot is running from bot settings (global option)
 - Servers menu to edit/add/remove usenet servers
 
