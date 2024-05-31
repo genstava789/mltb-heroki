@@ -1,6 +1,6 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aria2p import API as ariaAPI, Client as ariaClient
-from asyncio import Lock, run as aiorun
+from asyncio import get_event_loop, Lock
 from dotenv import load_dotenv, dotenv_values
 from logging import (
     basicConfig,
@@ -41,6 +41,7 @@ getLogger("httpx").setLevel(ERROR)
 getLogger("pymongo").setLevel(ERROR)
 
 botStartTime = time()
+bot_loop = get_event_loop()
 
 basicConfig(
     format="{asctime} - [{levelname[0]}] {name} [{module}:{lineno}] - {message}",
@@ -268,6 +269,44 @@ if len(TELEGRAM_HASH) == 0:
 TELEGRAM_API_PREMIUM = environ.get("TELEGRAM_API_PREMIUM", "")
 TELEGRAM_HASH_PREMIUM = environ.get("TELEGRAM_HASH_PREMIUM", "")
 
+USER_SESSION_STRING = environ.get("USER_SESSION_STRING", "")
+if len(USER_SESSION_STRING) != 0:
+    log_info(f"Creating client from USER_SESSION_STRING ({USER_SESSION_STRING[:10]}***{USER_SESSION_STRING[-10:]})...")
+    try:
+        if len(TELEGRAM_API_PREMIUM) != 0 and len(TELEGRAM_HASH_PREMIUM) != 0:
+            log_info("Using another Telegram Api & Telegram Hash for User Session...")
+            TELEGRAM_API_PREMIUM = int(TELEGRAM_API_PREMIUM)
+            user = tgClient(
+                name="User", 
+                api_id=TELEGRAM_API_PREMIUM, 
+                api_hash=TELEGRAM_HASH_PREMIUM, 
+                session_string=USER_SESSION_STRING,
+                parse_mode=enums.ParseMode.HTML, 
+                workers=20, 
+                max_concurrent_transmissions=20,
+            ).start()
+        else:
+            user = tgClient(
+                name="User", 
+                api_id=TELEGRAM_API, 
+                api_hash=TELEGRAM_HASH, 
+                session_string=USER_SESSION_STRING,
+                parse_mode=enums.ParseMode.HTML, 
+                workers=20, 
+                max_concurrent_transmissions=20,
+            ).start()
+
+        IS_PREMIUM_USER = user.me.is_premium
+    
+    except Exception as error:
+        user = ""
+        IS_PREMIUM_USER = False
+        log_error(f"Failed to create client from USER_SESSION_STRING ({error}).")
+
+else:
+    user = ""
+    IS_PREMIUM_USER = False
+
 GDRIVE_ID = environ.get("GDRIVE_ID", "")
 if len(GDRIVE_ID) == 0:
     GDRIVE_ID = ""
@@ -312,45 +351,7 @@ if len(EXTENSION_FILTER) > 0:
     for x in fx:
         x = x.lstrip(".")
         GLOBAL_EXTENSION_FILTER.append(x.strip().lower())
-
-USER_SESSION_STRING = environ.get("USER_SESSION_STRING", "")
-if len(USER_SESSION_STRING) != 0:
-    log_info(f"Creating client from USER_SESSION_STRING ({USER_SESSION_STRING[:10]}***{USER_SESSION_STRING[-10:]})...")
-    try:
-        if len(TELEGRAM_API_PREMIUM) != 0 and len(TELEGRAM_HASH_PREMIUM) != 0:
-            log_info("Using another Telegram Api & Telegram Hash for User Session...")
-            TELEGRAM_API_PREMIUM = int(TELEGRAM_API_PREMIUM)
-            user = tgClient(
-                name="User", 
-                api_id=TELEGRAM_API_PREMIUM, 
-                api_hash=TELEGRAM_HASH_PREMIUM, 
-                session_string=USER_SESSION_STRING,
-                parse_mode=enums.ParseMode.HTML, 
-                workers=20, 
-                max_concurrent_transmissions=20,
-            ).start()
-        else:
-            user = tgClient(
-                name="User", 
-                api_id=TELEGRAM_API, 
-                api_hash=TELEGRAM_HASH, 
-                session_string=USER_SESSION_STRING,
-                parse_mode=enums.ParseMode.HTML, 
-                workers=20, 
-                max_concurrent_transmissions=20,
-            ).start()
-
-        IS_PREMIUM_USER = user.me.is_premium
-    
-    except Exception as error:
-        user = ""
-        IS_PREMIUM_USER = False
-        log_error(f"Failed to create client from USER_SESSION_STRING ({error}).")
-
-else:
-    user = ""
-    IS_PREMIUM_USER = False
-    
+   
 JD_EMAIL = environ.get("JD_EMAIL", "")
 JD_PASS = environ.get("JD_PASS", "")
 if len(JD_EMAIL) == 0 or len(JD_PASS) == 0:
@@ -701,13 +702,12 @@ def get_qb_client():
         REQUESTS_ARGS={"timeout": (30, 60)},
     )
 
-def get_sabnzb_client():
-    return sabnzbdClient(
-        host="http://localhost",
-        api_key="mltb",
-        port="8070",
-        HTTPX_REQUETS_ARGS={"timeout": 10},
-    )
+sabnzbd_client = sabnzbdClient(
+    host="http://localhost",
+    api_key="mltb",
+    port="8070",
+    HTTPX_REQUETS_ARGS={"timeout": 10},
+)
 
 aria2c_global = [
     "bt-max-open-files", 
@@ -736,7 +736,6 @@ bot = tgClient(
     max_concurrent_transmissions=20,
 ).start()
 
-bot_loop = bot.loop
 bot_name = bot.me.username
 
 scheduler = AsyncIOScheduler(timezone=str(get_localzone()), event_loop=bot_loop)
@@ -767,12 +766,10 @@ else:
 
 async def get_nzb_options():
     global nzb_options
-    zclient = get_sabnzb_client()
-    nzb_options = (await zclient.get_config())["config"]["misc"]
-    await zclient.log_out()
+    nzb_options = (await sabnzbd_client.get_config())["config"]["misc"]
 
 
-aiorun(get_nzb_options())
+bot_loop.run_until_complete(get_nzb_options())
 
 log_info("Set up auto Alive...")
 Popen(["python3", "alive.py"])

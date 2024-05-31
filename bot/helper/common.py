@@ -12,6 +12,7 @@ from bot import (
     cpu_eater_lock,
     DOWNLOAD_DIR,
     GLOBAL_EXTENSION_FILTER,
+    Intervals,
     IS_PREMIUM_USER,
     LOGGER,
     MAX_SPLIT_SIZE,
@@ -162,9 +163,11 @@ class TaskConfig:
         self.nameSub = (
             self.nameSub
             or self.userDict.get("name_sub", False)
-            or (config_dict["NAME_SUBSTITUTE"]
-            if "name_sub" not in self.userDict
-            else "")
+            or (
+                config_dict["NAME_SUBSTITUTE"]
+                if "name_sub" not in self.userDict
+                else ""
+            )
         )
         if self.nameSub:
             self.nameSub = [x.split(" : ") for x in self.nameSub.split(" | ")]
@@ -386,7 +389,8 @@ class TaskConfig:
             self.multiTag = token_urlsafe(3)
             multi_tags.add(self.multiTag)
         elif self.multi <= 1:
-            multi_tags.discard(self.multiTag)
+            if self.multiTag in multi_tags:
+                multi_tags.discard(self.multiTag)
             return
         if self.multiTag and self.multiTag not in multi_tags:
             await sendMessage(
@@ -423,6 +427,8 @@ class TaskConfig:
             nextmsg.from_user = self.user
         else:
             nextmsg.sender_chat = self.user
+        if Intervals["stopAll"]:
+            return
         obj(
             self.client,
             nextmsg,

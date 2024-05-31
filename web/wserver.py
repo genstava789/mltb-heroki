@@ -1,4 +1,4 @@
-from asyncio import run
+from asyncio import get_event_loop
 from aria2p import API as ariaAPI, Client as ariaClient
 from flask import Flask, request, render_template
 from logging import (
@@ -19,6 +19,8 @@ app = Flask(
     template_folder='/usr/src/app/templates', 
     static_folder='/usr/src/app/templates'
 )
+
+web_loop = get_event_loop()
 
 aria2 = ariaAPI(
     ariaClient(
@@ -738,7 +740,7 @@ def list_torrent_contents(id_):
             await client.log_out()
             return res
 
-        res = run(get_files())
+        res = web_loop.run_until_complete(get_files())
         cont = make_tree(res, "nzb")
     elif len(id_) > 20:
         client = qbClient(host="localhost", port="8090")
@@ -770,7 +772,7 @@ def set_priority(id_):
             await client.remove_file(id_, to_remove)
             await client.log_out()
 
-        run(remove_files())
+        web_loop.run_until_complete(remove_files())
         LOGGER.info(f"Verified! nzo_id: {id_}")
 
     elif len(id_) > 20:

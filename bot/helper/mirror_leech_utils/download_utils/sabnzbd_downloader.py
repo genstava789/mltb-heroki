@@ -5,10 +5,10 @@ from sabnzbdapi.exception import NotLoggedIn, LoginFailed
 from bot import (
     config_dict,
     DATABASE_URL,
-    get_sabnzb_client,
     LOGGER,
     non_queued_dl,
     queue_dict_lock,
+    sabnzbd_client,
     task_dict_lock,
     task_dict,
 )
@@ -24,14 +24,14 @@ from bot.helper.telegram_helper.message_utils import (
 )
 
 
-async def add_servers(client):
-    res = await client.check_login()
+async def add_servers():
+    res = await sabnzbd_client.check_login()
     if res and (servers := res["servers"]):
         tasks = []
         servers_hosts = [x["host"] for x in servers]
         for server in list(config_dict["USENET_SERVERS"]):
             if server["host"] not in servers_hosts:
-                tasks.append(client.add_server(server))
+                tasks.append(sabnzbd_client.add_server(server))
                 config_dict["USENET_SERVERS"].append(server)
         if DATABASE_URL:
             tasks.append(
@@ -55,10 +55,10 @@ async def add_servers(client):
     ):
         raise NotLoggedIn("Kredensial USENET tidak ditemukan!")
     else:
-        tasks = []
-        for server in config_dict["USENET_SERVERS"]:
-            tasks.append(client.add_server(server))
-        if tasks:
+        if tasks := [
+            sabnzbd_client.add_server(server)
+            for server in config_dict["USENET_SERVERS"]
+        ]:
             try:
                 await gather(*tasks)
             except LoginFailed as e:
@@ -66,22 +66,21 @@ async def add_servers(client):
 
 
 async def add_nzb(listener, path):
-    client = get_sabnzb_client()
-    if not client.LOGGED_IN:
+    if not sabnzbd_client.LOGGED_IN:
         try:
-            await add_servers(client)
+            await add_servers()
         except Exception as e:
             await listener.onDownloadError(str(e))
             return
     try:
-        await client.create_category(f"{listener.mid}", path)
+        await sabnzbd_client.create_category(f"{listener.mid}", path)
         url = listener.link
         nzbpath = None
         if await aiopath.exists(listener.link):
             url = None
             nzbpath = listener.link
         add_to_queue, event = await check_running_tasks(listener)
-        res = await client.add_uri(
+        res = await sabnzbd_client.add_uri(
             url,
             nzbpath,
             listener.name,
@@ -100,14 +99,14 @@ async def add_nzb(listener, path):
 
         await sleep(0.5)
 
-        downloads = await client.get_downloads(nzo_ids=job_id)
+        downloads = await sabnzbd_client.get_downloads(nzo_ids=job_id)
         if not downloads["queue"]["slots"]:
             await sleep(1)
-            history = await client.get_history(nzo_ids=job_id)
+            history = await sabnzbd_client.get_history(nzo_ids=job_id)
             if err := history["history"]["slots"][0]["fail_message"]:
                 await gather(
                     listener.onDownloadError(err),
-                    client.delete_history(job_id, delete_files=True),
+                    sabnzbd_client.delete_history(job_id, delete_files=True),
                 )
                 return
             name = history["history"]["slots"][0]["name"]
@@ -132,7 +131,7 @@ async def add_nzb(listener, path):
                 metamsg = "<b>Mengunduh Metadata...</b>\n<b>Gunakan file NZB untuk melewati proses ini!</b>"
                 meta = await sendMessage(listener.message, metamsg)
                 while True:
-                    nzb_info = await client.get_downloads(nzo_ids=job_id)
+                    nzb_info = await sabnzbd_client.get_downloads(nzo_ids=job_id)
                     if nzb_info["queue"]["slots"]:
                         if not nzb_info["queue"]["slots"][0]["filename"].startswith(
                             "Trying"
@@ -144,7 +143,7 @@ async def add_nzb(listener, path):
                         return
                     await sleep(1)
             if not add_to_queue:
-                await client.pause_job(job_id)
+                await sabnzbd_client.pause_job(job_id)
             SBUTTONS = bt_selection_buttons(job_id)
             msg = "<b>Unduhan dihentikan...</b>\n<b>Pilih file yang mau diunduh lalu tekan tombol Selesai untuk melanjutkan!</b>"
             await sendMessage(listener.message, msg, SBUTTONS)
@@ -160,7 +159,7 @@ async def add_nzb(listener, path):
             async with task_dict_lock:
                 task_dict[listener.mid].queued = False
 
-            await client.resume_job(job_id)
+            await sabnzbd_client.resume_job(job_id)
             LOGGER.info(
                 f"Start Queued Download from Sabnzbd: {name} - Job_id: {job_id}"
             )
@@ -169,4 +168,3 @@ async def add_nzb(listener, path):
     finally:
         if nzbpath and await aiopath.exists(listener.link):
             await remove(listener.link)
-        await client.log_out()

@@ -98,7 +98,7 @@ async def forwardMessage(chat_id:int, from_chat_id:int, message_id=int, message_
         raise Exception(e)
 
 
-async def sendFile(message, file, caption=None):
+async def sendFile(message, file, caption=""):
     try:
         return await message.reply_document(
             document=file, 
@@ -115,7 +115,7 @@ async def sendFile(message, file, caption=None):
         return str(e)
 
 
-async def sendPhoto(message, photo, caption=None):
+async def sendPhoto(message, photo, caption=""):
     try:
         return await message.reply_photo(
             photo=photo, 
@@ -242,6 +242,8 @@ async def get_tg_link_message(link):
 
 
 async def update_status_message(sid, force=False):
+    if Intervals["stopAll"]:
+        return
     async with task_dict_lock:
         if not status_dict.get(sid):
             if obj := Intervals["status"].get(sid):
@@ -284,6 +286,8 @@ async def update_status_message(sid, force=False):
 
 
 async def sendStatusMessage(msg, user_id=0):
+    if Intervals["stopAll"]:
+        return
     async with task_dict_lock:
         sid = user_id or msg.chat.id
         is_user = bool(user_id)
