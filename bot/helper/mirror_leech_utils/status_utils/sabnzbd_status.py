@@ -3,9 +3,9 @@ from asyncio import gather
 from bot import LOGGER, nzb_jobs, nzb_listener_lock, sabnzbd_client
 from bot.helper.ext_utils.bot_utils import async_to_sync
 from bot.helper.ext_utils.status_utils import (
-    MirrorStatus,
     get_readable_file_size,
     get_readable_time,
+    MirrorStatus,
     time_to_seconds,
 )
 

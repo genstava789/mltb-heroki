@@ -691,22 +691,22 @@ if not ospath.exists("accounts"):
     log_warning("Service Accounts is not found!")
     config_dict["USE_SERVICE_ACCOUNTS"] = False
 
-def get_qb_client():
-    return qbClient(
-        host="localhost", 
-        port=8090, 
-        username="mltb",
-        password="mltbmltb",
-        FORCE_SCHEME_FROM_HOST=False, 
-        VERIFY_WEBUI_CERTIFICATE=False, 
-        REQUESTS_ARGS={"timeout": (30, 60)},
-    )
+qbittorrent_client = qbClient(
+    host="localhost",
+    port=8090,
+    VERIFY_WEBUI_CERTIFICATE=False,
+    REQUESTS_ARGS={"timeout": (30, 60)},
+    HTTPADAPTER_ARGS={
+        "pool_maxsize": 500,
+        "max_retries": 10,
+        "pool_block": True,
+    },
+)
 
 sabnzbd_client = sabnzbdClient(
     host="http://localhost",
     api_key="mltb",
     port="8070",
-    HTTPX_REQUETS_ARGS={"timeout": 10},
 )
 
 aria2c_global = [
@@ -743,7 +743,7 @@ scheduler = AsyncIOScheduler(timezone=str(get_localzone()), event_loop=bot_loop)
 def get_qb_options():
     global qbit_options
     if not qbit_options:
-        qbit_options = dict(get_qb_client().app_preferences())
+        qbit_options = dict(qbittorrent_client.app_preferences())
         del qbit_options["listen_port"]
         for k in list(qbit_options.keys()):
             if k.startswith("rss"):
@@ -753,7 +753,7 @@ def get_qb_options():
         for k, v in list(qb_opt.items()):
             if v in ["", "*"]:
                 del qb_opt[k]
-        get_qb_client().app_set_preferences(qb_opt)
+        qbittorrent_client.app_set_preferences(qb_opt)
 
 get_qb_options()
 

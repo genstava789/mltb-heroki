@@ -1,17 +1,17 @@
-from asyncio import sleep
+from asyncio import gather, sleep
 
-from bot import LOGGER, get_qb_client, QbTorrents, qb_listener_lock
+from bot import LOGGER, qbittorrent_client, QbTorrents, qb_listener_lock
 from bot.helper.ext_utils.bot_utils import sync_to_async
 from bot.helper.ext_utils.status_utils import (
-    MirrorStatus,
     get_readable_file_size,
     get_readable_time,
+    MirrorStatus,
 )
 
 
-def get_download(client, tag, old_info=None):
+def get_download(tag, old_info=None):
     try:
-        res = client.torrents_info(tag=tag)[0]
+        res = qbittorrent_client.torrents_info(tag=tag)[0]
         return res or old_info
     except Exception as e:
         LOGGER.error(f"{e}: Qbittorrent, while getting torrent info. Tag: {tag}")
@@ -21,13 +21,12 @@ def get_download(client, tag, old_info=None):
 class QbittorrentStatus:
     def __init__(self, listener, seeding=False, queued=False):
         self.listener = listener
-        self.client = get_qb_client()
         self.queued = queued
         self.seeding = seeding
         self._info = None
 
     def update(self):
-        self._info = get_download(self.client, f"{self.listener.mid}", self._info)
+        self._info = get_download(f"{self.listener.mid}", self._info)
 
     def progress(self):
         return f"{round(self._info.progress * 100, 2)}%"
@@ -96,7 +95,9 @@ class QbittorrentStatus:
     async def cancel_task(self):
         self.listener.isCancelled = True
         await sync_to_async(self.update)
-        await sync_to_async(self.client.torrents_pause, torrent_hashes=self._info.hash)
+        await sync_to_async(
+            qbittorrent_client.torrents_pause, torrent_hashes=self._info.hash
+        )
         if not self.seeding:
             if self.queued:
                 LOGGER.info(f"Cancelling QueueDL: {self.name()}")
@@ -105,14 +106,17 @@ class QbittorrentStatus:
                 LOGGER.info(f"Cancelling Download: {self._info.name}")
                 msg = "Unduhan dibatalkan oleh User!"
             await sleep(0.3)
-            await self.listener.onDownloadError(msg)
-            await sync_to_async(
-                self.client.torrents_delete,
-                torrent_hashes=self._info.hash,
-                delete_files=True,
+            await gather(
+                self.listener.onDownloadError(msg),
+                sync_to_async(
+                    qbittorrent_client.torrents_delete,
+                    torrent_hashes=self._info.hash,
+                    delete_files=True,
+                ),
+                sync_to_async(
+                    qbittorrent_client.torrents_delete_tags, tags=self._info.tags
+                ),
             )
-            await sync_to_async(self.client.torrents_delete_tags, tags=self._info.tags)
-            await sync_to_async(self.client.auth_log_out)
             async with qb_listener_lock:
                 if self._info.tags in QbTorrents:
                     del QbTorrents[self._info.tags]

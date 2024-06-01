@@ -1,10 +1,10 @@
-from bot import LOGGER, jd_lock, jd_downloads
-from bot.helper.ext_utils.bot_utils import retry_function, async_to_sync
+from bot import jd_downloads, jd_lock, LOGGER
+from bot.helper.ext_utils.bot_utils import async_to_sync, retry_function
 from bot.helper.ext_utils.jdownloader_booter import jdownloader
 from bot.helper.ext_utils.status_utils import (
-    MirrorStatus,
     get_readable_file_size,
     get_readable_time,
+    MirrorStatus,
 )
 
 
