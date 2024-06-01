@@ -649,7 +649,7 @@ config_dict = {
     "YT_DLP_OPTIONS": YT_DLP_OPTIONS,
 }
 
-# Reminder if forgot set something ^^
+# NOTE: Reminder if forgot to set something ^^
 for item, value in config_dict.items():
     if (
         isinstance(value, str)
@@ -750,9 +750,6 @@ def get_qb_options():
                 del qbit_options[k]
     else:
         qb_opt = {**qbit_options}
-        for k, v in list(qb_opt.items()):
-            if v in ["", "*"]:
-                del qb_opt[k]
         qbittorrent_client.app_set_preferences(qb_opt)
 
 get_qb_options()
@@ -767,7 +764,6 @@ else:
 async def get_nzb_options():
     global nzb_options
     nzb_options = (await sabnzbd_client.get_config())["config"]["misc"]
-
 
 bot_loop.run_until_complete(get_nzb_options())
 
