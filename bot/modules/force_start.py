@@ -77,7 +77,7 @@ async def remove_from_queue(_, message):
             
             elif listener.mid in queued_dl:
                 await start_dl_from_queued(listener.mid)
-                msg = "<b>Tugas berhasil dimulai paksa untuk Unduh dan akan Unggah setelah proses Unduh selesai!</b>"
+                msg = "<b>Tugas berhasil dimulai secara paksa untuk Unduh!</b>"
     
     if msg:
         await sendMessage(message, msg)
