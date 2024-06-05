@@ -4,6 +4,7 @@ from logging import (
     INFO,
 )
 from os import environ
+from re import DOTALL, search
 from requests import get
 from time import sleep
 
@@ -22,11 +23,11 @@ def sendRequest(url: str) -> None:
         headers=dict({
             "User-Agent": "Not a RoBot"
         }),
-        timeout=10
+        timeout=10,
     )
 
     if not request.ok:
-        raise Exception(f"[{request.status_code}] {request.text}")
+        raise Exception(f"[{request.status_code}] {search(pattern='(?<=<title>).+?(?=</title>)', string=request.text, flags=DOTALL)}")
 
 try:
     BASE_URL_PORT = environ.get("PORT", "")
@@ -45,7 +46,7 @@ try:
             BASE_URL = f"https://{RENDER_APP_NAME}.onrender.com"
     
     else:
-        raise Exception("Auto Alive is not set up correctly! Don't forget to add HEROKU_APP_NAME or RENDER_APP_NAME to prevent the Apps got shutdown!")
+        raise Exception("Auto Alive is not set correctly! Don't forget to add HEROKU_APP_NAME or RENDER_APP_NAME to prevent the App from shutting down!")
         
     if (
         BASE_URL 

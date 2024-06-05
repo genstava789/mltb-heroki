@@ -408,7 +408,7 @@ class YtDlp(TaskListener):
             return
 
         if "mdisk.me" in self.link:
-            name, self.link = await _mdisk(self.link, self.name)
+            self.name, self.link = await _mdisk(self.link, self.name)
 
         try:
             await self.beforeStart()
