@@ -69,7 +69,7 @@ START = 0
 STATE = "view"
 handler_dict = {}
 default_values = {
-    "DOWNLOAD_DIR": "/usr/src/app/downloads/",
+    "DOWNLOAD_DIR": "/app/downloads/",
     "LEECH_SPLIT_SIZE": MAX_SPLIT_SIZE,
     "RSS_DELAY": 600,
     "STATUS_UPDATE_INTERVAL": 15,
@@ -955,7 +955,7 @@ async def load_config():
 
     DOWNLOAD_DIR = environ.get("DOWNLOAD_DIR", "")
     if len(DOWNLOAD_DIR) == 0:
-        DOWNLOAD_DIR = "/usr/src/app/downloads/"
+        DOWNLOAD_DIR = "/app/downloads/"
     elif not DOWNLOAD_DIR.endswith("/"):
         DOWNLOAD_DIR = f"{DOWNLOAD_DIR}/"
 

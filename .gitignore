@@ -15,7 +15,6 @@ list_drives.txt
 log.txt
 rclone.conf
 rclone/*
-sabnzbd/*
 terabox.txt
 Thumbnails/*
 token.pickle

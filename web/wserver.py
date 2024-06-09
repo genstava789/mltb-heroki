@@ -2,11 +2,11 @@ from asyncio import get_event_loop
 from aria2p import API as ariaAPI, Client as ariaClient
 from flask import Flask, request, render_template
 from logging import (
-    getLogger,
     basicConfig,
     FileHandler,
+    getLogger,
+    INFO,
     StreamHandler,
-    INFO
 )
 from qbittorrentapi import Client as qbClient, NotFound404Error
 from sabnzbdapi import sabnzbdClient
@@ -16,8 +16,8 @@ from web.nodes import make_tree
 
 app = Flask(
     __name__, 
-    template_folder='/usr/src/app/templates', 
-    static_folder='/usr/src/app/templates'
+    template_folder="app/templates", 
+    static_folder="app/templates",
 )
 
 web_loop = get_event_loop()
