@@ -96,7 +96,7 @@ else:
         conn.close()
     
     except Exception as e:
-        LOGGER.error(f"DATABASE ERROR! {e}")
+        LOGGER.error(f"DATABASE ERROR! ERROR: {e}")
 
 UPSTREAM_REPO = environ.get("UPSTREAM_REPO", "")
 if len(UPSTREAM_REPO) == 0:
