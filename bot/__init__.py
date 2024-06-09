@@ -510,9 +510,9 @@ USER_TRANSMISSION = USER_TRANSMISSION.lower() == "true" and IS_PREMIUM_USER
 BASE_URL = environ.get("BASE_URL", "")
 BASE_URL = BASE_URL.rstrip("/")
 
-BASE_URL_PORT = str(environ.get("PORT", ""))
+BASE_URL_PORT = environ.get("PORT", "")
 if len(BASE_URL_PORT) == 0:
-    BASE_URL_PORT = str(environ.get("BASE_URL_PORT", ""))
+    BASE_URL_PORT = environ.get("BASE_URL_PORT", "")
     if len(BASE_URL_PORT) == 0:
         BASE_URL_PORT = 80
 
