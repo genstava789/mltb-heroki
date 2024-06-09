@@ -16,8 +16,8 @@ from web.nodes import make_tree
 
 app = Flask(
     __name__, 
-    template_folder="app/templates", 
-    static_folder="app/templates",
+    template_folder="/app/templates", 
+    static_folder="/app/templates",
 )
 
 web_loop = get_event_loop()
