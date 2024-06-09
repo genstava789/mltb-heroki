@@ -1196,7 +1196,17 @@ async def load_config():
     BASE_URL = BASE_URL.rstrip("/")
 
     BASE_URL_PORT = environ.get("BASE_URL_PORT", "")
-    BASE_URL_PORT = 80 if len(BASE_URL_PORT) == 0 else int(BASE_URL_PORT)
+    if len(BASE_URL_PORT) == 0:
+        if "herokuapp.com" in BASE_URL:
+            BASE_URL_PORT = environ.get("PORT", "")
+        
+        elif "hf.sp" in BASE_URL:
+            BASE_URL_PORT = 7860
+        
+        else:
+            BASE_URL_PORT = 80       
+
+    BASE_URL_PORT = int(BASE_URL_PORT)
     
     if len(BASE_URL) != 0:
         await create_subprocess_shell(

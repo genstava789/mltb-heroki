@@ -230,7 +230,7 @@ async def ping(_, message):
     end_time = int(round(time() * 1000))
     await editMessage(
         reply, 
-        f"🤖 <b>Respon Bot :</b> <code>{end_time - start_time} ms</code>"
+        f"🤖 <b>Waktu Respon :</b> <code>{end_time - start_time} ms</code>"
     )
 
 
