@@ -1192,29 +1192,11 @@ async def load_config():
     USER_TRANSMISSION = environ.get("USER_TRANSMISSION", "")
     USER_TRANSMISSION = USER_TRANSMISSION.lower() == "true" and IS_PREMIUM_USER
 
+    BASE_URL = environ.get("BASE_URL", "")
+    BASE_URL = BASE_URL.rstrip("/")
+
     BASE_URL_PORT = environ.get("BASE_URL_PORT", "")
     BASE_URL_PORT = 80 if len(BASE_URL_PORT) == 0 else int(BASE_URL_PORT)
-
-    BASE_URL = environ.get("BASE_URL", "")
-    HEROKU_APP_NAME = environ.get("HEROKU_APP_NAME", "")
-    RENDER_APP_NAME = environ.get("RENDER_APP_NAME", "")
-    if len(BASE_URL) == 0:
-        if len(HEROKU_APP_NAME) != 0:
-            if "://" in HEROKU_APP_NAME:
-                BASE_URL = HEROKU_APP_NAME
-            else:
-                BASE_URL = f"https://{HEROKU_APP_NAME}.herokuapp.com"
-            
-        elif len(RENDER_APP_NAME) != 0:            
-            if "://" in RENDER_APP_NAME:
-                BASE_URL = RENDER_APP_NAME
-            else:
-                BASE_URL = f"https://{RENDER_APP_NAME}.onrender.com"
-            
-        else:
-            BASE_URL = ""
-
-    BASE_URL = BASE_URL.rstrip("/")
     
     if len(BASE_URL) != 0:
         await create_subprocess_shell(

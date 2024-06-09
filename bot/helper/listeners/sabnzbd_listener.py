@@ -29,11 +29,12 @@ async def _remove_job(nzo_id, mid):
 @new_task
 async def _onDownloadError(err, nzo_id, button=None):
     task = await getTaskByGid(nzo_id)
-    LOGGER.info(f"Cancelling Download: {task.name() if task else '-'}")
-    await gather(
-        task.listener.onDownloadError(err, button),
-        _remove_job(nzo_id, task.listener.mid),
-    )
+    if task:
+        LOGGER.info(f"Cancelling Download: {task.name()}")
+        await gather(
+            task.listener.onDownloadError(err, button),
+            _remove_job(nzo_id, task.listener.mid),
+        )
 
 
 @new_task

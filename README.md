@@ -65,27 +65,6 @@ Include :
 - Cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MediaInfo, MKVToolNix, NeoFetch, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
 ```
 
-#### How to Delete Heroku Build Cache for Refresh Image
-- Install Plugin
-```
-heroku plugins:install heroku-builds
-```
-
-- Delete Cache
-```
-heroku builds:cache:purge -a app-name
-```
-
-- Commit Update
-```
-git commit --allow-empty -m "Purge cache"
-```
-
-- Push Update
-```
-git push heroku master
-```
-
 ## qBittorrent
 
 - External access to webui, so you can remove files or edit settings. Then you can sync settings in database with sync button in bsetting
@@ -569,6 +548,34 @@ sudo docker compose logs --follow
 
 2. Check the number of processing units of your machine with `nproc` cmd and times it by 4, then
    edit `AsyncIOThreadsCount` in qBittorrent.conf.
+
+
+#### Build And Run The Docker Image Using Heroku-CLI
+- Install Heroku-CLI
+[Heroku-CLI](https://devcenter.heroku.com/articles/heroku-cli#install-the-heroku-cli).
+
+- To be Continued...
+
+#### Delete The Docker Image Build Cache Using Heroku-Builds
+- Install Plugin
+```
+heroku plugins:install heroku-builds
+```
+
+- Delete Cache
+```
+heroku builds:cache:purge -a app-name
+```
+
+- Commit Update
+```
+git commit --allow-empty -m "Purge cache"
+```
+
+- Push Update
+```
+git push heroku master
+```
 
 ---
 

@@ -507,36 +507,7 @@ MEDIA_GROUP = MEDIA_GROUP.lower() == "true"
 USER_TRANSMISSION = environ.get("USER_TRANSMISSION", "")
 USER_TRANSMISSION = USER_TRANSMISSION.lower() == "true" and IS_PREMIUM_USER
 
-IS_HEROKU = False
-IS_RENDER = False
-
 BASE_URL = environ.get("BASE_URL", "")
-HEROKU_APP_NAME = environ.get("HEROKU_APP_NAME", "")
-RENDER_APP_NAME = environ.get("RENDER_APP_NAME", "")
-if len(BASE_URL) == 0:
-    if len(HEROKU_APP_NAME) != 0:
-        IS_HEROKU = True
-
-        if "://" in HEROKU_APP_NAME:
-            BASE_URL = HEROKU_APP_NAME
-        else:
-            BASE_URL = f"https://{HEROKU_APP_NAME}.herokuapp.com"
-
-        log_info("Using HEROKU_APP_NAME as BASE_URL!")
-        
-    elif len(RENDER_APP_NAME) != 0:
-        IS_RENDER = True
-        
-        if "://" in RENDER_APP_NAME:
-            BASE_URL = RENDER_APP_NAME
-        else:
-            BASE_URL = f"https://{RENDER_APP_NAME}.onrender.com"
-
-        log_info("Using RENDER_APP_NAME as BASE_URL!")
-        
-    else:
-        BASE_URL = ""
-
 BASE_URL = BASE_URL.rstrip("/")
 
 BASE_URL_PORT = str(environ.get("PORT", ""))

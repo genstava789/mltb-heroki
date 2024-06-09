@@ -278,7 +278,6 @@ def direct_link_generator(link: str):
         ]
     ):
         return tusfiles(link)
-        return tusfiles(link)
     elif "uploadhaven.com" in domain:
         return uploadhaven(link)
     elif "uploadrar.com" in domain:
@@ -993,7 +992,10 @@ def streamtape(url):
             html = HTML(session.get(url).text)
     except Exception as e:
         raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}") from e
-    if not (script := html.xpath("//script[contains(text(),'ideoooolink')]/text()")):
+    if not (script := (
+        html.xpath("//script[contains(text(),'ideoooolink')]/text()")
+        or html.xpath("//script[contains(text(),'ideoolink')]/text()")
+    )):
         raise DirectDownloadLinkException("ERROR: Script tidak ditemukan!")
     if not (link := findall(r"(&expires\S+)'", script[0])):
         raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")

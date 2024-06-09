@@ -7,7 +7,7 @@ from re import search as re_search
 from time import time
 from aioshutil import rmtree
 
-from bot import LOGGER, IS_HEROKU, subprocess_lock
+from bot import LOGGER, subprocess_lock
 from bot.helper.ext_utils.bot_utils import cmd_exec
 from bot.helper.ext_utils.bot_utils import sync_to_async
 from bot.helper.ext_utils.files_utils import ARCH_EXT, get_mime_type
@@ -224,7 +224,7 @@ async def get_document_type(path):
 
 
 async def take_ss(video_file, ss_nb) -> bool:
-    ss_nb = min(ss_nb, (5 if IS_HEROKU else 10))
+    ss_nb = min(ss_nb, 10)
     duration = (await get_media_info(video_file))[0]
     if duration != 0:
         dirpath, name = video_file.rsplit("/", 1)
@@ -254,7 +254,7 @@ async def take_ss(video_file, ss_nb) -> bool:
             cap_time += interval
             cmds.append(cmd_exec(cmd))
         try:
-            resutls = await wait_for(gather(*cmds), timeout=(600 if IS_HEROKU else 60))
+            resutls = await wait_for(gather(*cmds), timeout=60)
             if resutls[0][2] != 0:
                 LOGGER.error(
                     f"Error while creating sreenshots from video. Path: {video_file}. stderr: {resutls[0][1]}"
@@ -324,7 +324,7 @@ async def create_thumbnail(video_file, duration):
         des_dir,
     ]
     try:
-        _, err, code = await wait_for(cmd_exec(cmd), timeout=(600 if IS_HEROKU else 60))
+        _, err, code = await wait_for(cmd_exec(cmd), timeout=60)
         if code != 0 or not await aiopath.exists(des_dir):
             LOGGER.error(
                 f"Error while extracting thumbnail from video. Name: {video_file} stderr: {err}"

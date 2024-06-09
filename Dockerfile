@@ -1,8 +1,8 @@
 FROM arakurumi/mltb:latest
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-RUN chmod 777 /usr/src/app
+RUN chmod -R 777 /app
 
 COPY . .
 

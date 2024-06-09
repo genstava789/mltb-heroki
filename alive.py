@@ -1,10 +1,10 @@
+from http.client import responses
 from logging import (
     basicConfig,
     getLogger,
     INFO,
 )
 from os import environ
-from re import DOTALL, search
 from requests import get
 from time import sleep
 
@@ -17,43 +17,29 @@ basicConfig(
 
 LOGGER = getLogger("Alive")
 
-def sendRequest(url: str) -> None:
+def sendRequest(url: str, header: dict) -> None:
     request = get(
         url=url,
-        headers=dict({
-            "User-Agent": "Not a RoBot"
-        }),
+        headers=header,
         timeout=10,
+        allow_redirects=True,
     )
 
     if not request.ok:
-        raise Exception(f"[{request.status_code}] {search(pattern='(?<=<title>).+?(?=</title>)', string=request.text, flags=DOTALL)}")
+        raise Exception(f"[{request.status_code}] - {responses[request.status_code]}")
 
 try:
-    BASE_URL_PORT = environ.get("PORT", "")
-    HEROKU_APP_NAME = environ.get("HEROKU_APP_NAME", "")
-    RENDER_APP_NAME = environ.get("RENDER_APP_NAME", "")
-    if len(HEROKU_APP_NAME) != 0:
-        if "://" in HEROKU_APP_NAME:
-            BASE_URL = HEROKU_APP_NAME
-        else:
-            BASE_URL = f"https://{HEROKU_APP_NAME}.herokuapp.com"
+    HEADER = dict()
+    BASE_URL = None
     
-    elif len(RENDER_APP_NAME) != 0:
-        if "://" in RENDER_APP_NAME:
-            BASE_URL = RENDER_APP_NAME
-        else:
-            BASE_URL = f"https://{RENDER_APP_NAME}.onrender.com"
-    
-    else:
-        raise Exception("Auto Alive is not set correctly! Don't forget to add HEROKU_APP_NAME or RENDER_APP_NAME to prevent the App from shutting down!")
-        
-    if (
-        BASE_URL 
-        and len(BASE_URL_PORT) != 0
-    ):
+    if BASE_URL := environ.get("BASE_URL"):
+        HEADER["User-Agent"] = "Not a RoBot"
+
         while True:
-            sendRequest(BASE_URL)
+            sendRequest(
+                url=BASE_URL,
+                header=HEADER,
+            )
             sleep(300)
 
 except Exception as error:
