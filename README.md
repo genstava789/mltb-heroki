@@ -44,7 +44,7 @@ Include :
 - Updated Apps which used by Mirror Leech Telegram Bot
 
 Note :
-Automatically daily builds Docker Image and sometimes I often change the Docker Image for testing purposes. Maybe some Apps is not running properly!
+Automatically daily builds Docker Image
 ```
 
 - arakurumi/mltb:alpine
@@ -54,6 +54,9 @@ Based on Alpine Latest version with Heroku Bypass
 Include :
 - Stable Apps which used by Mirror Leech Telegram Bot
 - Cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MediaInfo, MKVToolNix, NeoFetch, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
+
+Note:
+Automatically weekly builds Docker Image
 ```
 
 - arakurumi/mltb:ubuntu
@@ -63,6 +66,9 @@ Based on Ubuntu Latest version with Heroku Bypass
 Include :
 - Stable Apps which used by Mirror Leech Telegram Bot
 - Cool Apps like AniDL, Bento4, Gallery-DL, HandBrakeCLI, MediaInfo, MKVToolNix, NeoFetch, N_m3u8DL-RE, PhantomJS, Shaka-Packager, VCSI
+
+Note:
+Automatically weekly builds Docker Image
 ```
 
 ## qBittorrent
