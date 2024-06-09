@@ -5,7 +5,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     
     steps:
       - name: Checkout 
@@ -15,7 +15,7 @@ jobs:
         uses: akhileshns/heroku-deploy@master
         with:
           stack: "container"
-          region: "eu"
+          region: "us"
           usedocker: true
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
