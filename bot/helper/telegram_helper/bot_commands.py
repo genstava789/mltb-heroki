@@ -3,7 +3,9 @@ from bot import CMD_SUFFIX
 
 class _BotCommands:
     def __init__(self):
+        # User
         self.StartCommand = f"start{CMD_SUFFIX}"
+        self.HelpCommand = [f"help{CMD_SUFFIX}", f"h{CMD_SUFFIX}"]
         self.MirrorCommand = [f"mirror{CMD_SUFFIX}", f"m{CMD_SUFFIX}"]
         self.QbMirrorCommand = [f"qbmirror{CMD_SUFFIX}", f"qm{CMD_SUFFIX}"]
         self.JdMirrorCommand = [f"jdmirror{CMD_SUFFIX}", f"jm{CMD_SUFFIX}"]
@@ -16,32 +18,32 @@ class _BotCommands:
         self.YtdlLeechCommand = [f"ytdlleech{CMD_SUFFIX}", f"yl{CMD_SUFFIX}", f"watchleech{CMD_SUFFIX}", f"wl{CMD_SUFFIX}"]
         self.CloneCommand = [f"clone{CMD_SUFFIX}", f"cl{CMD_SUFFIX}"]
         self.CountCommand = [f"count{CMD_SUFFIX}", f"co{CMD_SUFFIX}"]
-        self.DeleteCommand = [f"delete{CMD_SUFFIX}", f"del{CMD_SUFFIX}"]
+        self.ListCommand = [f"list{CMD_SUFFIX}", f"li{CMD_SUFFIX}"]
+        self.SearchCommand = [f"search{CMD_SUFFIX}", f"se{CMD_SUFFIX}"]
+        self.SelectCommand = [f"select{CMD_SUFFIX}", f"sel{CMD_SUFFIX}"]
+        self.StatusCommand = [f"status{CMD_SUFFIX}", f"sta{CMD_SUFFIX}"]
         self.CancelTaskCommand = [f"cancel{CMD_SUFFIX}", f"c{CMD_SUFFIX}"]
         self.CancelAllCommand = [f"cancelall{CMD_SUFFIX}", f"ca{CMD_SUFFIX}"]
         self.ForceStartCommand = [f"forcestart{CMD_SUFFIX}", f"fs{CMD_SUFFIX}"]
-        self.ListCommand = [f"list{CMD_SUFFIX}", f"li{CMD_SUFFIX}"]
-        self.SearchCommand = [f"search{CMD_SUFFIX}", f"se{CMD_SUFFIX}"]
-        self.StatusCommand = [f"status{CMD_SUFFIX}", f"sta{CMD_SUFFIX}"]
-        self.UsersCommand = [f"user{CMD_SUFFIX}", f"u{CMD_SUFFIX}"]
+        self.PingCommand = [f"ping{CMD_SUFFIX}", f"p{CMD_SUFFIX}"]
+        self.StatsCommand = [f"statistic{CMD_SUFFIX}", f"sts{CMD_SUFFIX}"]
+        self.UserSetCommand = [f"usersetting{CMD_SUFFIX}", f"us{CMD_SUFFIX}", f"uset{CMD_SUFFIX}"]
+        # Owner
+        self.RssCommand = f"rss{CMD_SUFFIX}"
+        self.DeleteCommand = [f"delete{CMD_SUFFIX}", f"del{CMD_SUFFIX}"]
         self.AuthorizeCommand = [f"authorize{CMD_SUFFIX}", f"au{CMD_SUFFIX}"]
         self.UnAuthorizeCommand = [f"unauthorize{CMD_SUFFIX}", f"ua{CMD_SUFFIX}"]
         self.AddSudoCommand = [f"addsudo{CMD_SUFFIX}", f"as{CMD_SUFFIX}"]
         self.RmSudoCommand = [f"rmsudo{CMD_SUFFIX}", f"rs{CMD_SUFFIX}"]
-        self.PingCommand = [f"ping{CMD_SUFFIX}", f"p{CMD_SUFFIX}"]
-        self.RestartCommand = [f"restart{CMD_SUFFIX}", f"r{CMD_SUFFIX}"]
-        self.StatsCommand = [f"statistic{CMD_SUFFIX}", f"sts{CMD_SUFFIX}"]
-        self.HelpCommand = [f"help{CMD_SUFFIX}", f"h{CMD_SUFFIX}"]
-        self.LogCommand = [f"log{CMD_SUFFIX}", f"lo{CMD_SUFFIX}"]
-        self.ShellCommand = [f"shell{CMD_SUFFIX}", f"sh{CMD_SUFFIX}"]
-        self.SpeedCommand = [f"speedtest{CMD_SUFFIX}", f"sp{CMD_SUFFIX}"]
         self.ExecCommand = [f"exe{CMD_SUFFIX}", f"execute{CMD_SUFFIX}"]
         self.AExecCommand = [f"aexe{CMD_SUFFIX}", f"aexecute{CMD_SUFFIX}"]
+        self.ShellCommand = [f"shell{CMD_SUFFIX}", f"sh{CMD_SUFFIX}"]
         self.ClearLocalsCommand = [f"clearlocal{CMD_SUFFIX}", f"clo{CMD_SUFFIX}"]
+        self.LogCommand = [f"log{CMD_SUFFIX}", f"lo{CMD_SUFFIX}"]
+        self.SpeedCommand = [f"speedtest{CMD_SUFFIX}", f"sp{CMD_SUFFIX}"]
+        self.RestartCommand = [f"restart{CMD_SUFFIX}", f"r{CMD_SUFFIX}"]
+        self.UsersCommand = [f"user{CMD_SUFFIX}", f"u{CMD_SUFFIX}"]
         self.BotSetCommand = [f"botsetting{CMD_SUFFIX}", f"bs{CMD_SUFFIX}", f"bset{CMD_SUFFIX}"]
-        self.UserSetCommand = [f"usersetting{CMD_SUFFIX}", f"us{CMD_SUFFIX}", f"uset{CMD_SUFFIX}"]
-        self.SelectCommand = [f"select{CMD_SUFFIX}", f"sel{CMD_SUFFIX}"]
-        self.RssCommand = f"rss{CMD_SUFFIX}"
 
 
 BotCommands = _BotCommands()

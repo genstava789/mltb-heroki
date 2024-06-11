@@ -590,37 +590,30 @@ git push heroku master
 ## Bot commands to be set in [@BotFather](https://t.me/BotFather)
 
 ```
-mirror - or /m Mirror
-qbmirror - or /qm Mirror torrent using qBittorrent
-jdmirror - or /jm Mirror torrent using jdownloader
-nzbmirror - or /nm Mirror using sabnzbd
-ytdl - or /y Mirror yt-dlp supported link
-leech - or /l Leech
-qbleech - or /ql Leech torrent using qBittorrent
-jdleech - or /jl Leech torrent using jdownloader
-nzbleech - or /nl Leech using sabnzbd
-ytdlleech - or /yl Leech through yt-dlp supported link
-clone - Copy file/folder to Drive
-count - Count file/folder from Drive
-usetting - or /us User settings
-bsetting - or /bs Bot settings
-status - Get Mirror Status message
-sel - Select files from torrent
-rss - Rss menu
-list - Search files in Drive
-search - Search for torrents with API
-cancel - or /c Cancel a task
-cancelall - Cancel all tasks
-forcestart - or /fs to start task from queue
-del - Delete file/folder from Drive
-log - Get the Bot Log
-shell - Run commands in Shell
-aexec - Execute async function
-exec - Execute sync function
-restart - Restart the Bot
-stats - Bot Usage Stats
-ping - Ping the Bot
-help - All cmds with description
+start - Mulai Bot.
+help - Cek semua perintah Bot.
+mirror - Unduh dan Unggah ke Cloud menggunakan Aria2.
+qbmirror - Unduh dan Unggah ke Cloud menggunakan qBittorrent.
+jdmirror - Unduh dan Unggah ke Cloud menggunakan JDownloader.
+nzbmirror - Unduh dan Unggah ke Cloud menggunakan SABnzbd.
+ytdl - Unduh dan Unggah ke Cloud menggunakan YT-DLP.
+leech - Unduh dan Unggah ke Telegram menggunakan Aria2.
+qbleech - Unduh dan Unggah ke Telegram menggunakan qBittorrent.
+jdleech - Unduh dan Unggah ke Telegram menggunakan JDownloader.
+nzbmirror - Unduh dan Unggah ke Telegram menggunakan SABnzbd.
+ytdlleech - Unduh dan Unggah ke Telegram menggunakan YT-DLP.
+clone - Menggandakan File/Folder Google Drive.
+count - Menghitung File/Folder Google Drive.
+list - Mencari File/Folder di Google Drive.
+search - Mencari torrent menggunakan API/Plugins.
+select - Memilih File/Folder dari Torrent atau NZB.
+status - Menampilkan status Tugas yang sedang berjalan.
+cancel - Membatalkan Tugas.
+cancelall - Membatalkan Tugas secara spesifik.
+forcestart - Memulai Tugas secara paksa.
+ping - Mengetes kecepatan respon Bot.
+statistic - Menampilan statistik dari mesin Bot.
+usersetting - Pengaturan User.
 ```
 
 ---

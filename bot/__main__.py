@@ -51,7 +51,7 @@ from .modules import (
     bot_settings,  # noqa: F401
     cancel_task,  # noqa: F401
     clone,  # noqa: F401
-    exec,  # noqa: F401
+    execute,  # noqa: F401
     file_selector,  # noqa: F401
     force_start,  # noqa: F401
     gd_count,  # noqa: F401
@@ -225,12 +225,12 @@ async def ping(_, message):
     start_time = int(round(time() * 1000))
     reply = await sendMessage(
         message, 
-        "<b>Mengetest waktu respon bot...</b>"
+        "<b>Mengetest waktu respon Bot...</b>",
     )
     end_time = int(round(time() * 1000))
     await editMessage(
         reply, 
-        f"🤖 <b>Waktu Respon :</b> <code>{end_time - start_time} ms</code>"
+        f"🤖 <b>Waktu Respon :</b> <code>{end_time - start_time} ms</code>",
     )
 
 
@@ -241,45 +241,48 @@ async def log(_, message):
 async def bot_help(_, message):
     help_string = f"""
 <b>Daftar Perintah</b> <code>@{bot_name}</code>
+<b>User</b>
 <code>/{BotCommands.StartCommand}</code> : Mulai Bot.
 <code>/{BotCommands.HelpCommand[0]}</code> atau <code>/{BotCommands.HelpCommand[1]}</code> : Cek semua perintah Bot.
-<code>/{BotCommands.MirrorCommand[0]}</code> atau <code>/{BotCommands.MirrorCommand[1]}</code> : Mirror ke Cloud menggunakan Aria2.
-<code>/{BotCommands.QbMirrorCommand[0]}</code> atau <code>/{BotCommands.QbMirrorCommand[1]}</code> : Mirror ke Cloud menggunakan qBittorrent.
-<code>/{BotCommands.JdMirrorCommand[0]}</code> atau <code>/{BotCommands.JdMirrorCommand[1]}</code> : Mirror ke Cloud menggunakan JDownloader.
-<code>/{BotCommands.NzbMirrorCommand[0]}</code> atau <code>/{BotCommands.NzbMirrorCommand[1]}</code> : Mirror ke Cloud menggunakan SABnzbd.
-<code>/{BotCommands.YtdlCommand[0]}</code> atau <code>/{BotCommands.YtdlCommand[1]}</code> : Mirror ke Cloud menggunakan YT-DLP.
-<code>/{BotCommands.LeechCommand[0]}</code> atau <code>/{BotCommands.LeechCommand[1]}</code> : Leech ke Telegram menggunakan Aria2.
-<code>/{BotCommands.QbLeechCommand[0]}</code> atau <code>/{BotCommands.QbLeechCommand[1]}</code> : Leech ke Telegram menggunakan qBittorrent.
-<code>/{BotCommands.JdLeechCommand[0]}</code> atau <code>/{BotCommands.JdLeechCommand[1]}</code> : Leech ke Telegram menggunakan JDownloader.
-<code>/{BotCommands.NzbLeechCommand[0]}</code> atau <code>/{BotCommands.NzbLeechCommand[1]}</code> : Leech ke Telegram menggunakan SABnzbd.
-<code>/{BotCommands.YtdlLeechCommand[0]}</code> atau <code>/{BotCommands.YtdlLeechCommand[1]}</code> : Leech ke Telegram menggunakan YT-DLP.
-<code>/{BotCommands.CloneCommand[0]}</code> atau <code>/{BotCommands.CloneCommand[1]}</code> [gdriveUrl] : Menggandakan file/folder Google Drive.
-<code>/{BotCommands.CountCommand[0]}</code> atau <code>/{BotCommands.CountCommand[1]}</code> [gdriveUrl] : Menghitung file/folder Google Drive.
-<code>/{BotCommands.DeleteCommand[0]}</code> atau <code>/{BotCommands.DeleteCommand[1]}</code> [gdriveUrl] : Menghapus file/folder Google Drive (Hanya Owner & Sudo).
-<code>/{BotCommands.UserSetCommand[0]}</code> atau <code>/{BotCommands.UserSetCommand[1]}</code> : Pengaturan User.
-<code>/{BotCommands.BotSetCommand[0]}</code> atau <code>/{BotCommands.BotSetCommand[1]}</code> : Pengaturan Bot (Hanya Owner & Sudo).
-<code>/{BotCommands.SelectCommand[0]}</code> atau <code>/{BotCommands.SelectCommand[1]}</code> : Memilih file dari Torrent atau NZB.
+<code>/{BotCommands.MirrorCommand[0]}</code> atau <code>/{BotCommands.MirrorCommand[1]}</code> : Unduh dan Unggah ke Cloud menggunakan Aria2.
+<code>/{BotCommands.QbMirrorCommand[0]}</code> atau <code>/{BotCommands.QbMirrorCommand[1]}</code> : Unduh dan Unggah ke Cloud menggunakan qBittorrent.
+<code>/{BotCommands.JdMirrorCommand[0]}</code> atau <code>/{BotCommands.JdMirrorCommand[1]}</code> : Unduh dan Unggah ke Cloud menggunakan JDownloader.
+<code>/{BotCommands.NzbMirrorCommand[0]}</code> atau <code>/{BotCommands.NzbMirrorCommand[1]}</code> : Unduh dan Unggah ke Cloud menggunakan SABnzbd.
+<code>/{BotCommands.YtdlCommand[0]}</code> atau <code>/{BotCommands.YtdlCommand[1]}</code> : Unduh dan Unggah ke Cloud menggunakan YT-DLP.
+<code>/{BotCommands.LeechCommand[0]}</code> atau <code>/{BotCommands.LeechCommand[1]}</code> : Unduh dan Unggah ke Telegram menggunakan Aria2.
+<code>/{BotCommands.QbLeechCommand[0]}</code> atau <code>/{BotCommands.QbLeechCommand[1]}</code> : Unduh dan Unggah ke Telegram menggunakan qBittorrent.
+<code>/{BotCommands.JdLeechCommand[0]}</code> atau <code>/{BotCommands.JdLeechCommand[1]}</code> : Unduh dan Unggah ke Telegram menggunakan JDownloader.
+<code>/{BotCommands.NzbLeechCommand[0]}</code> atau <code>/{BotCommands.NzbLeechCommand[1]}</code> : Unduh dan Unggah ke Telegram menggunakan SABnzbd.
+<code>/{BotCommands.YtdlLeechCommand[0]}</code> atau <code>/{BotCommands.YtdlLeechCommand[1]}</code> : Unduh dan Unggah ke Telegram menggunakan YT-DLP.
+<code>/{BotCommands.CloneCommand[0]}</code> atau <code>/{BotCommands.CloneCommand[1]}</code> [gdriveUrl] : Menggandakan File/Folder Google Drive.
+<code>/{BotCommands.CountCommand[0]}</code> atau <code>/{BotCommands.CountCommand[1]}</code> [gdriveUrl] : Menghitung File/Folder Google Drive.
+<code>/{BotCommands.ListCommand[0]}</code> atau <code>/{BotCommands.ListCommand[1]}</code> [query] : Mencari File/Folder di Google Drive.
+<code>/{BotCommands.SearchCommand[0]}</code> atau <code>/{BotCommands.SearchCommand[1]}</code> [query] : Mencari torrent menggunakan API/Plugins.
+<code>/{BotCommands.SelectCommand[0]}</code> atau <code>/{BotCommands.SelectCommand[1]}</code> : Memilih File/Folder dari Torrent atau NZB.
+<code>/{BotCommands.StatusCommand[0]}</code> atau <code>/{BotCommands.StatusCommand[1]}</code> : Menampilkan status Tugas yang sedang berjalan.
 <code>/{BotCommands.CancelTaskCommand[0]}</code> atau <code>/{BotCommands.CancelTaskCommand[1]}</code> [GID] : Membatalkan Tugas.
+<code>/{BotCommands.CancelAllCommand[0]}</code> atau <code>/{BotCommands.CancelAllCommand[1]}</code> : Membatalkan Tugas secara spesifik.
 <code>/{BotCommands.ForceStartCommand[0]}</code> atau <code>/{BotCommands.ForceStartCommand[1]}</code> [GID] : Memulai Tugas secara paksa.
-<code>/{BotCommands.CancelAllCommand[0]}</code> atau <code>/{BotCommands.CancelAllCommand[1]}</code> : Membatalkan semua Tugas (Hanya Owner & Sudo).
-<code>/{BotCommands.ListCommand[0]}</code> atau <code>/{BotCommands.ListCommand[1]}</code> [query] : Mencari file/folder di Google Drive.
-<code>/{BotCommands.SearchCommand[0]}</code> atau <code>/{BotCommands.SearchCommand[1]}</code> [query] : Mencari torrent menggunakan API.
-<code>/{BotCommands.StatusCommand[0]}</code> atau <code>/{BotCommands.StatusCommand[1]}</code> : Menampilkan status dari semua Tugas yang sedang berjalan.
-<code>/{BotCommands.StatsCommand[0]}</code> atau <code>/{BotCommands.StatsCommand[1]}</code> : Menampilan statistik dari mesin Bot.
 <code>/{BotCommands.PingCommand[0]}</code> atau <code>/{BotCommands.PingCommand[1]}</code> : Mengetes kecepatan respon Bot.
-<code>/{BotCommands.SpeedCommand[0]}</code> atau <code>/{BotCommands.SpeedCommand[1]}</code> : Mengetes kecepatan koneksi Bot (Hanya Owner & Sudo).
-<code>/{BotCommands.AuthorizeCommand[0]}</code> atau <code>/{BotCommands.AuthorizeCommand[1]}</code> : Memberikan izin chat atau user untuk menggunakan Bot (Hanya Owner & Sudo).
-<code>/{BotCommands.UnAuthorizeCommand[0]}</code> atau <code>/{BotCommands.UnAuthorizeCommand[1]}</code> : Menghapus izin chat atau user untuk menggunakan Bot (Hanya Owner & Sudo).
-<code>/{BotCommands.UsersCommand[0]}</code> atau <code>/{BotCommands.UsersCommand[1]}</code> : Menampilan pengaturan User (Hanya Owner & Sudo).
-<code>/{BotCommands.AddSudoCommand[0]}</code> atau <code>/{BotCommands.AddSudoCommand[1]}</code> : Menambahkan User Sudo (Hanya Owner).
-<code>/{BotCommands.RmSudoCommand[0]}</code> atau <code>/{BotCommands.RmSudoCommand[1]}</code> : Menghapus User Sudo (Hanya Owner).
-<code>/{BotCommands.RestartCommand[0]}</code> atau <code>/{BotCommands.RestartCommand[1]}</code> : Memulai ulang dan memperbarui Bot (Hanya Owner & Sudo).
-<code>/{BotCommands.LogCommand[0]}</code> atau <code>/{BotCommands.LogCommand[1]}</code> : Mengambil log file dari Bot (Hanya Owner & Sudo).
-<code>/{BotCommands.ShellCommand[0]}</code> atau <code>/{BotCommands.ShellCommand[1]}</code> : Menjalankan perintah Shell (Hanya Owner).
-<code>/{BotCommands.ExecCommand[0]}</code> atau <code>/{BotCommands.ExecCommand[1]}</code> : Menjalankan fungsi Sync Exec (Hanya Owner).
-<code>/{BotCommands.AExecCommand[0]}</code> atau <code>/{BotCommands.AExecCommand[1]}</code> : Menjalankan fungsi Async Exec (Hanya Owner).
-<code>/{BotCommands.ClearLocalsCommand[0]}</code> atau <code>/{BotCommands.ClearLocalsCommand[1]}</code> : Menghapus lokal Sync Exec atau Async Exec (Hanya Owner).
+<code>/{BotCommands.StatsCommand[0]}</code> atau <code>/{BotCommands.StatsCommand[1]}</code> : Menampilan statistik dari mesin Bot.
+<code>/{BotCommands.UserSetCommand[0]}</code> atau <code>/{BotCommands.UserSetCommand[1]}</code> : Pengaturan User.
+
+<b>Owner</b>
 <code>/{BotCommands.RssCommand}</code> : Menu RSS.
+<code>/{BotCommands.DeleteCommand[0]}</code> atau <code>/{BotCommands.DeleteCommand[1]}</code> [gdriveUrl] : Menghapus File/Folder Google Drive.
+<code>/{BotCommands.AuthorizeCommand[0]}</code> atau <code>/{BotCommands.AuthorizeCommand[1]}</code> : Memberikan izin chat atau user untuk menggunakan Bot.
+<code>/{BotCommands.UnAuthorizeCommand[0]}</code> atau <code>/{BotCommands.UnAuthorizeCommand[1]}</code> : Menghapus izin chat atau user untuk menggunakan Bot.
+<code>/{BotCommands.AddSudoCommand[0]}</code> atau <code>/{BotCommands.AddSudoCommand[1]}</code> : Menambahkan User Sudo.
+<code>/{BotCommands.RmSudoCommand[0]}</code> atau <code>/{BotCommands.RmSudoCommand[1]}</code> : Menghapus User Sudo.
+<code>/{BotCommands.ExecCommand[0]}</code> atau <code>/{BotCommands.ExecCommand[1]}</code> : Menjalankan fungsi Sync.
+<code>/{BotCommands.AExecCommand[0]}</code> atau <code>/{BotCommands.AExecCommand[1]}</code> : Menjalankan fungsi Async.
+<code>/{BotCommands.ShellCommand[0]}</code> atau <code>/{BotCommands.ShellCommand[1]}</code> : Menjalankan perintah Shell.
+<code>/{BotCommands.ClearLocalsCommand[0]}</code> atau <code>/{BotCommands.ClearLocalsCommand[1]}</code> : Menghapus lokal Sync atau Async.
+<code>/{BotCommands.LogCommand[0]}</code> atau <code>/{BotCommands.LogCommand[1]}</code> : Mengambil log file dari Bot.
+<code>/{BotCommands.SpeedCommand[0]}</code> atau <code>/{BotCommands.SpeedCommand[1]}</code> : Mengetes kecepatan koneksi Bot.
+<code>/{BotCommands.RestartCommand[0]}</code> atau <code>/{BotCommands.RestartCommand[1]}</code> : Memulai ulang dan memperbarui Bot.
+<code>/{BotCommands.UsersCommand[0]}</code> atau <code>/{BotCommands.UsersCommand[1]}</code> : Menampilan pengaturan User.
+<code>/{BotCommands.BotSetCommand[0]}</code> atau <code>/{BotCommands.BotSetCommand[1]}</code> : Pengaturan Bot.
 
 <b>NOTE :</b> Kirim perintah tanpa argument untuk melihat perintah secara detail!
 """

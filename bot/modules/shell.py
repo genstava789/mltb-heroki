@@ -1,8 +1,9 @@
 from io import BytesIO
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler, EditedMessageHandler
+from pyrogram.types import Message
 
-from bot import bot, LOGGER 
+from bot import bot 
 from bot.helper.ext_utils.bot_utils import cmd_exec, new_task
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
@@ -10,33 +11,49 @@ from bot.helper.telegram_helper.message_utils import sendMessage, sendFile
 
 
 @new_task
-async def shell(_, message):
+async def shell(_, message: Message):
     cmd = message.text.split(maxsplit=1)
     if len(cmd) == 1:
-        await sendMessage(message, "<b>Tidak ada perintah untuk dieksekusi!</b>")
-        return
+        return await sendMessage(
+            message=message,
+            text="<b>Tidak ada perintah untuk dieksekusi!</b>",
+        )
     
     cmd = cmd[1]
+    result = str()
+    caption = str()
+    caption += f"<b>Input :</b>\n<pre language='bash'>{cmd}</pre>"
+    
     stdout, stderr, _ = await cmd_exec(cmd, shell=True)
-    reply = ""
+    
     if len(stdout) != 0:
-        reply += f"<b>Stdout</b>\n<pre language='bash'>{stdout}</pre>\n"
-        LOGGER.info(f"Shell - {cmd} - {stdout}")
+        result += stdout
 
     if len(stderr) != 0:
-        reply += f"<b>Stderr</b>\n<pre language='bash'>{stderr}</pre>"
-        LOGGER.error(f"Shell - {cmd} - {stderr}")
+        result += stderr
 
-    if len(reply) > 3000:
-        with BytesIO(str.encode(reply)) as out_file:
-            out_file.name = "shell_output.txt"
-            await sendFile(message, out_file)
+    if len(result) > 4096:
+        with BytesIO(str.encode(result)) as file:
+            file.name = "Output.txt"
+            await sendFile(
+                message=message,
+                file=file,
+                caption=caption,
+            )
 
-    elif len(reply) != 0:
-        await sendMessage(message, reply)
+    elif len(result) != 0:
+        caption += f"\n\n<b>Output :</b>\n<pre language='bash'>{result}</pre>"
+
+        await sendMessage(
+            message=message,
+            text=caption,
+        )
 
     else:
-        await sendMessage(message, "<b>Tidak ada balasan!</b>")
+        await sendMessage(
+            message=message, 
+            text="<b>Tidak ada balasan!</b>",
+        )
 
 
 bot.add_handler(

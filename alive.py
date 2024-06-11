@@ -33,6 +33,10 @@ try:
     BASE_URL = None
     
     if BASE_URL := environ.get("BASE_URL"):
+        if "hf.sp" in BASE_URL:
+            if HF_TOKEN := environ.get("HF_TOKEN"):
+                HEADER["Authorization"] = f"Bearer {HF_TOKEN}"
+
         HEADER["User-Agent"] = "Not a RoBot"
 
         while True:
