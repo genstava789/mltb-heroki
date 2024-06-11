@@ -1,15 +1,15 @@
 from aiofiles.os import remove, path as aiopath
 
 from bot import (
-    aria2,
-    task_dict_lock,
-    task_dict,
-    LOGGER,
-    config_dict,
     aria2_options,
+    aria2,
     aria2c_global,
+    config_dict,
+    LOGGER,
     non_queued_dl,
     queue_dict_lock,
+    task_dict_lock,
+    task_dict,
 )
 from bot.helper.ext_utils.bot_utils import bt_selection_buttons, sync_to_async
 from bot.helper.ext_utils.task_manager import check_running_tasks

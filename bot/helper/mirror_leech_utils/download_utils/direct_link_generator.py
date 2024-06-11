@@ -15,7 +15,6 @@ from urllib3.util.retry import Retry
 from uuid import uuid4
 
 from bot import config_dict
-# from bot.helper.ext_utils.bot_utils import async_to_sync, get_content_type
 from bot.helper.ext_utils.exceptions import DirectDownloadLinkException
 from bot.helper.ext_utils.help_messages import PASSWORD_ERROR_MESSAGE
 from bot.helper.ext_utils.links_utils import is_share_link

@@ -1,13 +1,13 @@
 from secrets import token_urlsafe
 
 from bot import (
-    LOGGER,
     aria2_options,
     aria2c_global,
-    task_dict,
-    task_dict_lock,
+    LOGGER,
     non_queued_dl,
     queue_dict_lock,
+    task_dict_lock,
+    task_dict,
 )
 from bot.helper.ext_utils.bot_utils import sync_to_async
 from bot.helper.ext_utils.task_manager import check_running_tasks, stop_duplicate_check

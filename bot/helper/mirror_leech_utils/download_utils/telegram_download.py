@@ -3,12 +3,12 @@ from pyrogram.errors import FloodWait
 from time import time
 
 from bot import (
+    bot,
     LOGGER,
-    task_dict,
-    task_dict_lock,
     non_queued_dl,
     queue_dict_lock,
-    bot,
+    task_dict_lock,
+    task_dict,
     user,
 )
 from bot.helper.ext_utils.task_manager import check_running_tasks, stop_duplicate_check
@@ -92,7 +92,7 @@ class TelegramDownloadHelper:
         if download is not None:
             await self._onDownloadComplete()
         elif not self._listener.isCancelled:
-            await self._onDownloadError("Ada yang salah!")
+            await self._onDownloadError("Unduhan dibatalkan secara manual oleh Bot!")
 
     async def add_download(self, message, path, session):
         self.session = session
@@ -107,6 +107,7 @@ class TelegramDownloadHelper:
                 chat_id=message.chat.id, 
                 message_ids=message.id
             )
+        
         elif self.session != "user":
             self.session = "bot"
 
@@ -168,6 +169,4 @@ class TelegramDownloadHelper:
 
     async def cancel_task(self):
         self._listener.isCancelled = True
-        LOGGER.info(
-            f"Cancelling download on user request: name: {self._listener.name} id: {self._id}"
-        )
+        LOGGER.info(f"Cancelling Download: {self._listener.name}")

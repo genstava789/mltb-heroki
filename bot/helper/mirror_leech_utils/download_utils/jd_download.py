@@ -8,13 +8,13 @@ from pyrogram.handlers import CallbackQueryHandler
 from time import time
 
 from bot import (
-    task_dict,
-    task_dict_lock,
+    jd_downloads,
+    jd_lock,
     LOGGER,
     non_queued_dl,
     queue_dict_lock,
-    jd_lock,
-    jd_downloads,
+    task_dict_lock,
+    task_dict,
 )
 from bot.helper.ext_utils.bot_utils import new_thread, retry_function, new_task
 from bot.helper.ext_utils.jdownloader_booter import jdownloader
@@ -29,10 +29,10 @@ from bot.helper.mirror_leech_utils.status_utils.jdownloader_status import (
 from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.message_utils import (
+    deleteMessage,
+    editMessage,
     sendMessage,
     sendStatusMessage,
-    editMessage,
-    deleteMessage,
 )
 
 
