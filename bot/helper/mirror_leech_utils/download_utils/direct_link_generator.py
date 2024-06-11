@@ -1094,7 +1094,7 @@ def krakenfiles(url):
             raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}") from e
         html = HTML(_res.text)
         if post_url := html.xpath("//form[@id='dl-form']/@action"):
-            post_url = f"https:{post_url[0]}"
+            post_url = f"https://krakenfiles.com{post_url[0]}"
         else:
             raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
         if token := html.xpath("//input[@id='dl-token']/@value"):
