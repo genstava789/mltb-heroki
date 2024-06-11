@@ -35,11 +35,11 @@ if path.exists("rlog.txt"):
     remove("rlog.txt")
 
 if not path.exists("config.env"):
-    if CONFIG_FILE_URL := environ.get("CONFIG_FILE_URL"):
-        LOGGER.info("CONFIG_FILE_URL is found! Downloading CONFIG_FILE_URL...")
+    if CONFIG_URL := environ.get("CONFIG_URL"):
+        LOGGER.info("CONFIG_URL is found! Downloading CONFIG_URL...")
         
         request = get(
-            url=CONFIG_FILE_URL,
+            url=CONFIG_URL,
             timeout=10,
             allow_redirects=True,
         )
@@ -52,7 +52,7 @@ if not path.exists("config.env"):
             LOGGER.error(f"[{request.status_code}] {responses[request.status_code]}")    
     
     else:
-        LOGGER.warning("CONFIG_FILE_URL is not found! Using local config.env instead...")
+        LOGGER.warning("CONFIG_URL is not found! Using local config.env instead...")
             
 load_dotenv("config.env", override=True)
 
