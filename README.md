@@ -556,9 +556,9 @@ sudo docker compose logs --follow
    edit `AsyncIOThreadsCount` in qBittorrent.conf.
 
 
-#### Build And Run The Docker Image Using Heroku-CLI
-- Install Heroku-CLI
-[Heroku-CLI](https://devcenter.heroku.com/articles/heroku-cli#install-the-heroku-cli).
+#### Build And Run The Docker Image Using Heroku CLI
+- Install Heroku CLI
+[Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#install-the-heroku-cli).
 
 - To be Continued...
 
