@@ -898,16 +898,16 @@ async def edit_bot_settings(client, query):
             await (
                 await create_subprocess_shell(
                     f"git add -f {filename} \
-                                                    && git commit -sm botsettings -q \
-                                                    && git push origin {config_dict['UPSTREAM_BRANCH']} -qf"
+                    && git commit -sm botsettings -q \
+                    && git push origin {config_dict['UPSTREAM_BRANCH']} -qf"
                 )
             ).wait()
         else:
             await (
                 await create_subprocess_shell(
                     f"git rm -r --cached {filename} \
-                                                    && git commit -sm botsettings -q \
-                                                    && git push origin {config_dict['UPSTREAM_BRANCH']} -qf"
+                    && git commit -sm botsettings -q \
+                    && git push origin {config_dict['UPSTREAM_BRANCH']} -qf"
                 )
             ).wait()
         await deleteMessage(message.reply_to_message)
@@ -936,15 +936,15 @@ async def load_config():
     if len(TELEGRAM_HASH) == 0:
         TELEGRAM_HASH = config_dict["TELEGRAM_HASH"]
         
-    TELEGRAM_API_PREMIUM = environ.get('TELEGRAM_API_PREMIUM', '')
+    TELEGRAM_API_PREMIUM = environ.get("TELEGRAM_API_PREMIUM", "")
     if len(TELEGRAM_API_PREMIUM) == 0:
-        TELEGRAM_API_PREMIUM = config_dict['TELEGRAM_API_PREMIUM']
+        TELEGRAM_API_PREMIUM = TELEGRAM_API
     else:
         TELEGRAM_API_PREMIUM = int(TELEGRAM_API_PREMIUM)
 
-    TELEGRAM_HASH_PREMIUM = environ.get('TELEGRAM_HASH_PREMIUM', '')
+    TELEGRAM_HASH_PREMIUM = environ.get("TELEGRAM_HASH_PREMIUM", "")
     if len(TELEGRAM_HASH_PREMIUM) == 0:
-        TELEGRAM_HASH_PREMIUM = config_dict['TELEGRAM_HASH_PREMIUM']
+        TELEGRAM_HASH_PREMIUM = TELEGRAM_HASH
 
     OWNER_ID = environ.get("OWNER_ID", "")
     OWNER_ID = config_dict["OWNER_ID"] if len(OWNER_ID) == 0 else int(OWNER_ID)
@@ -1095,17 +1095,35 @@ async def load_config():
 
     LOG_CHAT_ID = environ.get("LOG_CHAT_ID", "")
     LOG_CHAT_ID = "" if len(LOG_CHAT_ID) == 0 else LOG_CHAT_ID
-    if LOG_CHAT_ID.isdigit() or (LOG_CHAT_ID.startswith("-") and ":" not in LOG_CHAT_ID):
+    if (
+        LOG_CHAT_ID.isdigit()
+        or (
+            LOG_CHAT_ID.startswith("-")
+            and ":" not in LOG_CHAT_ID
+        )
+    ):
         LOG_CHAT_ID = int(LOG_CHAT_ID)
 
     LEECH_CHAT_ID = environ.get("LEECH_CHAT_ID", "")
     LEECH_CHAT_ID = "" if len(LEECH_CHAT_ID) == 0 else LEECH_CHAT_ID
-    if LEECH_CHAT_ID.isdigit() or (LEECH_CHAT_ID.startswith("-") and ":" not in LEECH_CHAT_ID):
+    if (
+        LEECH_CHAT_ID.isdigit()
+        or (
+            LEECH_CHAT_ID.startswith("-")
+            and ":" not in LEECH_CHAT_ID
+        )
+    ):
         LEECH_CHAT_ID = int(LEECH_CHAT_ID)
 
     RSS_CHAT_ID= environ.get("RSS_CHAT_ID", "")
     RSS_CHAT_ID = "" if len(RSS_CHAT_ID) == 0 else RSS_CHAT_ID
-    if RSS_CHAT_ID.isdigit() or (RSS_CHAT_ID.startswith("-") and ":" not in RSS_CHAT_ID):
+    if (
+        RSS_CHAT_ID.isdigit()
+        or (
+            RSS_CHAT_ID.startswith("-")
+            and ":" not in RSS_CHAT_ID
+        )
+    ):
         RSS_CHAT_ID = int(RSS_CHAT_ID)
 
     STATUS_LIMIT = environ.get("STATUS_LIMIT", "")

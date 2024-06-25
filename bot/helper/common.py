@@ -290,7 +290,10 @@ class TaskConfig:
 
                     if (
                         self.upDest.lower() == "pm"
-                        and len(config_dict["LEECH_CHAT_ID"]) == 0 
+                        and (
+                            isinstance(config_dict["LEECH_CHAT_ID"], str)
+                            and len(config_dict["LEECH_CHAT_ID"]) == 0 
+                        )
                     ):
                         self.upDest = self.userId
 
@@ -331,7 +334,10 @@ class TaskConfig:
             elif (
                 (self.userTransmission or self.mixedLeech)
                 and not self.isSuperChat
-                and len(config_dict["LEECH_CHAT_ID"]) == 0
+                and (
+                    isinstance(config_dict["LEECH_CHAT_ID"], str)
+                    and len(config_dict["LEECH_CHAT_ID"]) == 0 
+                )
             ):
                 self.userTransmission = False
                 self.mixedLeech = False

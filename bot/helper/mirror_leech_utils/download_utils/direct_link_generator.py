@@ -188,8 +188,9 @@ def direct_link_generator(link: str):
             "filelions.online",
             "filelions.site",
             "filelions.to",
+            "kissmovies.net",
             "kitabmarkaz.xyz",
-            "streamwish.com",
+            "mycloudz.cc",
             "streamwish.to",
             "vidhide.com",
             "vidhidepro.com",
@@ -964,6 +965,9 @@ def onedrive(link):
 
 
 def pixeldrain(url):
+    if "api" in url:
+        return url
+
     url = url.strip("/ ")
     file_id = url.split("/")[-1]
     if url.split("/")[-2] == "l":
@@ -1927,13 +1931,14 @@ def filelions_and_streamwish(url):
     if any(
         x in hostname
         for x in [
+            "cabecabean.lol",
+            "filelions.live",
+            "filelions.online",
+            "filelions.site",
+            "filelions.to",
+            "mycloudz.cc",
             "vidhide.com",
             "vidhidepro.com",
-            "filelions.live",
-            "filelions.to",
-            "filelions.site",
-            "filelions.online",
-            "cabecabean.lol",
         ]
     ):
         apiKey = config_dict["FILELION_API"]
@@ -1942,10 +1947,10 @@ def filelions_and_streamwish(url):
         x in hostname
         for x in [
             "embedwish.com",
-            "streamwish.com",
+            "kissmovies.net",
             "kitabmarkaz.xyz",
-            "wishfast.top",
             "streamwish.to",
+            "wishfast.top",
         ]
     ):
         apiKey = config_dict["STREAMWISH_API"]

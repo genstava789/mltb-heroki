@@ -150,15 +150,14 @@ async def stats(_, message):
 
     await sendMessage(
         message, 
-        stats
+        stats,
     )
 
 
 async def start(client, message):
     buttons = ButtonMaker()
-    buttons.ubutton(
-        "Owner", "https://t.me/SaVe_USDT")
-    buttons.ubutton("Channel", "https://t.me/arakurumi")
+    buttons.ubutton("💭 Channel", "https://t.me/arakurumi")
+    buttons.ubutton("🦉 Maintainer", "https://t.me/SaVe_USDT")
     reply_markup = buttons.build_menu(2)
     if await CustomFilters.authorized(client, message):
         start_string = f"""
@@ -188,7 +187,7 @@ async def restart(_, message):
     Intervals["stopAll"] = True
     restart_message = await sendMessage(
         message, 
-        "<b>Restarting...</b>"
+        "<b>Restarting...</b>",
     )
     if scheduler.running:
         scheduler.shutdown(wait=False)
@@ -323,7 +322,7 @@ async def restart_notification():
             ):
                 thread_id = int(thread_id)
 
-    async def send_incompelete_task_message(cid, msg):
+    async def send_incomplete_task_message(cid, msg):
         try:
             if msg.startswith("<b>Bot berhasil dimulai ulang!</b>"):
                 await bot.edit_message_text(
@@ -366,11 +365,11 @@ async def restart_notification():
                     for index, link in enumerate(links, start=1):
                         msg += f"\n <a href='{link}'>Tugas ke {index}</a>"
                         if len(msg.encode()) > 4000:
-                            await send_incompelete_task_message(cid, msg)
+                            await send_incomplete_task_message(cid, msg)
                             msg = ""
 
                 if msg:
-                    await send_incompelete_task_message(cid, msg)
+                    await send_incomplete_task_message(cid, msg)
 
     if await aiopath.isfile(".restartmsg"):
         try:

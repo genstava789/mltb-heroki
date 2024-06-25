@@ -201,7 +201,8 @@ if DATABASE_URL:
         elif config_dict := db.settings.config.find_one({"_id": bot_id}):
             del config_dict["_id"]
             for key, value in config_dict.items():
-                environ[key] = str(value)
+                if key not in ["BASE_URL", "BASE_URL_PORT"]:
+                    environ[key] = str(value)
         if pf_dict := db.settings.files.find_one({"_id": bot_id}):
             del pf_dict["_id"]
             for key, value in pf_dict.items():
@@ -242,7 +243,10 @@ if not ospath.exists(".netrc"):
     
 log_info("Set up Aria2c, QBittorrent-Nox and SABnzbd...")
 run(
-    "chmod 600 .netrc && cp .netrc /root/.netrc && chmod +x aria-nox-nzb.sh && ./aria-nox-nzb.sh",
+    "chmod 600 .netrc \
+    && cp .netrc /root/.netrc \
+    && chmod +x aria-nox-nzb.sh \
+    && bash aria-nox-nzb.sh",
     shell=True,
 )
 
@@ -265,15 +269,19 @@ if len(TELEGRAM_HASH) == 0:
     log_error("TELEGRAM_HASH is not found!")
     exit(1)
 
-# Using different TELEGRAM_API  & TELEGRAM_HASH for USER_SESSION_STRING
+# NOTE: Using different TELEGRAM_API & TELEGRAM_HASH for USER_SESSION_STRING
 TELEGRAM_API_PREMIUM = environ.get("TELEGRAM_API_PREMIUM", "")
 TELEGRAM_HASH_PREMIUM = environ.get("TELEGRAM_HASH_PREMIUM", "")
 
 USER_SESSION_STRING = environ.get("USER_SESSION_STRING", "")
 if len(USER_SESSION_STRING) != 0:
     log_info(f"Creating client from USER_SESSION_STRING ({USER_SESSION_STRING[:10]}***{USER_SESSION_STRING[-10:]})...")
+    
     try:
-        if len(TELEGRAM_API_PREMIUM) != 0 and len(TELEGRAM_HASH_PREMIUM) != 0:
+        if (
+            len(TELEGRAM_API_PREMIUM) != 0
+            and len(TELEGRAM_HASH_PREMIUM) != 0
+        ):
             log_info("Using another Telegram Api & Telegram Hash for User Session...")
             TELEGRAM_API_PREMIUM = int(TELEGRAM_API_PREMIUM)
             user = tgClient(
@@ -282,9 +290,10 @@ if len(USER_SESSION_STRING) != 0:
                 api_hash=TELEGRAM_HASH_PREMIUM, 
                 session_string=USER_SESSION_STRING,
                 parse_mode=enums.ParseMode.HTML, 
-                workers=20, 
-                max_concurrent_transmissions=20,
+                workers=100, 
+                max_concurrent_transmissions=100,
             ).start()
+        
         else:
             user = tgClient(
                 name="User", 
@@ -292,16 +301,19 @@ if len(USER_SESSION_STRING) != 0:
                 api_hash=TELEGRAM_HASH, 
                 session_string=USER_SESSION_STRING,
                 parse_mode=enums.ParseMode.HTML, 
-                workers=20, 
-                max_concurrent_transmissions=20,
+                workers=100, 
+                max_concurrent_transmissions=100,
             ).start()
 
         IS_PREMIUM_USER = user.me.is_premium
+        TELEGRAM_API_PREMIUM = TELEGRAM_API
+        TELEGRAM_HASH_PREMIUM = TELEGRAM_HASH
     
     except Exception as error:
+        log_error(f"Failed to create client from USER_SESSION_STRING! ERROR: {error}")
+
         user = ""
         IS_PREMIUM_USER = False
-        log_error(f"Failed to create client from USER_SESSION_STRING ({error}).")
 
 else:
     user = ""
@@ -448,14 +460,38 @@ FORWARD_RESULT = FORWARD_RESULT.lower() == "true"
 LOG_CHAT_ID = environ.get("LOG_CHAT_ID", "")
 if len(LOG_CHAT_ID) == 0:
     LOG_CHAT_ID = ""
+if (
+    LOG_CHAT_ID.isdigit()
+    or (
+        LOG_CHAT_ID.startswith("-")
+        and ":" not in LOG_CHAT_ID
+    )
+):
+    LOG_CHAT_ID = int(LOG_CHAT_ID)
 
 LEECH_CHAT_ID = environ.get("LEECH_CHAT_ID", "")
 if len(LEECH_CHAT_ID) == 0:
     LEECH_CHAT_ID = ""
+if (
+    LEECH_CHAT_ID.isdigit()
+    or (
+        LEECH_CHAT_ID.startswith("-")
+        and ":" not in LEECH_CHAT_ID
+    )
+):
+    LEECH_CHAT_ID = int(LEECH_CHAT_ID)
 
 RSS_CHAT_ID = environ.get("RSS_CHAT_ID", "")
 if len(RSS_CHAT_ID) == 0:
     RSS_CHAT_ID = ""
+if (
+    RSS_CHAT_ID.isdigit()
+    or (
+        RSS_CHAT_ID.startswith("-")
+        and ":" not in RSS_CHAT_ID
+    )
+):
+    RSS_CHAT_ID = int(RSS_CHAT_ID)
 
 STATUS_LIMIT = environ.get("STATUS_LIMIT", "")
 STATUS_LIMIT = 4 if len(STATUS_LIMIT) == 0 else int(STATUS_LIMIT)
@@ -689,16 +725,16 @@ aria2c_global = [
     "bt-max-open-files", 
     "download-result", 
     "keep-unfinished-download-result",
-    "log", 
     "log-level",
+    "log", 
     "max-concurrent-downloads",
     "max-download-result", 
     "max-overall-download-limit", 
-    "save-session",
     "max-overall-upload-limit", 
     "optimize-concurrent-downloads", 
     "save-cookies", 
-    "server-stat-of"
+    "save-session",
+    "server-stat-of",
 ]
 
 log_info(f"Creating client from BOT_TOKEN ({BOT_TOKEN[:10]}***{BOT_TOKEN[-10:]})...")
@@ -708,8 +744,8 @@ bot = tgClient(
     api_hash=TELEGRAM_HASH,
     bot_token=BOT_TOKEN, 
     parse_mode=enums.ParseMode.HTML, 
-    workers=20, 
-    max_concurrent_transmissions=20,
+    workers=100, 
+    max_concurrent_transmissions=100,
 ).start()
 
 bot_name = bot.me.username
@@ -744,4 +780,4 @@ async def get_nzb_options():
 bot_loop.run_until_complete(get_nzb_options())
 
 log_info("Set up auto Alive...")
-Popen(["python3", "alive.py"])
+Popen(["python", "alive.py"])

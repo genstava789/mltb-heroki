@@ -59,7 +59,6 @@ class TgUploader:
         self._is_corrupted = False
         self._media_dict = {"videos": {}, "documents": {}}
         self._last_msg_in_group = False
-        # self._session = ""
         self._up_path = ""
         self._lprefix = ""
         self._media_group = False
@@ -72,10 +71,6 @@ class TgUploader:
 
     async def _upload_progress(self, current, _):
         if self._listener.isCancelled:
-            # if (
-            #     self._listener.userTransmission
-            #     or self._session == "user"
-            # ):
             if self._user_session:
                 user.stop_transmission()
             else:
@@ -133,25 +128,17 @@ class TgUploader:
 
     async def _msg_to_reply(self):
         if self._listener.upDest:
-            msg = (
-                self._listener.message.link
-                if self._listener.isSuperChat
-                else self._listener.message.text.lstrip("/")
-            )
-
-            try:
-                if self._user_session:
-                    client = user
-                else:
-                    client = self._listener.client
-                    
+            try:                   
                 self._sent_msg = await customSendMessage(
-                    client=client,
+                    client=self._listener.client,
                     chat_id=self._listener.upDest,
-                    text=msg,
+                    text=(
+                        self._listener.message.link
+                        if self._listener.isSuperChat
+                        else self._listener.message.text.lstrip("/")
+                    ),
                     message_thread_id=self._listener.threadId,
                 )
-                self._is_private = self._sent_msg.chat.type.name == "PRIVATE"
             
             except Exception as e:
                 await self._listener.onUploadError(str(e))
@@ -165,7 +152,7 @@ class TgUploader:
             if self._sent_msg is None:
                 self._sent_msg = await bot.send_message(
                     chat_id=self._listener.message.chat.id,
-                    text="<b>Pesan Cmd terhapus!</b>\nJangan menghapus pesan Cmd agar tidak terjadi error!",
+                    text="<b>Pesan Tugas terhapus!</b>\nJangan menghapus pesan Tugas agar tidak terjadi Error!",
                     disable_web_page_preview=True,
                     disable_notification=True,
                 )
@@ -263,7 +250,7 @@ class TgUploader:
                         message_id=self._sent_msg.id,
                         message_thread_id=self._forwardThreadId,
                         reply_to_message_id=(self._forwardMsg.id if self._forwardMsg is not None else self._listener.mid),
-                        is_media_group=True
+                        is_media_group=True,
                     )
                 )[-1]
         except Exception as e:
@@ -320,15 +307,6 @@ class TgUploader:
                 try:
                     f_size = await aiopath.getsize(self._up_path)
                     
-                    # Force uploads below 2GB using Bot session and above 2GB using User session
-                    # if f_size < 2097152000:
-                    #     self._session = "bot"
-                    # else:
-                    #     self._session = "user"
-                    # res = await self._msg_to_reply()
-                    # if not res:
-                    #     return
-
                     self._total_files += 1
                     if f_size == 0:
                         LOGGER.error(
@@ -553,10 +531,9 @@ class TgUploader:
             ):
                 await remove(thumb)
             
-            # Log
             if (
                 config_dict["FORWARD_RESULT"]
-                and self._forwardChatId != ""
+                and self._forwardChatId is not None
                 and not self._listener.isCancelled
                 and not self._is_corrupted
             ):
@@ -570,7 +547,7 @@ class TgUploader:
                             self._forwardMsg.id
                             if self._forwardMsg
                             else self._listener.mid
-                        )
+                        ),
                     )
 
                 except Exception as error:

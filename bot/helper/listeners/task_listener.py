@@ -319,9 +319,7 @@ class TaskListener(TaskConfig):
                 msg += f"\n\n<b>Path :</b> <code>{rclonePath}</code>"
                 button = None
             msg += f"\n\n<b>Oleh :</b> {self.tag}"
-            await sendMessage(self.message, msg, button)
             
-            # Log
             LOG_CHAT_ID = None
             LOG_CHAT_THREAD_ID = None
             if LOG_CHAT_ID := config_dict.get("LOG_CHAT_ID"):
@@ -346,7 +344,7 @@ class TaskListener(TaskConfig):
                     and LOG_CHAT_THREAD_ID.isdigit()
                 ):
                     LOG_CHAT_THREAD_ID= int(LOG_CHAT_THREAD_ID)
-                        
+                
                 try:
                     await customSendMessage(
                         client=bot,
@@ -357,7 +355,10 @@ class TaskListener(TaskConfig):
                     )
 
                 except Exception as error:
-                    LOGGER.error(f"Failed to forward Message! ERROR: {error}")               
+                    LOGGER.error(f"Failed to forward Message! ERROR: {error}")
+
+            if config_dict["FORWARD_RESULT"]:
+                await sendMessage(self.message, msg, button)
         
         if self.seed:
             if self.newDir:

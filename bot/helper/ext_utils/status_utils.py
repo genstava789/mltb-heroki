@@ -180,7 +180,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", _=1):
         tstatus = await sync_to_async(task.status) if status == "All" else status
 
         if task.listener.isPrivateChat: 
-            msg += "<blockquote><code>PRIVATE 🤓</code></blockquote>"
+            msg += "<blockquote><code>🔐 Private</code></blockquote>"
         else: 
             msg += f"<blockquote><code>{escape(f'{task.name()}')}</code></blockquote>"
 
@@ -228,8 +228,8 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", _=1):
             msg += f"\n<b>├ Ukuran : </b> <code>{task.size()}</code>"
                    
         if task.listener.isPrivateChat: 
-            msg += "\n<b>├ UID :</b> <code>PRIVATE</code>"
-            msg += "\n<b>├ UName :</b> <code>PRIVATE</code>" 
+            msg += "\n<b>├ UID :</b> <code>🔐 Private</code>"
+            msg += "\n<b>├ UName :</b> <code>🔐 Private</code>" 
         else:
             msg += f"\n<b>├ UID :</b> <code>{task.listener.userId}</code>"
             msg += f"\n<b>├ UName :</b> <code>{task.listener.user.first_name} {(task.listener.user.last_name or '')}</code>"
