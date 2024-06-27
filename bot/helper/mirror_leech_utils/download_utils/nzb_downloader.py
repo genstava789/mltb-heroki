@@ -15,8 +15,8 @@ from bot import (
 from bot.helper.ext_utils.bot_utils import bt_selection_buttons
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.task_manager import check_running_tasks
-from private.bot.helper.listeners.nzb_listener import onDownloadStart
-from private.bot.helper.mirror_leech_utils.status_utils.nzb_status import SabnzbdStatus
+from bot.helper.listeners.nzb_listener import onDownloadStart
+from bot.helper.mirror_leech_utils.status_utils.nzb_status import SabnzbdStatus
 from bot.helper.telegram_helper.message_utils import (
     deleteMessage,
     sendMessage,

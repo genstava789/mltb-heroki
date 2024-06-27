@@ -39,7 +39,7 @@ from bot.helper.mirror_leech_utils.download_utils.qbit_download import add_qb_to
 from bot.helper.mirror_leech_utils.download_utils.rclone_download import (
     add_rclone_download,
 )
-from private.bot.helper.mirror_leech_utils.download_utils.nzb_downloader import add_nzb
+from bot.helper.mirror_leech_utils.download_utils.nzb_downloader import add_nzb
 from bot.helper.mirror_leech_utils.download_utils.telegram_download import TelegramDownloadHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
