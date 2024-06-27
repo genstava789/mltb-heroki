@@ -7,7 +7,12 @@ from shutil import rmtree
 from subprocess import run as srun
 from sys import exit as sexit
 
-from bot import aria2, DOWNLOAD_DIR, LOGGER, qbittorrent_client
+from bot import (
+    aria2,
+    DOWNLOAD_DIR,
+    LOGGER,
+    qbittorrent_client,
+)
 from bot.helper.ext_utils.bot_utils import sync_to_async, cmd_exec
 from .exceptions import NotSupportedExtractionArchive
 

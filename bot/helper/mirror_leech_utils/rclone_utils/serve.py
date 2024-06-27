@@ -5,8 +5,8 @@ from configparser import ConfigParser
 
 from bot import config_dict
 
-RcloneServe = []
 
+RcloneServe = []
 
 async def rclone_serve_booter():
     if not config_dict["RCLONE_SERVE_URL"] or not await aiopath.exists("rclone.conf"):

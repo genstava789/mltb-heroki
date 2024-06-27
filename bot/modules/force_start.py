@@ -2,20 +2,20 @@ from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 
 from bot import (
-    task_dict,
     bot,
-    task_dict_lock,
     OWNER_ID,
-    user_data,
-    queued_up,
-    queued_dl,
     queue_dict_lock,
+    queued_dl,
+    queued_up,
+    task_dict_lock,
+    task_dict,
+    user_data,
 )
 from bot.helper.ext_utils.status_utils import getTaskByGid
+from bot.helper.ext_utils.task_manager import start_dl_from_queued, start_up_from_queued
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import sendMessage
-from bot.helper.ext_utils.task_manager import start_dl_from_queued, start_up_from_queued
 
 
 async def remove_from_queue(_, message):
@@ -82,10 +82,12 @@ async def remove_from_queue(_, message):
     if msg:
         await sendMessage(message, msg)
 
-        
+
 bot.add_handler(
     MessageHandler(
         remove_from_queue,
-        filters=command(BotCommands.ForceStartCommand) & CustomFilters.authorized,
+        filters=command(
+            BotCommands.ForceStartCommand
+        ) & CustomFilters.authorized
     )
 )

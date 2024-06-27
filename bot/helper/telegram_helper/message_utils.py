@@ -11,7 +11,15 @@ from re import match as re_match
 from time import time
 from typing import Any, Optional, Union
 
-from bot import config_dict, LOGGER, status_dict, task_dict_lock, Intervals, bot, user
+from bot import (
+    bot,
+    config_dict,
+    Intervals,
+    LOGGER,
+    status_dict,
+    task_dict_lock,
+    user,
+)
 from bot.helper.ext_utils.bot_utils import setInterval
 from bot.helper.ext_utils.exceptions import TgLinkException
 from bot.helper.ext_utils.status_utils import get_readable_message
@@ -26,31 +34,47 @@ async def sendMessage(message, text, buttons=None, block=True):
             disable_notification=True,
             reply_markup=buttons,
         )
-    except FloodWait as f:
-        LOGGER.warning(str(f))
+    
+    except FloodWait as flood:
+        LOGGER.warning(str(flood))
         if block:
-            await sleep(f.value * 1.2)
-            return await sendMessage(message, text, buttons)
-        return str(f)
-    except Exception as e:
-        LOGGER.error(str(e))
-        return str(e)
+            await sleep(flood.value * 1.2)
+            return await sendMessage(
+                message=message,
+                text=text,
+                buttons=buttons,
+            )
+        
+        return str(flood)
+    
+    except Exception as error:
+        LOGGER.error(str(error))
+        raise Exception(error)
 
 
 async def editMessage(message, text, buttons=None, block=True):
     try:
         await message.edit(
-            text=text, disable_web_page_preview=True, reply_markup=buttons
+            text=text,
+            disable_web_page_preview=True,
+            reply_markup=buttons,
         )
-    except FloodWait as f:
-        LOGGER.warning(str(f))
+    
+    except FloodWait as flood:
+        LOGGER.warning(str(flood))
         if block:
-            await sleep(f.value * 1.2)
-            return await editMessage(message, text, buttons)
-        return str(f)
-    except Exception as e:
-        LOGGER.error(str(e))
-        return str(e)
+            await sleep(flood.value * 1.2)
+            return await editMessage(
+                message=message,
+                text=text,
+                buttons=buttons,
+            )
+        
+        return str(flood)
+    
+    except Exception as error:
+        LOGGER.error(str(error))
+        raise Exception(error)
    
 
 async def copyMessage(chat_id:int, from_chat_id:int, message_id=int, message_thread_id=None, reply_to_message_id=None, is_media_group=False):
@@ -61,7 +85,7 @@ async def copyMessage(chat_id:int, from_chat_id:int, message_id=int, message_thr
                 from_chat_id=from_chat_id, 
                 message_id=message_id, 
                 message_thread_id=message_thread_id,
-                reply_to_message_id=reply_to_message_id
+                reply_to_message_id=reply_to_message_id,
             )
         else:
             return await bot.copy_message(
@@ -69,15 +93,23 @@ async def copyMessage(chat_id:int, from_chat_id:int, message_id=int, message_thr
                 from_chat_id=from_chat_id, 
                 message_id=message_id, 
                 message_thread_id=message_thread_id,
-                reply_to_message_id=reply_to_message_id
+                reply_to_message_id=reply_to_message_id,
             )
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await copyMessage(chat_id, from_chat_id, message_id, message_thread_id, is_media_group)
-    except Exception as e:
-        LOGGER.error(str(e))
-        raise Exception(e)
+    
+    except FloodWait as flood:
+        LOGGER.warning(str(flood))
+        await sleep(flood.value * 1.2)
+        return await copyMessage(
+            chat_id=chat_id,
+            from_chat_id=from_chat_id,
+            message_id=message_id,
+            message_thread_id=message_thread_id,
+            is_media_group=is_media_group,
+        )
+    
+    except Exception as error:
+        LOGGER.error(str(error))
+        raise Exception(error)
 
 
 async def forwardMessage(chat_id:int, from_chat_id:int, message_id=int, message_thread_id=None, unquote=True):
@@ -87,15 +119,23 @@ async def forwardMessage(chat_id:int, from_chat_id:int, message_id=int, message_
                 from_chat_id=from_chat_id, 
                 message_id=message_id, 
                 message_thread_id=message_thread_id,
-                drop_author=unquote
+                drop_author=unquote,
             )
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await forwardMessage(chat_id, from_chat_id, message_id, message_thread_id, unquote)
-    except Exception as e:
-        LOGGER.error(str(e))
-        raise Exception(e)
+    
+    except FloodWait as flood:
+        LOGGER.warning(str(flood))
+        await sleep(flood.value * 1.2)
+        return await forwardMessage(
+            chat_id=chat_id,
+            from_chat_id=from_chat_id,
+            message_id=message_id,
+            message_thread_id=message_thread_id,
+            unquote=unquote,
+        )
+    
+    except Exception as error:
+        LOGGER.error(str(error))
+        raise Exception(error)
 
 
 async def sendFile(message, file, caption=""):
@@ -104,15 +144,21 @@ async def sendFile(message, file, caption=""):
             document=file, 
             quote=True, 
             caption=caption, 
-            disable_notification=True
+            disable_notification=True,
         )
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await sendFile(message, file, caption)
-    except Exception as e:
-        LOGGER.error(str(e))
-        return str(e)
+    
+    except FloodWait as flood:
+        LOGGER.warning(str(flood))
+        await sleep(flood.value * 1.2)
+        return await sendFile(
+            message=message,
+            file=file,
+            caption=caption,
+        )
+    
+    except Exception as error:
+        LOGGER.error(str(error))
+        raise Exception(error)
 
 
 async def sendPhoto(message, photo, caption=""):
@@ -121,15 +167,21 @@ async def sendPhoto(message, photo, caption=""):
             photo=photo, 
             quote=True, 
             caption=caption, 
-            disable_notification=True
+            disable_notification=True,
         )
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await sendFile(message, photo, caption)
-    except Exception as e:
-        LOGGER.error(str(e))
-        return str(e)
+    
+    except FloodWait as flood:
+        LOGGER.warning(str(flood))
+        await sleep(flood.value * 1.2)
+        return await sendFile(
+            message=message,
+            photo=photo,
+            caption=caption,
+        )
+    
+    except Exception as error:
+        LOGGER.error(str(error))
+        raise Exception(error)
 
 
 async def sendRss(text):
@@ -141,26 +193,30 @@ async def sendRss(text):
             disable_web_page_preview=True,
             disable_notification=True,
         )
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
-        return await sendRss(text)
-    except Exception as e:
-        LOGGER.error(str(e))
-        return str(e)
+    
+    except FloodWait as flood:
+        LOGGER.warning(str(flood))
+        await sleep(flood.value * 1.2)
+        return await sendRss(text=text)
+    
+    except Exception as error:
+        LOGGER.error(str(error))
+        raise Exception(error)
 
 
 async def deleteMessage(message):
     try:
         await message.delete()
-    except Exception as e:
-        LOGGER.error(str(e))
+    except Exception as error:
+        LOGGER.error(str(error))
 
 
 async def auto_delete_message(cmd_message=None, bot_message=None):
     await sleep(60)
+    
     if cmd_message is not None:
         await deleteMessage(cmd_message)
+    
     if bot_message is not None:
         await deleteMessage(bot_message)
 
@@ -171,13 +227,13 @@ async def delete_status():
             try:
                 await deleteMessage(data["message"])
                 del status_dict[key]
-            except Exception as e:
-                LOGGER.error(str(e))
+            except Exception as error:
+                LOGGER.error(str(error))
 
 
 async def get_tg_link_message(link):
-    message = None
     links = []
+    message = None
     if link.startswith("https://t.me/"):
         private = False
         msg = re_match(
@@ -204,6 +260,7 @@ async def get_tg_link_message(link):
             for _ in range(btw):
                 start_id += 1
                 links.append(f"{link}&message_id={start_id}")
+        
         else:
             link = link.rsplit("/", 1)[0]
             links.append(f"{link}/{start_id}")
@@ -221,22 +278,27 @@ async def get_tg_link_message(link):
             message = await bot.get_messages(chat_id=chat, message_ids=msg_id)
             if message.empty:
                 private = True
-        except Exception as e:
+        
+        except Exception as error:
             private = True
             if not user:
-                raise e
+                raise Exception(error)
 
     if not private:
         return (links, "bot") if links else (message, "bot")
+    
     elif user:
         try:
             user_message = await user.get_messages(chat_id=chat, message_ids=msg_id)
-        except Exception as e:
+        
+        except Exception as error:
             raise TgLinkException(
-                f"You don't have access to this chat!. ERROR: {e}"
-            ) from e
+                f"You don't have access to this chat! ERROR: {error}"
+            ) from error
+        
         if not user_message.empty:
             return (links, "user") if links else (user_message, "user")
+    
     else:
         raise TgLinkException("Link private!")
 
@@ -244,6 +306,7 @@ async def get_tg_link_message(link):
 async def update_status_message(sid, force=False):
     if Intervals["stopAll"]:
         return
+    
     async with task_dict_lock:
         if not status_dict.get(sid):
             if obj := Intervals["status"].get(sid):
@@ -260,12 +323,14 @@ async def update_status_message(sid, force=False):
         text, buttons = await get_readable_message(
             sid, is_user, page_no, status, page_step
         )
+        
         if text is None:
             del status_dict[sid]
             if obj := Intervals["status"].get(sid):
                 obj.cancel()
                 del Intervals["status"][sid]
             return
+        
         if text != status_dict[sid]["message"].text:
             message = await editMessage(
                 status_dict[sid]["message"], text, buttons, block=False
@@ -288,6 +353,7 @@ async def update_status_message(sid, force=False):
 async def sendStatusMessage(msg, user_id=0):
     if Intervals["stopAll"]:
         return
+    
     async with task_dict_lock:
         sid = user_id or msg.chat.id
         is_user = bool(user_id)
@@ -314,6 +380,7 @@ async def sendStatusMessage(msg, user_id=0):
                 return
             message.text = text
             status_dict[sid].update({"message": message, "time": time()})
+        
         else:
             text, buttons = await get_readable_message(sid, is_user)
             if text is None:
@@ -333,6 +400,7 @@ async def sendStatusMessage(msg, user_id=0):
                 "status": "All",
                 "is_user": is_user,
             }
+    
     if not Intervals["status"].get(sid) and not is_user:
         Intervals["status"][sid] = setInterval(
             config_dict["STATUS_UPDATE_INTERVAL"], update_status_message, sid
@@ -357,9 +425,9 @@ async def customSendMessage(
             reply_markup=reply_markup,
         )
     
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
+    except FloodWait as flood:
+        LOGGER.warning(str(flood))
+        await sleep(flood.value * 1.2)
         return await customSendMessage(
             client=client,
             chat_id=chat_id,
@@ -368,9 +436,9 @@ async def customSendMessage(
             reply_markup=reply_markup,
         )
     
-    except Exception as e:
-        LOGGER.error(str(e))
-        raise Exception(e)
+    except Exception as error:
+        LOGGER.error(str(error))
+        raise Exception(error)
 
 
 async def customSendRss(
@@ -446,9 +514,9 @@ async def customSendRss(
                 reply_markup=reply_markup
             )
         
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
+    except FloodWait as flood:
+        LOGGER.warning(str(flood))
+        await sleep(flood.value * 1.2)
         return await customSendRss(
             text=text,
             photo=photo,
@@ -457,9 +525,9 @@ async def customSendRss(
             reply_markup=reply_markup,
         )
     
-    except Exception as e:
-        LOGGER.error(str(e))
-        return str(e)
+    except Exception as error:
+        LOGGER.error(str(error))
+        raise Exception(error)
 
 
 async def customSendDocument(
@@ -486,9 +554,9 @@ async def customSendDocument(
             progress_args=progress_args,
         )
     
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
+    except FloodWait as flood:
+        LOGGER.warning(str(flood))
+        await sleep(flood.value * 1.2)
         return await customSendDocument(
             message=message,
             document=document,
@@ -500,9 +568,9 @@ async def customSendDocument(
             progress_args=progress_args,
         )
     
-    except Exception as e:
-        LOGGER.error(str(e))
-        raise Exception(e)
+    except Exception as error:
+        LOGGER.error(str(error))
+        raise Exception(error)
 
 
 async def customSendAudio(
@@ -532,9 +600,9 @@ async def customSendAudio(
             progress_args=progress_args,
         )
     
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
+    except FloodWait as flood:
+        LOGGER.warning(str(flood))
+        await sleep(flood.value * 1.2)
         return await customSendAudio(
             message=message,
             audio=audio,
@@ -548,9 +616,9 @@ async def customSendAudio(
             progress_args=progress_args,
         )
     
-    except Exception as e:
-        LOGGER.error(str(e))
-        raise Exception(e)
+    except Exception as error:
+        LOGGER.error(str(error))
+        raise Exception(error)
     
 
 async def customSendVideo(
@@ -583,9 +651,9 @@ async def customSendVideo(
             progress_args=progress_args,
         )
     
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
+    except FloodWait as flood:
+        LOGGER.warning(str(flood))
+        await sleep(flood.value * 1.2)
         return await customSendVideo(
             message=message,
             video=video,
@@ -600,9 +668,9 @@ async def customSendVideo(
             progress_args=progress_args,
         )
     
-    except Exception as e:
-        LOGGER.error(str(e))
-        raise Exception(e)
+    except Exception as error:
+        LOGGER.error(str(error))
+        raise Exception(error)
 
 
 async def customSendPhoto(
@@ -626,9 +694,9 @@ async def customSendPhoto(
             progress_args=progress_args,
         )
     
-    except FloodWait as f:
-        LOGGER.warning(str(f))
-        await sleep(f.value * 1.2)
+    except FloodWait as flood:
+        LOGGER.warning(str(flood))
+        await sleep(flood.value * 1.2)
         return await customSendPhoto(
             message=message,
             photo=photo,
@@ -639,6 +707,6 @@ async def customSendPhoto(
             progress_args=progress_args,
         )
     
-    except Exception as e:
-        LOGGER.error(str(e))
-        raise Exception(e)
+    except Exception as error:
+        LOGGER.error(str(error))
+        raise Exception(error)

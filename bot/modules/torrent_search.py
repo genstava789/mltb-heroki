@@ -5,7 +5,13 @@ from math import ceil
 from pyrogram.filters import command, regex
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 
-from bot import bot, config_dict, LOGGER, qbittorrent_client, USE_TELEGRAPH
+from bot import (
+    bot,
+    config_dict,
+    LOGGER,
+    qbittorrent_client,
+    USE_TELEGRAPH,
+)
 from bot.helper.ext_utils.bot_utils import sync_to_async, new_task, get_telegraph_list
 from bot.helper.ext_utils.status_utils import get_readable_file_size
 from bot.helper.telegram_helper.bot_commands import BotCommands
@@ -14,15 +20,14 @@ from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import editMessage, sendMessage
 
 
-PLUGINS = []
 SITES = None
+PLUGINS = []
 MAX_LIMIT = 500
 TELEGRAPH_LIMIT = 300
 
 msg_dict = {}
 max_total = 5
 torrent_search_lock = Lock()
-
 
 async def initiate_search_tools():
     qb_plugins = await sync_to_async(qbittorrent_client.search_plugins)
@@ -478,47 +483,22 @@ async def telegram_search(_, query):
         await query.message.reply_to_message.delete()
         return await query.answer(text="Waktu query pencarian habis!", show_alert=True)
     
-    if data[2] == "pre":
-        if msgs[2] == 1:
-            msgs[0] = max_total * (msgs[3] - 1)
-            msgs[2] = msgs[3]
-        else:
-            msgs[0] -= max_total
-            msgs[2] -= 1
-            
-        msg = ""
-        page_cur = ceil(len(msgs[1]) / max_total)
+    if data[2] in ["pre", "nex"]:
+        if data[2] == "pre":
+            if msgs[2] == 1:
+                msgs[0] = max_total * (msgs[3] - 1)
+                msgs[2] = msgs[3]
+            else:
+                msgs[0] -= max_total
+                msgs[2] -= 1
         
-        if (
-            page_cur != 0 
-            and msgs[2] > page_cur
-        ):
-            msgs[0] -= max_total
-            msgs[2] -= 1
-            
-        for no, data in enumerate(msgs[1][msgs[0]:], start=1):
-            msg += "\n\n" + data
-            if no == max_total:
-                break
-            
-        if len(msgs[1]) > max_total:
-            buttons.ibutton("⏪", f"tg_search {userId} pre {msgs[5]}")
-            buttons.ibutton(f"{msgs[2]}/{page_cur}", f"tg_search {userId} ref {msgs[5]}")
-            buttons.ibutton("⏩", f"tg_search {userId} nex {msgs[5]}")
-            
-        if len(msgs[1]) <= max_total:
-            buttons.ibutton(f"{msgs[2]}/{page_cur}", f"tg_search {userId} ref {msgs[5]}")
-            
-        buttons.ibutton("Close", f"tg_search {userId} close {msgs[5]}", position="footer")
-        await editMessage(query.message, msg, buttons.build_menu(3))
-        
-    elif data[2] == "nex":
-        if msgs[2] == msgs[3]:
-            msgs[0] = 0
-            msgs[2] = 1
-        else:
-            msgs[0] += max_total
-            msgs[2] += 1
+        elif data[2] == "nex":
+            if msgs[2] == msgs[3]:
+                msgs[0] = 0
+                msgs[2] = 1
+            else:
+                msgs[0] += max_total
+                msgs[2] += 1
             
         msg = ""
         page_cur = ceil(len(msgs[1]) / max_total)
@@ -543,7 +523,7 @@ async def telegram_search(_, query):
             
         if len(msgs[1]) <= max_total:
             buttons.ibutton(f"{msgs[2]}/{page_cur}", f"tg_search {userId} ref {msgs[5]}")
-        
+
         buttons.ibutton("Close", f"tg_search {userId} close {msgs[5]}", position="footer")
         await editMessage(query.message, msg, buttons.build_menu(3))
     
@@ -571,9 +551,10 @@ bot.add_handler(
         torrentSearch,
         filters=command(
             BotCommands.SearchCommand
-        ) & CustomFilters.authorized,
+        ) & CustomFilters.authorized
     )
 )
+
 bot.add_handler(
     CallbackQueryHandler(
         torrentSearchUpdate, 
@@ -582,6 +563,7 @@ bot.add_handler(
         )
     )
 )
+
 bot.add_handler(
     CallbackQueryHandler(
         telegram_search, 

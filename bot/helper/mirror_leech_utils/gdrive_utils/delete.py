@@ -3,8 +3,8 @@ from logging import getLogger
 
 from bot.helper.mirror_leech_utils.gdrive_utils.helper import GoogleDriveHelper
 
-LOGGER = getLogger(__name__)
 
+LOGGER = getLogger(__name__)
 
 class gdDelete(GoogleDriveHelper):
     def __init__(self):

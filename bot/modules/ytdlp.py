@@ -6,13 +6,18 @@ from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 from time import time
 from yt_dlp import YoutubeDL
 
-from bot import DOWNLOAD_DIR, bot, config_dict, LOGGER
+from bot import (
+    bot,
+    config_dict,
+    DOWNLOAD_DIR,
+    LOGGER,
+)
 from bot.helper.ext_utils.bot_utils import (
-    new_task,
-    sync_to_async,
-    new_thread,
     arg_parser,
     COMMAND_USAGE,
+    new_task,
+    new_thread,
+    sync_to_async,
 )
 from bot.helper.ext_utils.links_utils import is_url
 from bot.helper.ext_utils.status_utils import get_readable_file_size, get_readable_time
@@ -22,9 +27,9 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import (
-    sendMessage,
-    editMessage,
     deleteMessage,
+    editMessage,
+    sendMessage,
 )
 
 
@@ -496,11 +501,12 @@ bot.add_handler(
         ) & CustomFilters.authorized
     )
 )
+
 bot.add_handler(
     MessageHandler(
         ytdlleech,
         filters=command(
             BotCommands.YtdlLeechCommand
-        ) & CustomFilters.authorized,
+        ) & CustomFilters.authorized
     )
 )

@@ -6,7 +6,7 @@ from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 from re import match as re_match
 
-from bot import bot, DOWNLOAD_DIR, LOGGER
+from bot import bot, LOGGER, DOWNLOAD_DIR
 from bot.helper.ext_utils.bot_utils import (
     arg_parser,
     COMMAND_USAGE,
@@ -39,7 +39,7 @@ from bot.helper.mirror_leech_utils.download_utils.qbit_download import add_qb_to
 from bot.helper.mirror_leech_utils.download_utils.rclone_download import (
     add_rclone_download,
 )
-from bot.helper.mirror_leech_utils.download_utils.sabnzbd_downloader import add_nzb
+from private.bot.helper.mirror_leech_utils.download_utils.nzb_downloader import add_nzb
 from bot.helper.mirror_leech_utils.download_utils.telegram_download import TelegramDownloadHelper
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
@@ -459,30 +459,34 @@ bot.add_handler(
         ) & CustomFilters.authorized
     )
 )
+
 bot.add_handler(
     MessageHandler(
         qb_mirror,
         filters=command(
             BotCommands.QbMirrorCommand
-        ) & CustomFilters.authorized,
+        ) & CustomFilters.authorized
     )
 )
+
 bot.add_handler(
     MessageHandler(
         jd_mirror,
         filters=command(
             BotCommands.JdMirrorCommand
-        ) & CustomFilters.authorized,
+        ) & CustomFilters.authorized
     )
 )
+
 bot.add_handler(
     MessageHandler(
         nzb_mirror,
         filters=command(
             BotCommands.NzbMirrorCommand
-        ) & CustomFilters.authorized,
+        ) & CustomFilters.authorized
     )
 )
+
 bot.add_handler(
     MessageHandler(
         leech, 
@@ -491,6 +495,7 @@ bot.add_handler(
         ) & CustomFilters.authorized
     )
 )
+
 bot.add_handler(
     MessageHandler(
         qb_leech, 
@@ -499,6 +504,7 @@ bot.add_handler(
         ) & CustomFilters.authorized
     )
 )
+
 bot.add_handler(
     MessageHandler(
         jd_leech, 
@@ -507,11 +513,12 @@ bot.add_handler(
         ) & CustomFilters.authorized
     )
 )
+
 bot.add_handler(
     MessageHandler(
         nzb_leech,
         filters=command(
             BotCommands.NzbLeechCommand
-        ) & CustomFilters.authorized,
+        ) & CustomFilters.authorized
     )
 )

@@ -6,7 +6,6 @@ from bot.helper.mirror_leech_utils.gdrive_utils.helper import GoogleDriveHelper
 
 LOGGER = getLogger(__name__)
 
-
 class gdCount(GoogleDriveHelper):
     def __init__(self):
         super().__init__()

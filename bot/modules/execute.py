@@ -1,14 +1,12 @@
-from aiofiles import open as aiopen
 from contextlib import redirect_stdout
 from io import StringIO, BytesIO
-from os import path as ospath, getcwd, chdir
 from pyrogram.filters import command
 from pyrogram.handlers import MessageHandler
 from pyrogram.types import Message
 from textwrap import indent
 from traceback import format_exc
 
-from bot import LOGGER, bot
+from bot import bot
 from bot.helper.ext_utils.bot_utils import sync_to_async, new_task
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
@@ -164,6 +162,7 @@ bot.add_handler(
         ) & CustomFilters.owner
     )
 )
+
 bot.add_handler(
     MessageHandler(
         aioexecute, filters=command(
@@ -171,6 +170,7 @@ bot.add_handler(
         ) & CustomFilters.owner
     )
 )
+
 bot.add_handler(
     MessageHandler(
         clear, filters=command(

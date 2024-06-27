@@ -42,10 +42,10 @@ from bot import (
     user_data,
 )
 from bot.helper.ext_utils.bot_utils import (
-    setInterval,
-    sync_to_async,
     new_thread,
     retry_function,
+    setInterval,
+    sync_to_async,
 )
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.jdownloader_booter import jdownloader
@@ -55,11 +55,11 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import (
-    sendMessage,
-    sendFile,
-    editMessage,
-    update_status_message,
     deleteMessage,
+    editMessage,
+    sendFile,
+    sendMessage,
+    update_status_message,
 )
 from bot.modules.rss import addJob
 from bot.modules.torrent_search import initiate_search_tools
@@ -1367,6 +1367,7 @@ bot.add_handler(
         ) & CustomFilters.sudo
     )
 )
+
 bot.add_handler(
     CallbackQueryHandler(
         edit_bot_settings, 

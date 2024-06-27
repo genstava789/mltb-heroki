@@ -3,11 +3,11 @@ from googleapiclient.http import MediaFileUpload
 from logging import getLogger
 from os import path as ospath, listdir, remove
 from tenacity import (
-    retry,
-    wait_exponential,
-    stop_after_attempt,
     retry_if_exception_type,
+    retry,
     RetryError,
+    stop_after_attempt,
+    wait_exponential,
 )
 
 from bot import config_dict

@@ -1,5 +1,5 @@
 from aiofiles.os import remove, path as aiopath
-from asyncio import sleep, gather
+from asyncio import sleep
 from time import time
 
 from bot import (
@@ -36,36 +36,32 @@ async def _onDownloadError(err, tor, button=None):
     LOGGER.info(f"Cancelling Download: {tor.name}")
     ext_hash = tor.hash
     if task := await getTaskByGid(ext_hash[:12]):
-        await gather(
-            task.listener.onDownloadError(err, button),
-            sync_to_async(qbittorrent_client.torrents_pause, torrent_hashes=ext_hash),
-        )
-        await sleep(0.3)
-        await _remove_torrent(ext_hash, tor.tags)
+        await task.listener.onDownloadError(err, button)
+    await sync_to_async(qbittorrent_client.torrents_pause, torrent_hashes=ext_hash)
+    await sleep(0.3)
+    await _remove_torrent(ext_hash, tor.tags)
 
 
 @new_task
 async def _onSeedFinish(tor):
     ext_hash = tor.hash
     LOGGER.info(f"Cancelling Seed: {tor.name}")
-    task = await getTaskByGid(ext_hash[:12])
-    if not hasattr(task, "seeders_num"):
-        return
-    msg = f"Seeding dihentikan!\nRatio : {round(tor.ratio, 3)} | Waktu : {get_readable_time(tor.seeding_time)}"
-    await task.listener.onUploadError(msg)
+    if task := await getTaskByGid(ext_hash[:12]):
+        msg = f"Seeding dihentikan!\nRatio : {round(tor.ratio, 3)} | Waktu : {get_readable_time(tor.seeding_time)}"
+        await task.listener.onUploadError(msg)
     await _remove_torrent(ext_hash, tor.tags)
 
 
 @new_task
 async def _stop_duplicate(tor):
-    task = await getTaskByGid(tor.hash[:12])
-    if not hasattr(task, "listener"):
-        return
-    if task.listener.stopDuplicate:
-        task.listener.name = tor.content_path.rsplit("/", 1)[-1].rsplit(".!qB", 1)[0]
-        msg, button = await stop_duplicate_check(task.listener)
-        if msg:
-            _onDownloadError(msg, tor, button)
+    if task := await getTaskByGid(tor.hash[:12]):
+        if task.listener.stopDuplicate:
+            task.listener.name = tor.content_path.rsplit("/", 1)[-1].rsplit(".!qB", 1)[
+                0
+            ]
+            msg, button = await stop_duplicate_check(task.listener)
+            if msg:
+                _onDownloadError(msg, tor, button)
 
 
 @new_task
@@ -74,7 +70,9 @@ async def _onDownloadComplete(tor):
     tag = tor.tags
     if task := await getTaskByGid(ext_hash[:12]):
         if not task.listener.seed:
-            await sync_to_async(qbittorrent_client.torrents_pause, torrent_hashes=ext_hash)
+            await sync_to_async(
+                qbittorrent_client.torrents_pause, torrent_hashes=ext_hash
+            )
         if task.listener.select:
             await clean_unwanted(task.listener.dir)
             path = tor.content_path.rsplit("/", 1)[0]
@@ -94,7 +92,9 @@ async def _onDownloadComplete(tor):
             async with task_dict_lock:
                 if task.listener.mid in task_dict:
                     removed = False
-                    task_dict[task.listener.mid] = QbittorrentStatus(task.listener, True)
+                    task_dict[task.listener.mid] = QbittorrentStatus(
+                        task.listener, True
+                    )
                 else:
                     removed = True
             if removed:
@@ -109,6 +109,8 @@ async def _onDownloadComplete(tor):
             LOGGER.info(f"Seeding started: {tor.name} - Hash: {ext_hash}")
         else:
             await _remove_torrent(ext_hash, tag)
+    else:
+        await _remove_torrent(ext_hash, tag)
 
 
 async def _qb_listener():

@@ -11,7 +11,14 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from re import sub as re_sub, findall as re_findall
 from time import time
 
-from bot import scheduler, rss_dict, LOGGER, DATABASE_URL, config_dict, bot
+from bot import (
+    bot,
+    config_dict,
+    DATABASE_URL,
+    LOGGER,
+    rss_dict,
+    scheduler,
+)
 from bot.helper.ext_utils.bot_utils import new_thread, arg_parser
 from bot.helper.ext_utils.db_handler import DbManager
 from bot.helper.ext_utils.exceptions import RssShutdownException
@@ -20,17 +27,16 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import (
-    sendMessage,
+    customSendRss,
+    deleteMessage,
     editMessage,
     sendFile,
-    deleteMessage,
-    customSendRss,
+    sendMessage,
 )
 
 
-rss_dict_lock = Lock()
 handler_dict = {}
-
+rss_dict_lock = Lock()
 
 async def rssMenu(event):
     user_id = event.from_user.id
@@ -1040,9 +1046,22 @@ def addJob():
 
 addJob()
 scheduler.start()
+
+
 bot.add_handler(
     MessageHandler(
-        getRssMenu, filters=command(BotCommands.RssCommand) & CustomFilters.authorized
+        getRssMenu,
+        filters=command(
+            BotCommands.RssCommand
+        ) & CustomFilters.authorized
     )
 )
-bot.add_handler(CallbackQueryHandler(rssListener, filters=regex("^rss")))
+
+bot.add_handler(
+    CallbackQueryHandler(
+        rssListener,
+        filters=regex(
+            "^rss"
+        )
+    )
+)

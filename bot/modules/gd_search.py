@@ -3,7 +3,12 @@ from math import ceil
 from pyrogram.filters import command, regex
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 
-from bot import LOGGER, USE_TELEGRAPH, bot, user_data
+from bot import (
+    bot,
+    LOGGER,
+    USE_TELEGRAPH,
+    user_data,
+)
 from bot.helper.ext_utils.bot_utils import sync_to_async, new_task, get_telegraph_list
 from bot.helper.mirror_leech_utils.gdrive_utils.search import gdSearch
 from bot.helper.telegram_helper.bot_commands import BotCommands
@@ -15,7 +20,6 @@ from bot.helper.telegram_helper.message_utils import sendMessage, editMessage
 msg_dict = {}
 max_total = 5
 telegram_list_lock = Lock()
-
 
 async def list_buttons(user_id, isRecursive=True, user_token=False):
     buttons = ButtonMaker()
@@ -184,47 +188,22 @@ async def telegram_list(_, query):
         await query.message.reply_to_message.delete()
         return await query.answer(text="Waktu query pencarian habis!", show_alert=True)
     
-    if data[2] == "pre":
-        if msgs[2] == 1:
-            msgs[0] = max_total * (msgs[3] - 1)
-            msgs[2] = msgs[3]
-        else:
-            msgs[0] -= max_total
-            msgs[2] -= 1
-            
-        msg = ""
-        page_cur = ceil(len(msgs[1]) / max_total)
+    if data[2] in ["pre", "nex"]:
+        if data[2] == "pre":
+            if msgs[2] == 1:
+                msgs[0] = max_total * (msgs[3] - 1)
+                msgs[2] = msgs[3]
+            else:
+                msgs[0] -= max_total
+                msgs[2] -= 1
         
-        if (
-            page_cur != 0 
-            and msgs[2] > page_cur
-        ):
-            msgs[0] -= max_total
-            msgs[2] -= 1
-            
-        for no, data in enumerate(msgs[1][msgs[0]:], start=1):
-            msg += "\n\n" + data
-            if no == max_total:
-                break
-            
-        if len(msgs[1]) > max_total:
-            buttons.ibutton("⏪", f"tg_list {userId} pre {msgs[5]}")
-            buttons.ibutton(f"{msgs[2]}/{page_cur}", f"tg_list {userId} ref {msgs[5]}")
-            buttons.ibutton("⏩", f"tg_list {userId} nex {msgs[5]}")
-            
-        if len(msgs[1]) <= max_total:
-            buttons.ibutton(f"{msgs[2]}/{page_cur}", f"tg_list {userId} ref {msgs[5]}")
-            
-        buttons.ibutton("Close", f"tg_list {userId} close {msgs[5]}", position="footer")
-        await editMessage(query.message, msg, buttons.build_menu(3))
-        
-    elif data[2] == "nex":
-        if msgs[2] == msgs[3]:
-            msgs[0] = 0
-            msgs[2] = 1
-        else:
-            msgs[0] += max_total
-            msgs[2] += 1
+        elif data[2] == "nex":
+            if msgs[2] == msgs[3]:
+                msgs[0] = 0
+                msgs[2] = 1
+            else:
+                msgs[0] += max_total
+                msgs[2] += 1
             
         msg = ""
         page_cur = ceil(len(msgs[1]) / max_total)
@@ -277,9 +256,10 @@ bot.add_handler(
         gdrive_search,
         filters=command(
             BotCommands.ListCommand
-        ) & CustomFilters.authorized,
+        ) & CustomFilters.authorized
     )
 )
+
 bot.add_handler(
     CallbackQueryHandler(
         select_type, 
@@ -288,10 +268,12 @@ bot.add_handler(
         )
     )
 )
+
 bot.add_handler(
     CallbackQueryHandler(
         telegram_list, 
         filters=regex(
-            "^tg_list")
+            "^tg_list"
+        )
     )
 )

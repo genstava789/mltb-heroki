@@ -64,6 +64,7 @@ bot.add_handler(
         ) & CustomFilters.owner
     )
 )
+
 bot.add_handler(
     EditedMessageHandler(
         shell, 

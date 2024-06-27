@@ -10,12 +10,12 @@ from time import time
 
 from bot import (
     bot,
-    IS_PREMIUM_USER,
-    user_data,
     config_dict,
     DATABASE_URL,
-    MAX_SPLIT_SIZE,
     GLOBAL_EXTENSION_FILTER,
+    IS_PREMIUM_USER,
+    MAX_SPLIT_SIZE,
+    user_data,
 )
 from bot.helper.ext_utils.bot_utils import update_user_ldata, new_thread, getSizeBytes
 from bot.helper.ext_utils.db_handler import DbManager
@@ -24,15 +24,14 @@ from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import (
-    sendMessage,
+    deleteMessage,
     editMessage,
     sendFile,
-    deleteMessage,
+    sendMessage,
 )
 
 
 handler_dict = {}
-
 
 async def get_user_settings(from_user):
     user_id = from_user.id
@@ -886,13 +885,26 @@ async def send_users_settings(bot, message):
 bot.add_handler(
     MessageHandler(
         send_users_settings,
-        filters=command(BotCommands.UsersCommand) & CustomFilters.sudo,
+        filters=command(
+            BotCommands.UsersCommand
+        ) & CustomFilters.sudo
     )
 )
+
 bot.add_handler(
     MessageHandler(
         user_settings,
-        filters=command(BotCommands.UserSetCommand) & CustomFilters.authorized,
+        filters=command(
+            BotCommands.UserSetCommand
+        ) & CustomFilters.authorized
     )
 )
-bot.add_handler(CallbackQueryHandler(edit_user_settings, filters=regex("^userset")))
+
+bot.add_handler(
+    CallbackQueryHandler(
+        edit_user_settings,
+        filters=regex(
+            "^userset"
+        )
+    )
+)

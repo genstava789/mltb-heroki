@@ -2,17 +2,24 @@ from asyncio import sleep
 from pyrogram.filters import command, regex
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
 
-from bot import task_dict, bot, task_dict_lock, OWNER_ID, user_data, multi_tags
+from bot import (
+    bot,
+    multi_tags,
+    OWNER_ID,
+    task_dict_lock,
+    task_dict,
+    user_data,
+)
 from bot.helper.ext_utils.bot_utils import new_task
 from bot.helper.ext_utils.status_utils import getTaskByGid, getAllTasks, MirrorStatus
 from bot.helper.telegram_helper import button_build
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import (
-    sendMessage,
     auto_delete_message,
     deleteMessage,
     editMessage,
+    sendMessage,
 )
 
 
@@ -178,17 +185,19 @@ bot.add_handler(
         cancel_task,
         filters=command(
             BotCommands.CancelTaskCommand
-        ) & CustomFilters.authorized,
+        ) & CustomFilters.authorized
     )
 )
+
 bot.add_handler(
     MessageHandler(
         cancell_all_buttons,
         filters=command(
             BotCommands.CancelAllCommand
-        ) & CustomFilters.authorized,
+        ) & CustomFilters.authorized
     )
 )
+
 bot.add_handler(
     CallbackQueryHandler(
         cancel_all_update, 
@@ -197,6 +206,7 @@ bot.add_handler(
         )
     )
 )
+
 bot.add_handler(
     CallbackQueryHandler(
         cancel_multi, 

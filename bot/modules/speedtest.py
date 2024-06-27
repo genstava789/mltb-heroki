@@ -8,10 +8,10 @@ from bot.helper.ext_utils.status_utils import get_readable_file_size
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import (
-    sendMessage,
-    sendPhoto,
     deleteMessage,
     editMessage,
+    sendMessage,
+    sendPhoto,
 )
 
 
@@ -59,6 +59,7 @@ async def speedtest(_, message):
     except Exception as e:
         LOGGER.error(str(e))
         await editMessage(msg, caption)
+
 
 bot.add_handler(
     MessageHandler(

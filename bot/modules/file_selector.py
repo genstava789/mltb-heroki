@@ -19,9 +19,9 @@ from bot.helper.ext_utils.status_utils import getTaskByGid, MirrorStatus
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import (
+    deleteMessage,
     sendMessage,
     sendStatusMessage,
-    deleteMessage,
 )
 
 
@@ -182,6 +182,7 @@ bot.add_handler(
         ) & CustomFilters.authorized
     )
 )
+
 bot.add_handler(
     CallbackQueryHandler(
         get_confirm, 

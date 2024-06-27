@@ -1,8 +1,8 @@
 from psutil import (
     cpu_percent, 
-    virtual_memory, 
     disk_usage, 
-    net_io_counters
+    net_io_counters,
+    virtual_memory, 
 )
 from pyrogram.filters import command, regex
 from pyrogram.handlers import MessageHandler, CallbackQueryHandler
@@ -28,14 +28,12 @@ from bot.helper.ext_utils.status_utils import (
 from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.filters import CustomFilters
 from bot.helper.telegram_helper.message_utils import (
-    sendMessage,
-    deleteMessage,
     auto_delete_message,
+    deleteMessage,
+    sendMessage,
     sendStatusMessage,
     update_status_message,
-    # editMessage,
 )
-# from bot.helper.telegram_helper.button_build import ButtonMaker
 
 
 @new_task
@@ -161,9 +159,6 @@ Kec. Unggah : {get_readable_file_size(up_speed)}/s
 @{bot_name}
 """
         await query.answer(msg, show_alert=True)
-        # button = ButtonMaker()
-        # button.ibutton("Back", f"status {data[1]} ref")
-        # await editMessage(message, msg, button.build_menu())
 
 
 bot.add_handler(
@@ -171,9 +166,10 @@ bot.add_handler(
         mirror_status,
         filters=command(
             BotCommands.StatusCommand
-        ) & CustomFilters.authorized,
+        ) & CustomFilters.authorized
     )
 )
+
 bot.add_handler(
     CallbackQueryHandler(
         status_pages, 
