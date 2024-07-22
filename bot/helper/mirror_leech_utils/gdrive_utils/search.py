@@ -138,9 +138,9 @@ class gdSearch(GoogleDriveHelper):
                     continue
             if not Title:
                 if USE_TELEGRAPH:
-                    msg += f"<h4>Hasil pencarian Google Drive</h4>"
+                    msg += "<h4>Hasil pencarian Google Drive</h4>"
                 else:
-                    msg += f"<b>Hasil pencarian Google Drive</b>"
+                    msg += "<b>Hasil pencarian Google Drive</b>"
                 Title = True
             if drive_name:
                 if USE_TELEGRAPH:

@@ -65,7 +65,7 @@ class TelegramDownloadHelper:
         async with global_lock:
             try:
                 GLOBAL_GID.remove(self._id)
-            except:
+            except Exception:
                 pass
         await self._listener.onDownloadError(error)
 
@@ -97,10 +97,9 @@ class TelegramDownloadHelper:
     async def add_download(self, message, path, session):
         self.session = session
         if (
-            self.session not in ["user", "bot"] 
+            self.session not in ["user", "bot"]
             and self._listener.userTransmission
-            # and self._listener.isSuperChat
-            and not self._listener.isPrivateChat
+            and self._listener.isPrivateChat
         ):
             self.session = "user"
             message = await user.get_messages(

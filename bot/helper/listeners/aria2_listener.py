@@ -65,7 +65,7 @@ async def _onDownloadStarted(api, gid):
 async def _onDownloadComplete(api, gid):
     try:
         download = await sync_to_async(api.get_download, gid)
-    except:
+    except Exception:
         return
     if download.followed_by_ids:
         new_gid = download.followed_by_ids[0]
@@ -113,7 +113,7 @@ async def _onBtDownloadComplete(api, gid):
                 if not file_o.selected and await aiopath.exists(f_path):
                     try:
                         await remove(f_path)
-                    except:
+                    except Exception:
                         pass
             await clean_unwanted(download.dir)
         if task.listener.seed:
@@ -176,7 +176,7 @@ async def _onDownloadError(api, gid):
             return
         error = download.error_message
         LOGGER.info(f"Download Error: {error}")
-    except:
+    except Exception:
         pass
     if task := await getTaskByGid(gid):
         await task.listener.onDownloadError(error)

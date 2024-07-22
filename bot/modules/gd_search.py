@@ -183,7 +183,7 @@ async def telegram_list(_, query):
 
     try:
         msgs = msg_dict[int(data[3])]
-    except:
+    except Exception:
         await query.message.delete()
         await query.message.reply_to_message.delete()
         return await query.answer(text="Waktu query pencarian habis!", show_alert=True)
@@ -241,7 +241,7 @@ async def telegram_list(_, query):
         await query.message.reply_to_message.delete()
         try:
             del msgs[5]
-        except:
+        except Exception:
             pass
         
     else:

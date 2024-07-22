@@ -33,13 +33,13 @@ class MegaDownloadStatus:
     def eta(self):
         try:
             return get_readable_time((self._size - self._obj.downloaded_bytes) / self._obj.speed)
-        except:
+        except Exception:
             return "-"
 
     def progress(self):
         try:
             return f"{round(self._obj.downloaded_bytes / self._size * 100, 2)}%"
-        except:
+        except Exception:
             return "0.0%"
         
     def processed_bytes(self):

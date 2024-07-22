@@ -214,7 +214,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", _=1):
                     msg += f"\n<b>├ Seeders :</b> <code>{task.seeders_num()}</code>"
                     msg += f"\n<b>├ Leechers :</b> <code>{task.leechers_num()}</code>"
 
-                except:
+                except Exception:
                     pass
                 
         elif tstatus == MirrorStatus.STATUS_SEEDING:

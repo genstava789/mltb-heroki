@@ -378,7 +378,7 @@ try:
         USENET_SERVERS = []
     else:
         USENET_SERVERS = eval(USENET_SERVERS)
-except:
+except Exception:
     log_error(f"Wrong USENET_SERVERS format: {USENET_SERVERS}")
     USENET_SERVERS = []
 
@@ -424,7 +424,7 @@ if len(SEARCH_PLUGINS) == 0:
 else:
     try:
         SEARCH_PLUGINS = eval(SEARCH_PLUGINS)
-    except:
+    except Exception:
         log_error(f"Wrong SEARCH_PLUGINS format: {SEARCH_PLUGINS}")
         SEARCH_PLUGINS = ""
 

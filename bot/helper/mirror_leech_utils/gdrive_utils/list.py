@@ -144,7 +144,7 @@ class gdriveList(GoogleDriveHelper):
         )
         try:
             await wait_for(self.event.wait(), timeout=self._timeout)
-        except:
+        except Exception:
             self.id = "<b>Tugas dibatalkan oleh User!</b>"
             self.listener.isCancelled = True
             self.event.set()

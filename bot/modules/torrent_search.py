@@ -281,7 +281,7 @@ async def _getResult(search_results, key, method):
                             msg += "<br>"
                         else:
                             msg += "\n"
-                    except:
+                    except Exception:
                         pass
                     
                     if "torrent" in result.keys():
@@ -301,7 +301,7 @@ async def _getResult(search_results, key, method):
                         else:
                             msg += "\n"
                         
-            except:
+            except Exception:
                 continue
             
         else:
@@ -478,7 +478,7 @@ async def telegram_search(_, query):
 
     try:
         msgs = msg_dict[int(data[3])]
-    except:
+    except Exception:
         await query.message.delete()
         await query.message.reply_to_message.delete()
         return await query.answer(text="Waktu query pencarian habis!", show_alert=True)
@@ -536,7 +536,7 @@ async def telegram_search(_, query):
         await query.message.reply_to_message.delete()
         try:
             del msgs[5]
-        except:
+        except Exception:
             pass
         
     else:

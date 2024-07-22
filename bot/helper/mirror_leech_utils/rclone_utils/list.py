@@ -141,7 +141,7 @@ class RcloneList:
         )
         try:
             await wait_for(self.event.wait(), timeout=self._timeout)
-        except:
+        except Exception:
             self.path = ""
             self.remote = "<b>Waktu habis. Tugas dibatalkan!</b>"
             self.listener.isCancelled = True

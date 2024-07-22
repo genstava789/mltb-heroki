@@ -42,14 +42,16 @@ async def select(_, message):
         async with task_dict_lock:
             task = task_dict.get(reply_to_id)
         if task is None:
-            await sendMessage(message, "<b>Bukan Tugas Aktif!</b>")
+            await sendMessage(message, "<b>Bukan Tugas aktif!</b>")
             return
     
     elif len(msg) == 1:
         msg = (
-            "<b>Balas ke Tugas Aktif dengan perintah atau tambahkan ID Tugas setelah perintah!</b>\n\n"
-            + "<b>Perintah ini hanya untuk memilih file yang ingin diunduh dan hanya bisa digunakan untuk Torrent atau NZB!</b>"
-            + "<b>Kamu juga dapat menambahkan args -s sebelum memulai mengunduh!</b>"
+            "<b>Balas ke pesan perintah saat digunakan untuk memulai Tugas</b>" \
+            f" <b>atau kirim</b> <code>/{BotCommands.SelectCommand[0]} [GID]</code>" \
+            f" <b>atau</b> <code>/{BotCommands.SelectCommand[0]} [GID]</code> <b>untuk memilih File/Folder!</b>" \
+            "\n\n<b>Kamu dapat menambahkan args -s pada akhir perintah sebelum memulai Tugas Unduh!</b>" \
+            "\n\n<b>Perintah ini hanya untuk memilih file yang ingin diunduh dan hanya bisa digunakan untuk Tugas Torrent atau NZB!</b>"
         )
         await sendMessage(message, msg)
         return
@@ -97,7 +99,7 @@ async def select(_, message):
                         f"{e} Error in pause, this mostly happens after abuse aria2"
                     )
         task.listener.select = True
-    except:
+    except Exception:
         await sendMessage(message, "<b>Bukan Tugas Bittorrent atau SABnzbd!</b>")
         return
 
@@ -143,7 +145,7 @@ async def get_confirm(_, query):
                             if await aiopath.exists(f_path):
                                 try:
                                     await remove(f_path)
-                                except:
+                                except Exception:
                                     pass
                 if not task.queued:
                     await sync_to_async(
@@ -155,7 +157,7 @@ async def get_confirm(_, query):
                     if f["selected"] == "false" and await aiopath.exists(f["path"]):
                         try:
                             await remove(f["path"])
-                        except:
+                        except Exception:
                             pass
                 if not task.queued:
                     try:

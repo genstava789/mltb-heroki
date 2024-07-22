@@ -41,13 +41,14 @@ async def cancel_task(_, message):
         async with task_dict_lock:
             task = task_dict.get(reply_to_id)
         if task is None:
-            await sendMessage(message, "<b>Bukan Tugas Aktif!</b>")
+            await sendMessage(message, "<b>Bukan Tugas aktif!</b>")
             return
     
     elif len(msg) == 1:
         msg = (
-        "<b>Balas ke pesan perintah saat digunakan untuk memulai Tugas</b>" \
-        f" <b>atau kirim</b> <code>/{BotCommands.CancelTaskCommand[0]} [GID]</code> <b>atau</b> <code>/{BotCommands.CancelTaskCommand[1]} [GID]</code> <b>untuk membatalkan Tugas!</b>"
+            "<b>Balas ke pesan perintah saat digunakan untuk memulai Tugas</b>" \
+            f" <b>atau kirim</b> <code>/{BotCommands.CancelTaskCommand[0]} [GID]</code>" \
+            f" <b>atau</b> <code>/{BotCommands.CancelTaskCommand[1]} [GID]</code> <b>untuk membatalkan Tugas!</b>"
         )
         await sendMessage(message, msg)
         return
@@ -125,7 +126,7 @@ async def cancell_all_buttons(_, message):
     async with task_dict_lock:
         count = len(task_dict)
     if count == 0:
-        await sendMessage(message, "<b>Tidak ada Tugas Aktif!</b>")
+        await sendMessage(message, "<b>Tidak ada Tugas aktif!</b>")
         return
     isSudo = await CustomFilters.sudo("", message)
     button = create_cancel_buttons(isSudo, message.from_user.id)
