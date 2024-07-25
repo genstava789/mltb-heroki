@@ -122,7 +122,7 @@ class RcloneTransferHelper:
         elif return_code != -9:
             error = (await self._proc.stderr.read()).decode().strip()
             if not error and remote_type == "drive" and self._use_service_accounts:
-                error = "Terjadi kesalahan! Kemungkinan karena SAccounts tidak mempunyai akses ke Cloud!"
+                error = "Tugas tidak ditambahkan! Kemungkinan SAccounts tidak mempunyai akses ke Cloud!"
             elif not error:
                 error = "Tugas tidak ditambahkan! Kemungkinan ada masalah pada Remote atau Rclone!"
             LOGGER.error(error)
@@ -239,7 +239,7 @@ class RcloneTransferHelper:
         elif return_code != 0:
             error = (await self._proc.stderr.read()).decode().strip()
             if not error and remote_type == "drive" and self._use_service_accounts:
-                error = "Terjadi kesalahan! Kemungkinan karena SAccounts tidak mempunyai akses ke Cloud atau RATE_LIMIT_EXCEEDED!"
+                error = "Tugas tidak ditambahkan! Kemungkinan SAccounts tidak mempunyai akses ke Cloud atau RATE_LIMIT_EXCEEDED!"
             elif not error:
                 error = "Tugas tidak ditambahkan! Kemungkinan ada masalah pada Remote atau Rclone!"
             LOGGER.error(error)

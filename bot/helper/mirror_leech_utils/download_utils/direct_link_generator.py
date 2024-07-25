@@ -1195,7 +1195,7 @@ def terabox(url):
             if "errmsg" in _json:
                 raise DirectDownloadLinkException(f"ERROR: {_json['errmsg']}")
             else:
-                raise DirectDownloadLinkException("ERROR: Terjadi kesalahan!")
+                raise DirectDownloadLinkException("ERROR: Tugas tidak ditambahkan!")
 
         if "list" not in _json:
             return
