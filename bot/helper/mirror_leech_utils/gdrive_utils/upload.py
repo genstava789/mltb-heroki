@@ -63,7 +63,7 @@ class gdUpload(GoogleDriveHelper):
                 if self.listener.isCancelled:
                     return
                 if link is None:
-                    raise Exception("Unggahan dibatalkan secara manual oleh Bot!")
+                    raise Exception("Tugas tidak ditambahkan! Kemungkinan ada masalah pada File atau Google Drive!")
                 LOGGER.info(f"Uploaded To G-Drive: {self._path}")
             else:
                 mime_type = "Folder"
@@ -73,7 +73,7 @@ class gdUpload(GoogleDriveHelper):
                 )
                 result = self._upload_dir(self._path, dir_id, unwanted_files, ft_delete)
                 if result is None:
-                    raise Exception("Unggahan dibatalkan secara manual oleh Bot!")
+                    raise Exception("Tugas tidak ditambahkan! Kemungkinan ada masalah pada File atau Google Drive!")
                 link = self.G_DRIVE_DIR_BASE_DOWNLOAD_URL.format(dir_id)
                 if self.listener.isCancelled:
                     return

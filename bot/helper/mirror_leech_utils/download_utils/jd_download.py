@@ -233,7 +233,7 @@ async def add_jd_download(listener, path):
         else:
             error = (
                 name 
-                or "Tugas tidak ditambahkan!\nKemungkinan ada masalah pada Link atau JDownloader!"
+                or "Tugas tidak ditambahkan! Kemungkinan ada masalah pada Link atau JDownloader!"
             )
             await listener.onDownloadError(error)
             if corrupted_packages or online_packages:
@@ -324,7 +324,7 @@ async def add_jd_download(listener, path):
             jd_downloads[gid]["ids"] = packages
 
     if not packages:
-        await listener.onDownloadError("Unduhan dibatalkan secara manual oleh Bot!")
+        await listener.onDownloadError("Tugas tidak ditambahkan! Kemungkinan ada masalah pada Link atau JDownloader!")
         async with jd_lock:
             del jd_downloads[gid]
         return

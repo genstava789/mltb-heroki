@@ -33,7 +33,7 @@ async def remove_download(gid):
         package_ids=[gid],
     )
     if task := await getTaskByGid(f"{gid}"):
-        await task.listener.onDownloadError("Unduhan dibatalkan secara manual oleh Bot!")
+        await task.listener.onDownloadError("Tugas tidak ditambahkan! Kemungkinan ada masalah pada Link atau JDownloader!")
         async with jd_lock:
             del jd_downloads[gid]
 

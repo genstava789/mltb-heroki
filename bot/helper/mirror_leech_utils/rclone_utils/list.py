@@ -233,7 +233,7 @@ class RcloneList:
         res, err, code = await cmd_exec(cmd)
         if code not in [0, -9]:
             if not err:
-                err = "Kirim perintah /shell cat rlog.txt untuk melihat Error!"
+                err = "Tugas tidak ditambahkan! Kemungkinan ada masalah pada Remote atau Rclone!"
             LOGGER.error(
                 f"While rclone listing. Path: {self.remote}{self.path}. Stderr: {err}"
             )

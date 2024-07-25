@@ -91,7 +91,7 @@ async def add_nzb(listener, path):
         )
         if not res["status"]:
             await listener.onDownloadError(
-                "Unduhan tidak ditambahkan!\nKemungkinan ada masalah pada Link atau SABnzbd!"
+                "Tugas tidak ditambahkan! Kemungkinan ada masalah pada NZB atau SABnzbd!"
             )
             return
 

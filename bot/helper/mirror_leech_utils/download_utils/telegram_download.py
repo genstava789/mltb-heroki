@@ -92,7 +92,7 @@ class TelegramDownloadHelper:
         if download is not None:
             await self._onDownloadComplete()
         elif not self._listener.isCancelled:
-            await self._onDownloadError("Unduhan dibatalkan secara manual oleh Bot!")
+            await self._onDownloadError("Tugas tidak ditambahkan! Kemungkinan ada masalah pada File atau Telegram!")
 
     async def add_download(self, message, path, session):
         self.session = session

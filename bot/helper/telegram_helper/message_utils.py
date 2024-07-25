@@ -293,7 +293,7 @@ async def get_tg_link_message(link):
         
         except Exception as error:
             raise TgLinkException(
-                f"Bot tidak punya akses! ERROR: {error}"
+                f"Tugas tidak ditambahkan! {error}"
             ) from error
         
         if not user_message.empty:

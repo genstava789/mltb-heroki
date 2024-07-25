@@ -767,7 +767,9 @@ def mediafire(url, session=None):
     if html.xpath("//div[@class='passwordPrompt']"):
         if not _password:
             session.close()
-            raise DirectDownloadLinkException(f"ERROR: {PASSWORD_ERROR_MESSAGE}".format(url))
+            raise DirectDownloadLinkException(
+                f"ERROR: {PASSWORD_ERROR_MESSAGE}".format(url)
+            )
         try:
             html = HTML(session.post(url, data={"downloadp": _password}).text)
         except Exception as e:
