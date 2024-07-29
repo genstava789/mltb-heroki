@@ -19,6 +19,7 @@ natsort
 pillow
 psutil
 pycryptodome
+pycurl
 pymongo
 pyrofork
 python-dotenv

@@ -38,18 +38,18 @@ if not path.exists("config.env"):
     if CONFIG_URL := environ.get("CONFIG_URL"):
         LOGGER.info("CONFIG_URL is found! Downloading CONFIG_URL...")
         
-        request = get(
+        req = get(
             url=CONFIG_URL,
             timeout=10,
             allow_redirects=True,
         )
         
-        if request.ok:
+        if req.ok:
             with open("config.env", "wb+") as file:
-                file.write(request.content)
+                file.write(req.content)
         
         else:
-            LOGGER.error(f"[{request.status_code}] {responses[request.status_code]}")    
+            LOGGER.error(f"[{req.status_code}] {responses[req.status_code]}")    
     
     else:
         LOGGER.warning("CONFIG_URL is not found! Using local config.env instead...")
