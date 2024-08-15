@@ -1,4 +1,4 @@
-FROM arakurumi/mltb:ubuntu
+FROM arakurumi/mltb:lastes
 
 WORKDIR /app
 
