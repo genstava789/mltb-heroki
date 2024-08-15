@@ -1,4 +1,4 @@
-FROM arakurumi/mltb:lastes
+FROM arakurumi/mltb:latest
 
 WORKDIR /app
 
