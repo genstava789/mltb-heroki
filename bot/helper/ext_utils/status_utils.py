@@ -180,7 +180,7 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", _=1):
         tstatus = await sync_to_async(task.status) if status == "All" else status
 
         if task.listener.isPrivateChat: 
-            msg += "<blockquote><code>🔐 Private</code></blockquote>"
+            msg += f"<blockquote><code>{escape(f'{task.name()}')}</code></blockquote>"
         else: 
             msg += f"<blockquote><code>{escape(f'{task.name()}')}</code></blockquote>"
 
@@ -189,14 +189,12 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", _=1):
             if iscoroutinefunction(task.progress)
             else task.progress()
         )
-
-        msg += f"\n<b>┌┤{get_progress_bar_string(progress)}</b> <code>{progress}</code>"
+        
+        msg += f"\n<b>┌ {tstatus}</b> ({progress})"
+        msg += f"\n<b>├ {get_progress_bar_string(progress)}</b>"
 
         if task.listener.isSuperChat:
-            msg += f"\n<b>├ Status :</b> <a href='{task.listener.message.link}'>{tstatus}</a>"
-
-        else:
-            msg += f"\n<b>├ Status :</b> <code>{tstatus}</code>"
+            msg += f"\n<b>├ By :</b> {task.listener.user.mention}"
 
         if tstatus not in [
             MirrorStatus.STATUS_SPLITTING,
@@ -205,7 +203,8 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", _=1):
             MirrorStatus.STATUS_CONVERTING,
             MirrorStatus.STATUS_QUEUEUP,
         ]:
-            msg += f"\n<b>├ Proses :</b> <code>{task.processed_bytes()}</code> | <code>{task.size()}</code>"
+            msg += f"\n<b>├ Proses :</b> <code>{task.processed_bytes()}</code>"
+            msg += f"\n<b>├ Ukuran :</b> <code>{task.size()}</code>"
             msg += f"\n<b>├ Perkiraan :</b> <code>{task.eta()}</code>"
             msg += f"\n<b>├ Kecepatan :</b> <code>{task.speed()}</code>"
 
@@ -226,17 +225,10 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", _=1):
 
         else:
             msg += f"\n<b>├ Ukuran : </b> <code>{task.size()}</code>"
-                   
-        if task.listener.isPrivateChat: 
-            msg += "\n<b>├ UID :</b> <code>🔐 Private</code>"
-            msg += "\n<b>├ UName :</b> <code>🔐 Private</code>" 
-        else:
-            msg += f"\n<b>├ UID :</b> <code>{task.listener.userId}</code>"
-            msg += f"\n<b>├ UName :</b> <code>{task.listener.user.first_name} {(task.listener.user.last_name or '')}</code>"
-
+       
         gid = task.gid()
         msg += f"\n├<code>/{BotCommands.CancelTaskCommand[1]} {gid}</code>"
-        msg += f"\n└<code>/{BotCommands.ForceStartCommand[1]} {gid}</code>\n\n"
+        msg += f"\n└<code>/{BotCommands.ForceStartCommand[1]} {gid}</code>\n\n"    
 
     if len(msg) == 0:
         if status == "All":
@@ -247,14 +239,14 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", _=1):
     buttons = ButtonMaker()
 
     if not is_user:
-        buttons.ibutton("👀", f"status {sid} ov", position="header")
+        buttons.ibutton("⬜", f"status {sid} ov", position="header")
 
     if len(tasks) > STATUS_LIMIT:
         # msg += f"<b>Step :</b> <code>{page_step}</code>"
         msg += f"<b>Halaman :</b> <code>{page_no}/{pages}</code>"
         msg += f"\n<b>Total Tugas :</b> <code>{tasks_no}</code>\n"
-        buttons.ibutton("⏪", f"status {sid} pre", position="header")
-        buttons.ibutton("⏩", f"status {sid} nex", position="header")
+        buttons.ibutton("⬅️", f"status {sid} pre", position="header")
+        buttons.ibutton("➡️", f"status {sid} nex", position="header")
         if tasks_no > 30:
             for i in [1, 2, 4, 6, 8, 10, 15]:
                 buttons.ibutton(i, f"status {sid} ps {i}", position="footer")
@@ -264,12 +256,11 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", _=1):
             if status_value != status:
                 buttons.ibutton(label, f"status {sid} st {status_value}")
 
-    buttons.ibutton("♻️", f"status {sid} ref", position="header")
+    buttons.ibutton("🔄", f"status {sid} ref", position="header")
 
     button = buttons.build_menu(8)
-
-    msg += f"\n<b>CPU :</b> <code>{cpu_percent()}%</code> | <b>RAM :</b> <code>{virtual_memory().percent}%</code>"
-    msg += f"\n<b>DISK :</b> <code>{get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}</code> | <b>UPTIME :</b> <code>{get_readable_time(time() - botStartTime)}</code>"
-    msg += f"\n<b>T.Unduh :</b> <code>{get_readable_file_size(net_io_counters().bytes_recv)}</code> | <b>T.Unggah :</b> <code>{get_readable_file_size(net_io_counters().bytes_sent)}</code>"
+    msg += f"<b>──────────────────</b>"
+    msg += f"\n<b>CPU:</b> {cpu_percent()}% | <b>FREE:</b> {get_readable_file_size(disk_usage(config_dict['DOWNLOAD_DIR']).free)}"
+    msg += f"\n<b>RAM:</b> {virtual_memory().percent}% | <b>UPTIME:</b> {get_readable_time(time() - botStartTime)}"
     
     return msg, button
