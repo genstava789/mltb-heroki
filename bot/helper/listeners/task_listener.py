@@ -256,17 +256,6 @@ class TaskListener(TaskConfig):
             and config_dict["INCOMPLETE_TASK_NOTIFIER"]
             and DATABASE_URL
         ):
-                RCTransfer.upload(up_path, unwanted_files, files_to_delete),
-            )
-
-    async def onUploadComplete(
-        self, link, files, folders, mime_type, rclonePath="", dir_id=""
-    ):
-        if (
-            self.isSuperChat
-            and config_dict["INCOMPLETE_TASK_NOTIFIER"]
-            and DATABASE_URL
-        ):
             await DbManager().rm_complete_task(self.message.link)
         msg = f"<blockquote><code>{escape(self.name)}</code></blockquote>"
         msg += f"\n<b>📦 Ukuran :</b> <code>{get_readable_file_size(self.size)}</code>"
