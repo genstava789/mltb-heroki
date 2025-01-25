@@ -866,6 +866,147 @@ async def rssMonitor():
                                 description = rss_d.entries[feed_count].get("description").split("<br />")[-1]
                             if photo:
                                 caption = item_title
+                            
+                        elif "monikadesign" in url.lower():
+                            private_tracker = True
+                            url = "https://monikadesign.uk/"
+                            guid = rss_d.entries[feed_count].get("guid")
+                            full_url = f"{url}torrents/{guid}"
+                            view = full_url
+                            if description:
+                                description = re_sub(r"<.*?>", "", description)
+                                description = re_sub(r'[\u4e00-\u9fff]', '', description)
+                                size = description.split("Size: ")[-1].split("\n")[0]
+                                category = description.split("Category: ")[-1].split("\n")[0]
+
+                                uploader_info = description.split("Uploader:")[-1].strip()  # Get the uploader info
+                                uploader_name = uploader_info.replace("Uploaded By ", "").split("\n")[0]  # Remove "Uploaded By" and get the name
+
+                                if uploader_name == "Anonymous Uploader":
+                                    uploader_name = "Anonymous"
+                                description = f"""<b>Seed :</b> <code>{description.split('Seeders: ')[-1].split(' ')[0]}</code> | <b>Leech :</b> <code>{description.split('Leechers: ')[-1].split(' ')[0]}</code> | <b>Completed :</b> <code>{description.split('Completed: ')[-1].split(f'{chr(10)}')[0]}</code>
+
+<b>By :</b> <code>{uploader_name}</code>"""
+
+                        elif "oldtoons" in url.lower():
+                            private_tracker = True
+                            url = "https://oldtoons.world/"
+                            guid = rss_d.entries[feed_count].get("guid")
+                            full_url = f"{url}torrents/{guid}"
+                            view = full_url
+                            if description:
+                                description = re_sub(r"<.*?>", "", description)
+                                size = description.split("Size: ")[-1].split("\n")[0]
+                                category = description.split("Type: ")[-1].split("\n")[0]
+
+                                uploader_info = description.split("Uploader:")[-1].strip()  # Get the uploader info
+                                uploader_name = uploader_info.replace("Uploaded By ", "").split("\n")[0]  # Remove "Uploaded By" and get the name
+
+                                if uploader_name == "Anonymous Uploader":
+                                    uploader_name = "Anonymous"
+
+                                description = f"""<b>Seed :</b> <code>{description.split('Seeders: ')[-1].split(' ')[0]}</code> | <b>Leech :</b> <code>{description.split('Leechers: ')[-1].split(' ')[0]}</code> | <b>Completed :</b> <code>{description.split('Completed: ')[-1].split(f'{chr(10)}')[0]}</code>
+
+<b>By :</b> <code>{uploader_name}</code>"""
+
+                        elif "reelflix" in url.lower():
+                            private_tracker = True
+                            url = "https://reelflix.xyz/"
+                            guid = rss_d.entries[feed_count].get("guid")
+                            full_url = f"{url}torrents/{guid}"
+                            view = full_url
+                            if description:
+                                description = re_sub(r"<.*?>", "", description)
+                                size = description.split("Size: ")[-1].split("\n")[0]
+                                category = description.split("Category: ")[-1].split("\n")[0]
+
+                                uploader_info = description.split("Uploader:")[-1].strip()  # Get the uploader info
+                                uploader_name = uploader_info.replace("Uploaded By ", "").split("\n")[0]  # Remove "Uploaded By" and get the name
+
+                                if uploader_name == "Anonymous Uploader":
+                                    uploader_name = "Anonymous"
+
+                                description = f"""<b>Seed :</b> <code>{description.split('Seeders: ')[-1].split(' ')[0]}</code> | <b>Leech :</b> <code>{description.split('Leechers: ')[-1].split(' ')[0]}</code> | <b>Completed :</b> <code>{description.split('Completed: ')[-1].split(f'{chr(10)}')[0]}</code>
+
+<b>By :</b> <code>{uploader_name}</code>"""
+                                
+                        elif "lst" in url.lower():
+                            private_tracker = True
+                            url = "https://lst.gg/"
+                            guid = rss_d.entries[feed_count].get("guid")
+                            full_url = f"{url}torrents/{guid}"
+                            view = full_url
+                            if description:
+                                description = re_sub(r"<.*?>", "", description)
+                                size = description.split("Size: ")[-1].split("\n")[0]
+                                category = description.split("Category: ")[-1].split("\n")[0]
+
+                                uploader_info = description.split("Uploader:")[-1].strip()  # Get the uploader info
+                                uploader_name = uploader_info.replace("Uploaded By ", "").split("\n")[0]  # Remove "Uploaded By" and get the name
+
+                                if uploader_name == "Anonymous Uploader":
+                                    uploader_name = "Anonymous"
+                                    
+                                description = f"""<b>Seed :</b> <code>{description.split('Seeders: ')[-1].split(' ')[0]}</code> | <b>Leech :</b> <code>{description.split('Leechers: ')[-1].split(' ')[0]}</code> | <b>Completed :</b> <code>{description.split('Completed: ')[-1].split(f'{chr(10)}')[0]}</code>
+
+<b>By :</b> <code>{uploader_name}</code>"""
+
+                        elif "lat-team" in url.lower():
+                            private_tracker = True
+                            url = "https://lat-team.com/"
+                            guid = rss_d.entries[feed_count].get("guid")
+                            category = rss_d.entries[feed_count].get("type")
+                            full_url = f"{url}torrents/{guid}"
+                            view = full_url
+                            if description:
+                                description = re_sub(r"<.*?>", "", description)
+                                size = description.split("Size: ")[-1].split("\n")[0]
+
+                                uploader_info = description.split("Uploader:")[-1].strip()  # Get the uploader info
+                                uploader_name = uploader_info.replace("Uploaded By ", "").split("\n")[0]  # Remove "Uploaded By" and get the name
+
+                                if uploader_name == "Anonymous Uploader":
+                                    uploader_name = "Anonymous"
+                                    
+                                description = f"""<b>Seed :</b> <code>{description.split('Seeders: ')[-1].split(' ')[0]}</code> | <b>Leech :</b> <code>{description.split('Leechers: ')[-1].split(' ')[0]}</code> | <b>Completed :</b> <code>{description.split('Completed: ')[-1].split(f'{chr(10)}')[0]}</code>
+
+<b>By :</b> <code>{uploader_name}</code>"""
+
+                        elif "upload" in url.lower():
+                            private_tracker = True
+                            url = "https://upload.cx/"
+                            guid = rss_d.entries[feed_count].get("guid")
+                            full_url = f"{url}torrents/{guid}"
+                            view = full_url
+                            if description:
+                                description = re_sub(r"<.*?>", "", description)
+                                size = description.split("Size: ")[-1].split("\n")[0]
+                                category = description.split("Category: ")[-1].split("\n")[0]
+
+                                uploader_info = description.split("Uploader:")[-1].strip()  # Get the uploader info
+                                uploader_name = uploader_info.replace("Uploaded By ", "").split("\n")[0]  # Remove "Uploaded By" and get the name
+
+                                if uploader_name == "Anonymous Uploader":
+                                    uploader_name = "Anonymous"
+
+                                description = f"""<b>Seed :</b> <code>{description.split('Seeders: ')[-1].split(' ')[0]}</code> | <b>Leech :</b> <code>{description.split('Leechers: ')[-1].split(' ')[0]}</code> | <b>Completed :</b> <code>{description.split('Completed: ')[-1].split(f'{chr(10)}')[0]}</code>
+
+<b>By :</b> <code>{uploader_name}</code>"""
+                                
+                        elif "portugas" in url.lower():
+                            private_tracker = True
+                            url = "https://portugas.org/"
+                            guid = rss_d.entries[feed_count].get("guid")
+                            full_url = f"{url}torrents/{guid}"
+                            view = full_url
+                            if description:
+                                description = re_sub(r"<.*?>", "", description)
+                                description = re_sub(r"(Seeders:\s*\d+)\n", r"\1 ", description)
+                                size = description.split("Tamanho: ")[-1].split("\n")[0]
+                                category = description.split("Tipo: ")[-1].split("\n")[0]
+                                description = f"""<b>Seed :</b> <code>{description.split('Seeders: ')[-1].split(' ')[0]}</code> | <b>Leech :</b> <code>{description.split('Leechers: ')[-1].split(' ')[0].split(f'{chr(10)}')[0]}</code>
+
+<b>By :</b> <code>{description.split(f'Uploader:{chr(10)}')[-1].split(f'{chr(10)}')[0]}</code>"""
                         
                         # https://avistaz.to/
                         elif "avistaz" in url.lower():
@@ -878,6 +1019,27 @@ async def rssMonitor():
                                 description = f"""<b>Seed :</b> <code>{description.split('Seed: ')[-1].split(' ')[0]}</code> | <b>Leech :</b> <code>{description.split('Leech: ')[-1].split(' ')[0]}</code> | <b>Completed :</b> <code>{description.split('Completed: ')[-1].split('Uploader: ')[0]}</code>
 
 <b>Oleh :</b> <code>{description.split('Uploader: ')[-1].split('Rip Type: ')[0]}</code>"""
+
+                        elif "privatehd" in url.lower():
+                            private_tracker = True
+                            url = "https://privatehd.to/"
+                            view = rss_d.entries[feed_count]["link"]
+                            if description:
+                                description = re_sub(r"<.*?>", "", description)
+                                size = description.split("Size: ")[-1].split("Uploaded: ")[0]
+                                description = f"""<b>Seed :</b> <code>{description.split('Seed: ')[-1].split(' ')[0]}</code> | <b>Leech :</b> <code>{description.split('Leech: ')[-1].split(' ')[0]}</code> | <b>Completed :</b> <code>{description.split('Completed: ')[-1].split('Uploader: ')[0]}</code>
+
+<b>By :</b> <code>{description.split('Uploader: ')[-1].split('Rip Type: ')[0]}</code>"""
+                                
+                            
+                        elif "hd-space" in url.lower():
+                            private_tracker = True
+                            url = "https://hd-space.org/"
+                            view = rss_d.entries[feed_count].get("guid")
+                            item_title = re_sub(r"^\[.*?\]\s*", "", item_title)  # Remove anything in brackets at the start
+                            item_title = re_sub(r"\s*\[SEEDERS.*?\]$", "", item_title)  # Remove seeders/leechers info
+                            item_title = item_title.strip()
+
 
                         # https://www.torrentleech.org/
                         elif "torrentleech" in url.lower():
