@@ -34,7 +34,7 @@ from bot import (
     user,
     Version,
 )
-from .helper.ext_utils.bot_utils import cmd_exec, sync_to_async, create_help_buttons
+from .helper.ext_utils.bot_utils import cmd_exec, sync_to_async, create_help_buttons, set_commands
 from .helper.ext_utils.db_handler import DbManager
 from .helper.ext_utils.files_utils import clean_all, exit_clean_up
 from .helper.ext_utils.jdownloader_booter import jdownloader
