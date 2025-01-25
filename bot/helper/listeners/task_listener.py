@@ -269,7 +269,7 @@ class TaskListener(TaskConfig):
             else:
                 msg += f"\n<b>⏰ Waktu :</b> <code>{get_readable_time(time() - self.message.date.timestamp())}</code>"
                 msg += f"\n<b>👤 Task by :</b> {self.message.from_user.mention}"
-                fmsg = "<b>List File :</b>\n"
+                fmsg = "\n\n<b>List File :</b>"
                 for index, (link, name) in enumerate(files.items(), start=1):
                     fmsg += f"<b>{index:02d}.</b> <a href='{link}'>{name}</a>\n"
                     if len(fmsg.encode() + msg.encode()) > 4000:
