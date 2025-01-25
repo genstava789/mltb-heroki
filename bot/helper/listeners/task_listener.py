@@ -2,6 +2,8 @@ from aiofiles.os import path as aiopath, listdir, makedirs, remove
 from aioshutil import move
 from asyncio import sleep, gather
 from html import escape
+from time import time
+from datetime import datetime
 from requests import utils as rutils
 
 from bot import (
@@ -255,31 +257,34 @@ class TaskListener(TaskConfig):
             and DATABASE_URL
         ):
             await DbManager().rm_complete_task(self.message.link)
-        msg = f"<b>Nama :</b> <code>{escape(self.name)}</code>"
-        msg += f"\n\n<b>Ukuran :</b> <code>{get_readable_file_size(self.size)}</code>"
+        
         LOGGER.info(f"Task Done: {self.name}")
+        msg = f"<b><i>{escape(self.name)}</i></b>"
+        msg += f"\n<b>cc</b>: <i>{self.tag}</i>"  
+        msg += f"\n<b>Hey {self.tag}!\nYour job is done.</b>"
+        msg += f"\n\n<code>Size  </code>: {get_readable_file_size(self.size)}"
+        msg += f"\n<code>Past  </code>: {get_readable_time(time() - self.message.date.timestamp())}"
         if self.isLeech:
-            msg += f"\n\n<b>Jumlah File :</b> <code>{folders}</code>"
+            msg += f"\n<code>Files </code>: {folders}\n"
             if mime_type != 0:
-                msg += f"\n\n<b>File Rusak :</b> <code>{mime_type}</code>"
-            msg += f'\n\n<b>Oleh :</b> {self.tag}\n\n'
+                msg += f"<code>Error </code>: {mime_type}\n"
             if not files:
                 await sendMessage(self.message, msg)
             else:
-                fmsg = "<b>List File :</b>\n"
+                fmsg = "\n"
                 for index, (link, name) in enumerate(files.items(), start=1):
-                    fmsg += f"<b>{index:02d}.</b> <a href='{link}'>{name}</a>\n"
+                    fmsg += f"{index}. <a href='{link}'>{self.name}</a>\n"
                     if len(fmsg.encode() + msg.encode()) > 4000:
                         await sendMessage(self.message, msg + fmsg)
                         await sleep(1)
-                        fmsg = ""
-                if fmsg != "":
+                        fmsg = "\n"
+                if fmsg != "\n":
                     await sendMessage(self.message, msg + fmsg)
         else:
-            msg += f"\n\n<b>Tipe :</b> <code>{mime_type}</code>"
+            msg += f"\n<code>Type  </code>: {mime_type}"
             if mime_type == "Folder":
-                msg += f"\n\n<b>Jumlah Folder :</b> <code>{folders}</code>"
-                msg += f"\n\n<b>Jumlah File :</b> <code>{files}</code>"
+                msg += f"\n<code>Files </code>: {files}"
+                msg += f"\n<code>Folder</code>: {folders}"
             if (
                 link
                 or rclonePath
@@ -289,8 +294,9 @@ class TaskListener(TaskConfig):
                 buttons = ButtonMaker()
                 if link:
                     buttons.ubutton("☁️ Cloud", link)
+
                 if rclonePath:
-                    msg += f"\n\n<b>Path :</b> <code>{rclonePath}</code>"
+                    msg += f"\n\n<code>Path  </code>: {rclonePath}"
                 if (
                     rclonePath
                     and (RCLONE_SERVE_URL := config_dict["RCLONE_SERVE_URL"])
@@ -318,7 +324,6 @@ class TaskListener(TaskConfig):
             else:
                 msg += f"\n\n<b>Path :</b> <code>{rclonePath}</code>"
                 button = None
-            msg += f"\n\n<b>Oleh :</b> {self.tag}"
             
             LOG_CHAT_ID = None
             LOG_CHAT_THREAD_ID = None
