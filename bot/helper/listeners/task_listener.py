@@ -257,21 +257,23 @@ class TaskListener(TaskConfig):
             and DATABASE_URL
         ):
             await DbManager().rm_complete_task(self.message.link)
-        
-        LOGGER.info(f"Task Done: {self.name}")
         msg = f"<blockquote><code>{escape(self.name)}</code></blockquote>"
         msg += f"\n\n<code>Size  </code>: {get_readable_file_size(self.size)}"
         msg += f"\n<code>Past  </code>: {get_readable_time(time() - self.message.date.timestamp())}"
+        LOGGER.info(f"Task Done: {self.name}")
+
         if self.isLeech:
             msg += f"\n<code>Files </code>: {folders}\n"
             if mime_type != 0:
                 msg += f"<code>Error </code>: {mime_type}\n"
+                msg += f"\n\n<b>Hey {self.message.from_user.mention}!\nYour job is done.</b>"
             if not files:
                 await sendMessage(self.message, msg)
             else:
                 fmsg = "\n"
+                msg += f"\n\n<b>Hey {self.message.from_user.mention}!\nYour job is done.</b>"
                 for index, (link, name) in enumerate(files.items(), start=1):
-                    fmsg += f"{index}. <a href='{link}'>{self.name}</a>\n"
+                    fmsg += f"<b>{index:02d}.</b> <a href='{link}'>{name}</a>\n"
                     if len(fmsg.encode() + msg.encode()) > 4000:
                         await sendMessage(self.message, msg + fmsg)
                         await sleep(1)
@@ -321,8 +323,8 @@ class TaskListener(TaskConfig):
                 button = buttons.build_menu(2)
             else:
                 msg += f"\n\n<b>Path :</b> <code>{rclonePath}</code>"
-                button = None
                 msg += f"\n\n<b>Hey {self.message.from_user.mention}!\nYour job is done.</b>"
+                button = None
             
             LOG_CHAT_ID = None
             LOG_CHAT_THREAD_ID = None
