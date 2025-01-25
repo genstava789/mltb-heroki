@@ -291,6 +291,7 @@ def direct_link_generator(link: str):
             "database.seikel.itunesmusicid.com",
             "database.seikel.workers.dev",
             "seikel.adventure.workers.dev",
+            "database.s3cr3t.workers.dev",
         ]
     ):
         return index(link)
