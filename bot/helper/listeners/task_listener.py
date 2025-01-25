@@ -256,22 +256,32 @@ class TaskListener(TaskConfig):
             and config_dict["INCOMPLETE_TASK_NOTIFIER"]
             and DATABASE_URL
         ):
+                RCTransfer.upload(up_path, unwanted_files, files_to_delete),
+            )
+
+    async def onUploadComplete(
+        self, link, files, folders, mime_type, rclonePath="", dir_id=""
+    ):
+        if (
+            self.isSuperChat
+            and config_dict["INCOMPLETE_TASK_NOTIFIER"]
+            and DATABASE_URL
+        ):
             await DbManager().rm_complete_task(self.message.link)
         msg = f"<blockquote><code>{escape(self.name)}</code></blockquote>"
-        msg += f"\n\n<code>Size  </code>: {get_readable_file_size(self.size)}"
-        msg += f"\n<code>Past  </code>: {get_readable_time(time() - self.message.date.timestamp())}"
+        msg += f"\n<b>📦 Ukuran :</b> <code>{get_readable_file_size(self.size)}</code>"
         LOGGER.info(f"Task Done: {self.name}")
-
         if self.isLeech:
-            msg += f"\n<code>Files </code>: {folders}\n"
+            msg += f"\n<b>📁 File :</b> <code>{folders}</code>"
             if mime_type != 0:
-                msg += f"<code>Error </code>: {mime_type}\n"
-                msg += f"\n\n<b>Hey {self.message.from_user.mention}!\nYour job is done.</b>"
+                msg += f"\n\n<b>File Rusak :</b> <code>{mime_type}</code>"
+            msg += f"\n\n<b>👤 Task by :</b> {self.message.from_user.mention}"
             if not files:
                 await sendMessage(self.message, msg)
             else:
-                fmsg = "\n"
-                msg += f"\n\n<b>Hey {self.message.from_user.mention}!\nYour job is done.</b>"
+                msg += f"\n<b>⏰ Waktu :</b> <code>{get_readable_time(time() - self.message.date.timestamp())}</code>"
+                msg += f"\n<b>👤 Task by :</b> {self.message.from_user.mention}"
+                fmsg = "<b>List File :</b>\n"
                 for index, (link, name) in enumerate(files.items(), start=1):
                     fmsg += f"<b>{index:02d}.</b> <a href='{link}'>{name}</a>\n"
                     if len(fmsg.encode() + msg.encode()) > 4000:
@@ -281,22 +291,22 @@ class TaskListener(TaskConfig):
                 if fmsg != "":
                     await sendMessage(self.message, msg + fmsg)
         else:
-            msg += f"\n<code>Type  </code>: {mime_type}"
+            msg += f"\n<b>🔖 Type :</b> <code>{mime_type}</code>"
             if mime_type == "Folder":
-                msg += f"\n<code>Files </code>: {files}"
-                msg += f"\n<code>Folder</code>: {folders}"
+                msg += f"\n<b>🗂️ Folder :</b> <code>{folders}</code>"
+                msg += f"\n<b>📁 File :</b> <code>{files}</code>"
             if (
                 link
                 or rclonePath
                 and config_dict["RCLONE_SERVE_URL"]
                 and not self.privateLink
             ):
+                msg += f"\n\n<b>⏰ Waktu :</b> <code>{get_readable_time(time() - self.message.date.timestamp())}</code>"
                 buttons = ButtonMaker()
                 if link:
                     buttons.ubutton("☁️ Cloud", link)
-
                 if rclonePath:
-                    msg += f"\n\n<code>Path  </code>: {rclonePath}"
+                    msg += f"\n\n<b>Path :</b> <code>{rclonePath}</code>"
                 if (
                     rclonePath
                     and (RCLONE_SERVE_URL := config_dict["RCLONE_SERVE_URL"])
@@ -304,7 +314,7 @@ class TaskListener(TaskConfig):
                 ):
                     remote, path = rclonePath.split(":", 1)
                     url_path = rutils.quote(f"{path}")
-                    share_url = f"{RCLONE_SERVE_URL}/{remote}/{url_path}"
+                    share_url = f"{RCLONE_SERVE_URL}/[{remote}:]/{url_path}"
                     if mime_type == "Folder":
                         share_url += "/"
                     buttons.ubutton("🔗 Rclone", share_url)
@@ -323,8 +333,8 @@ class TaskListener(TaskConfig):
                 button = buttons.build_menu(2)
             else:
                 msg += f"\n\n<b>Path :</b> <code>{rclonePath}</code>"
-                msg += f"\n\n<b>Hey {self.message.from_user.mention}!\nYour job is done.</b>"
                 button = None
+            msg += f"\n\n<b>👤 Task by :</b> {self.message.from_user.mention}"
             
             LOG_CHAT_ID = None
             LOG_CHAT_THREAD_ID = None
