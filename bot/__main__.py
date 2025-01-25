@@ -395,6 +395,7 @@ async def main():
         restart_notification(),
         telegraph.create_account(),
         rclone_serve_booter(),
+        set_commands(bot),
         sync_to_async(start_aria2_listener, wait=False),
     )
     create_help_buttons()
