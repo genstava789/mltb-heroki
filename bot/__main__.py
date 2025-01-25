@@ -156,8 +156,7 @@ async def stats(_, message):
 
 async def start(client, message):
     buttons = ButtonMaker()
-    buttons.ubutton("💭 Channel", "https://t.me/arakurumi")
-    buttons.ubutton("🦉 Maintainer", "https://t.me/SaVe_USDT")
+    buttons.ubutton("Owner", "https://t.me/nonplayablcharacter")
     reply_markup = buttons.build_menu(2)
     if await CustomFilters.authorized(client, message):
         start_string = f"""
@@ -169,11 +168,7 @@ Selalu backup File setelah Tugas Unduh/Unggah selesai untuk menghindari Cloud te
 """
     else:
         start_string = """
-<b>Tidak ada izin!</b>
-
-<b>Note :</b>
-Gabung Grup/Channel untuk menggunakan Bot!
-Jika Group ini mengaktifkan Topik, Kirim perintah di Topik yang diizinkan!
+<b>No permission!</b>
 """
 
     await sendMessage(
