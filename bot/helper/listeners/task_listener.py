@@ -264,7 +264,6 @@ class TaskListener(TaskConfig):
             msg += f"\n<b>📁 File :</b> <code>{folders}</code>"
             if mime_type != 0:
                 msg += f"\n\n<b>File Rusak :</b> <code>{mime_type}</code>"
-            msg += f"\n\n<b>👤 Task by :</b> {self.message.from_user.mention}"
             if not files:
                 await sendMessage(self.message, msg)
             else:
