@@ -267,7 +267,7 @@ async def set_commands(client):
             ),
             BotCommand(
                 BotCommands.CountCommand,
-                '[drive_url]: Count file/folder of Google Drive/RClone Drives',
+                f'[drive_url]: Count file/folder of Google Drive/RClone Drives',
             ),
             BotCommand(
                 BotCommands.StatusCommand[0],
@@ -283,24 +283,27 @@ async def set_commands(client):
             ),
             BotCommand(
                 BotCommands.CancelAllCommand[0],
-                'Cancel all Tasks in whole Bots.',
+                f'Cancel all Tasks in whole Bots.',
             ),
             BotCommand(
                 BotCommands.ForceStartCommand[0],
                 f'or /{BotCommands.ForceStartCommand[1]} Force a task to run in a queue',
             ),
-            BotCommand(BotCommands.ListCommand, 'Search in Drive(s)'),
+            BotCommand(BotCommands.ListCommand[0], 
+                f'Search in Drive(s)'
+            ),
+            
             BotCommand(
-                BotCommands.SearchCommand,
-                'Search in Torrent via qBit clients!',
+                BotCommands.SearchCommand[0],
+                f'Search in Torrent via qBit clients!',
             ),
             BotCommand(
-                BotCommands.HelpCommand,
-                'Get detailed help about the WZML-X Bot',
+                BotCommands.HelpCommand]0],
+                f'Get detailed help about the WZML-X Bot',
             ),
             BotCommand(
-                BotCommands.RssCommand,
-                'Set RSS feed to bot',
+                BotCommands.RssCommand[0],
+                f'Set RSS feed to bot',
             ),
             BotCommand(
                 BotCommands.ShellCommand[0],
@@ -311,16 +314,16 @@ async def set_commands(client):
                 f"or /{BotCommands.UserSetCommand[1]} User's Personal Settings (Open in PM)",
             ),
             BotCommand(
-                BotCommands.UsersCommand,
+                BotCommands.UsersCommand[0],
                 f"View's user Settings",
             ),
             BotCommand(
-                BotCommands.BotSetCommand,
+                BotCommands.BotSetCommand[0],
                 f'Bot settings',
             ),
             BotCommand(
-                BotCommands.PingCommand,
-                'Ping bot latency',
+                BotCommands.PingCommand[0],
+                f'Ping bot latency',
             ),
             BotCommand(
                 BotCommands.SpeedCommand[0],
