@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial, wraps
 from httpx import AsyncClient
 
-from bot import bot_loop, config_dict, user_data
+from bot import bot_loop, config_dict, user_data, LOGGER
 from bot.helper.ext_utils.help_messages import (
     CLONE_HELP_DICT,
     MIRROR_HELP_DICT,
