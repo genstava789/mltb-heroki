@@ -225,8 +225,8 @@ def new_thread(func):
         return future.result() if wait else future
 
     return wrapper
-    
-    async def set_commands(client):
+
+async def set_commands(client):
     try:
         bot_cmds = [
             BotCommand(
@@ -241,8 +241,11 @@ def new_thread(func):
                 BotCommands.QbMirrorCommand[0],
                 f'or /{BotCommands.QbMirrorCommand[1]} Mirror magnet/torrent using qBittorrent',
             ),
+            BotCommand(
+                BotCommands.QbLeechCommand[0],
+                f'or /{BotCommands.QbLeechCommand[1]} Leech magnet/torrent using qBittorrent',
+            ),
         ]
-
         await client.set_bot_commands(bot_cmds)
         LOGGER.info('Bot Commands have been Set & Updated')
     except Exception as err:
