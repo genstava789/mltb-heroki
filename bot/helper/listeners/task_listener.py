@@ -259,9 +259,7 @@ class TaskListener(TaskConfig):
             await DbManager().rm_complete_task(self.message.link)
         
         LOGGER.info(f"Task Done: {self.name}")
-        msg = f"<b><i>{escape(self.name)}</i></b>"
-        msg += f"\n<b>cc</b>: <i>{self.tag}</i>"  
-        msg += f"\n<b>Hey {self.tag}!\nYour job is done.</b>"
+        msg = f"<blockquote><code>{escape(self.name)}</code></blockquote>"
         msg += f"\n\n<code>Size  </code>: {get_readable_file_size(self.size)}"
         msg += f"\n<code>Past  </code>: {get_readable_time(time() - self.message.date.timestamp())}"
         if self.isLeech:
@@ -273,12 +271,12 @@ class TaskListener(TaskConfig):
             else:
                 fmsg = "\n"
                 for index, (link, name) in enumerate(files.items(), start=1):
-                    fmsg += f"{index:02d}. <a href='{link}'>{name}</a>\n"
+                    fmsg += f"{index}. <a href='{link}'>{self.name}</a>\n"
                     if len(fmsg.encode() + msg.encode()) > 4000:
                         await sendMessage(self.message, msg + fmsg)
                         await sleep(1)
-                        fmsg = "\n"
-                if fmsg != "\n":
+                        fmsg = ""
+                if fmsg != "":
                     await sendMessage(self.message, msg + fmsg)
         else:
             msg += f"\n<code>Type  </code>: {mime_type}"
@@ -324,6 +322,7 @@ class TaskListener(TaskConfig):
             else:
                 msg += f"\n\n<b>Path :</b> <code>{rclonePath}</code>"
                 button = None
+                msg += f"\n\n<b>Hey {self.message.from_user.mention}!\nYour job is done.</b>"
             
             LOG_CHAT_ID = None
             LOG_CHAT_THREAD_ID = None
