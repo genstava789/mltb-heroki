@@ -16,6 +16,8 @@ from bot.helper.ext_utils.help_messages import (
     YT_HELP_DICT,
 )
 from bot.helper.ext_utils.telegraph_helper import telegraph
+from pyrogram.types import BotCommand
+from bot.helper.telegram_helper.bot_commands import BotCommands
 from bot.helper.telegram_helper.button_build import ButtonMaker
 
 
@@ -223,3 +225,25 @@ def new_thread(func):
         return future.result() if wait else future
 
     return wrapper
+    
+    async def set_commands(client):
+    try:
+        bot_cmds = [
+            BotCommand(
+                BotCommands.MirrorCommand[0],
+                f'or /{BotCommands.MirrorCommand[1]} Mirror [links/media/rclone_path]',
+            ),
+            BotCommand(
+                BotCommands.LeechCommand[0],
+                f'or /{BotCommands.LeechCommand[1]} Leech [links/media/rclone_path]',
+            ),
+            BotCommand(
+                BotCommands.QbMirrorCommand[0],
+                f'or /{BotCommands.QbMirrorCommand[1]} Mirror magnet/torrent using qBittorrent',
+            ),
+        ]
+
+        await client.set_bot_commands(bot_cmds)
+        LOGGER.info('Bot Commands have been Set & Updated')
+    except Exception as err:
+        LOGGER.error(err)
