@@ -263,7 +263,7 @@ class TaskListener(TaskConfig):
         msg += f"\n<b>cc</b>: <i>{self.tag}</i>"  
         msg += f"\n<b>Hey {self.tag}!\nYour job is done.</b>"
         msg += f"\n\n<code>Size  </code>: {get_readable_file_size(self.size)}"
-        msg += f"\n<code>Past  </code>: {get_readable_time(time() - self.time)}"
+        msg += f"\n<code>Past  </code>: {get_readable_time(time() - self.message.date.timestamp())}"
         if self.isLeech:
             msg += f"\n<code>Files </code>: {folders}\n"
             if mime_type != 0:
