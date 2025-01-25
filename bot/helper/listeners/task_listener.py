@@ -273,7 +273,7 @@ class TaskListener(TaskConfig):
             else:
                 fmsg = "\n"
                 for index, (link, name) in enumerate(files.items(), start=1):
-                    fmsg += f"{index}. <a href='{link}'>{self.name}</a>\n"
+                    fmsg += f"{index:02d}. <a href='{link}'>{name}</a>\n"
                     if len(fmsg.encode() + msg.encode()) > 4000:
                         await sendMessage(self.message, msg + fmsg)
                         await sleep(1)
