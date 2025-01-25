@@ -298,7 +298,7 @@ async def set_commands(client):
                 f'Search in Torrent via qBit clients!',
             ),
             BotCommand(
-                BotCommands.HelpCommand]0],
+                BotCommands.HelpCommand[0],
                 f'Get detailed help about the WZML-X Bot',
             ),
             BotCommand(
