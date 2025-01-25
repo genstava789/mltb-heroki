@@ -245,6 +245,107 @@ async def set_commands(client):
                 BotCommands.QbLeechCommand[0],
                 f'or /{BotCommands.QbLeechCommand[1]} Leech magnet/torrent using qBittorrent',
             ),
+            BotCommand(
+                BotCommands.NzbMirrorCommand[0],
+                f'or /{BotCommands.NzbMirrorCommand[1]} Mirror nzb/usenet using sabnzbd',
+            ),
+            BotCommand(
+                BotCommands.NzbLeechCommand[0],
+                f'or /{BotCommands.NzbLeechCommand[1]} Leech nzb/usenet using sabnzbd to telegram',
+            ),
+            BotCommand(
+                BotCommands.YtdlCommand[0],
+                f'or /{BotCommands.YtdlCommand[1]} Mirror yt-dlp supported links via bot',
+            ),
+            BotCommand(
+                BotCommands.YtdlLeechCommand[0],
+                f'or /{BotCommands.YtdlLeechCommand[1]} Leech yt-dlp supported links via bot',
+            ),
+            BotCommand(
+                BotCommands.CloneCommand[0],
+                f'or /{BotCommands.CloneCommand[1]} Copy file/folder to Drive (GDrive/RClone)',
+            ),
+            BotCommand(
+                BotCommands.CountCommand,
+                '[drive_url]: Count file/folder of Google Drive/RClone Drives',
+            ),
+            BotCommand(
+                BotCommands.StatusCommand[0],
+                f'or /{BotCommands.StatusCommand[1]} Get Bot All Status Stats Message',
+            ),
+            BotCommand(
+                BotCommands.StatsCommand[0],
+                f'or /{BotCommands.StatsCommand[1]} Check Bot & System stats',
+            ),
+            BotCommand(
+                BotCommands.CancelTaskCommand[1],
+                f'or /{BotCommands.StatsCommand[0]} Cancel a Task of yours!',
+            ),
+            BotCommand(
+                BotCommands.CancelAllCommand[0],
+                'Cancel all Tasks in whole Bots.',
+            ),
+            BotCommand(
+                BotCommands.ForceStartCommand[0],
+                f'or /{BotCommands.ForceStartCommand[1]} Force a task to run in a queue',
+            ),
+            BotCommand(BotCommands.ListCommand, 'Search in Drive(s)'),
+            BotCommand(
+                BotCommands.SearchCommand,
+                'Search in Torrent via qBit clients!',
+            ),
+            BotCommand(
+                BotCommands.HelpCommand,
+                'Get detailed help about the WZML-X Bot',
+            ),
+            BotCommand(
+                BotCommands.RssCommand,
+                'Set RSS feed to bot',
+            ),
+            BotCommand(
+                BotCommands.ShellCommand[0],
+                f'Use shell command (Owner or Sudo Only)',
+            ),
+            BotCommand(
+                BotCommands.UserSetCommand[0],
+                f"or /{BotCommands.UserSetCommand[1]} User's Personal Settings (Open in PM)",
+            ),
+            BotCommand(
+                BotCommands.UsersCommand,
+                f"View's user Settings",
+            ),
+            BotCommand(
+                BotCommands.BotSetCommand,
+                f'Bot settings',
+            ),
+            BotCommand(
+                BotCommands.PingCommand,
+                'Ping bot latency',
+            ),
+            BotCommand(
+                BotCommands.SpeedCommand[0],
+                f'or /{BotCommands.SpeedCommand[1]} Check Server Up & Down Speed & Details',
+            ),
+            BotCommand(
+                BotCommands.BotSetCommand[0],
+                f"or /{BotCommands.BotSetCommand[1]} Bot's Personal Settings (Owner or Sudo Only)",
+            ),
+            BotCommand(
+                BotCommands.RestartCommand[0],
+                f'or /{BotCommands.RestartCommand[1]} Restart & Update the Bot (Owner or Sudo Only)',
+            ),
+            BotCommand(
+                BotCommands.ExecCommand[0],
+                f'Use execute code command (Owner or Sudo Only)',
+            ),
+            BotCommand(
+                BotCommands.AExecCommand[0],
+                f'Use asynchronous execute code command (Owner or Sudo Only)',
+            ),
+            BotCommand(
+                BotCommands.LogCommand[0],
+                f'Check log bot (Owner or Sudo Only)',
+            ),
         ]
         await client.set_bot_commands(bot_cmds)
         LOGGER.info('Bot Commands have been Set & Updated')
