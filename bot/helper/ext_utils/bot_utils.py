@@ -310,12 +310,52 @@ async def set_commands(client):
                 f'or /{BotCommands.UserSetCommand[1]} Pengaturan User.',
             ),
             BotCommand(
-                BotCommands.RssCommand[0],
-                f'Menu rss',
+                BotCommands.RssCommand,
+                f'Pasang feed untuk rss',
             ),
             BotCommand(
                 BotCommands.DeleteCommand[0],
                 f'or /{BotCommands.DeleteCommand[1]} [gdriveUrl] : Menghapus File/Folder Google Drive.',
+            ),
+            BotCommand(
+                BotCommands.AuthorizeCommand[0],
+                f'or /{BotCommands.AuthorizeCommand[1]} Memberikan izin chat atau user untuk menggunakan Bot(Owner/Admin only)..',
+            ),
+            BotCommand(
+                BotCommands.UnAuthorizeCommand[0],
+                f'or /{BotCommands.UnAuthorizeCommand[1]} Menghapus izin chat atau user untuk menggunakan Bot(Owner/Admin only).',
+            ),
+            BotCommand(
+                BotCommands.ExecCommand[0],
+                f'or /{BotCommands.ExecCommand[1]} Menjalankan fungsi Sync (Owner/Admin only).',
+            ),
+            BotCommand(
+                BotCommands.AExecCommand[0],
+                f'or /{BotCommands.AExecCommand[1]} Menjalankan fungsi Async. (Owner/Admin only).',
+            ),
+            BotCommand(
+                BotCommands.ShellCommand[0],
+                f'or /{BotCommands.ShellCommand[1]} Menjalankan perintah Shell (Owner/Admin only).',
+            ),
+            BotCommand(
+                BotCommands.ClearLocalsCommand[0],
+                f'or /{BotCommands.ClearLocalsCommand[1]} Menghapus lokal Sync atau Async (Owner/Admin only).',
+            ),
+            BotCommand(
+                BotCommands.LogCommand[0],
+                f'or /{BotCommands.LogCommand[1]} Mengambil log file dari Bot (Owner/Admin only).',
+            ),
+            BotCommand(
+                BotCommands.RestartCommand[0],
+                f'or /{BotCommands.RestartCommand[1]} Merestart ulang dan memperbarui Bot (Owner/Admin only).',
+            ),
+            BotCommand(
+                BotCommands.UsersCommand[0],
+                f'or /{BotCommands.UsersCommand[1]} Menampilan pengaturan User.',
+            ),
+            BotCommand(
+                BotCommands.BotSetCommand[0],
+                f'or /{BotCommands.BotSetCommand[1]} Pengaturan Bot.',
             ),
         ]
         await client.set_bot_commands(bot_cmds)
