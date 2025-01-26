@@ -27,7 +27,7 @@ class _BotCommands:
         self.ForceStartCommand = [f"forcestart{CMD_SUFFIX}", f"fs{CMD_SUFFIX}"]
         self.PingCommand = [f"ping{CMD_SUFFIX}", f"p{CMD_SUFFIX}"]
         self.StatsCommand = [f"statistic{CMD_SUFFIX}", f"sts{CMD_SUFFIX}"]
-        self.UserSetCommand = [f"usersetting{CMD_SUFFIX}", f"usetting{CMD_SUFFIX}", f"userset{CMD_SUFFIX}", f"uset{CMD_SUFFIX}"]
+        self.UserSetCommand = [f"usersetting{CMD_SUFFIX}", f"us{CMD_SUFFIX}", f"userset{CMD_SUFFIX}", f"uset{CMD_SUFFIX}"]
         # Owner
         self.RssCommand = f"rss{CMD_SUFFIX}"
         self.DeleteCommand = [f"delete{CMD_SUFFIX}", f"del{CMD_SUFFIX}"]
@@ -35,15 +35,15 @@ class _BotCommands:
         self.UnAuthorizeCommand = [f"unauthorize{CMD_SUFFIX}", f"ua{CMD_SUFFIX}"]
         self.AddSudoCommand = [f"addsudo{CMD_SUFFIX}", f"as{CMD_SUFFIX}"]
         self.RmSudoCommand = [f"rmsudo{CMD_SUFFIX}", f"rs{CMD_SUFFIX}"]
-        self.ExecCommand = [f"exe{CMD_SUFFIX}", f"execute{CMD_SUFFIX}"]
-        self.AExecCommand = [f"aexe{CMD_SUFFIX}", f"aexecute{CMD_SUFFIX}"]
+        self.ExecCommand = [f"exec{CMD_SUFFIX}", f"execute{CMD_SUFFIX}"]
+        self.AExecCommand = [f"aexec{CMD_SUFFIX}", f"aexecute{CMD_SUFFIX}"]
         self.ShellCommand = [f"shell{CMD_SUFFIX}", f"sh{CMD_SUFFIX}"]
         self.ClearLocalsCommand = [f"clearlocal{CMD_SUFFIX}", f"clo{CMD_SUFFIX}"]
         self.LogCommand = [f"log{CMD_SUFFIX}", f"lo{CMD_SUFFIX}"]
         self.SpeedCommand = [f"speedtest{CMD_SUFFIX}", f"sp{CMD_SUFFIX}"]
         self.RestartCommand = [f"restart{CMD_SUFFIX}", f"r{CMD_SUFFIX}"]
         self.UsersCommand = [f"user{CMD_SUFFIX}", f"us{CMD_SUFFIX}"]
-        self.BotSetCommand = [f"botsetting{CMD_SUFFIX}", f"bsetting{CMD_SUFFIX}", f"botset{CMD_SUFFIX}", f"bset{CMD_SUFFIX}"]
+        self.BotSetCommand = [f"botsetting{CMD_SUFFIX}", f"bs{CMD_SUFFIX}", f"botset{CMD_SUFFIX}", f"bset{CMD_SUFFIX}"]
 
 
 BotCommands = _BotCommands()
