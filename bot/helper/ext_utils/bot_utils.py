@@ -290,7 +290,7 @@ async def set_commands(client):
                 f'or /{BotCommands.ForceStartCommand[1]} Force a task to run in a queue',
             ),
             BotCommand(BotCommands.ListCommand[0], 
-                f'Search in Drive(s)'
+                f'Search in Drive(s)',
             ),
             
             BotCommand(
