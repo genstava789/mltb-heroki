@@ -230,6 +230,10 @@ async def set_commands(client):
     try:
         bot_cmds = [
             BotCommand(
+                BotCommands.HelpCommand[0],
+                f'or /{BotCommands.HelpCommand[1]} Cek semua perintah Bot.',
+            ),
+            BotCommand(
                 BotCommands.MirrorCommand[0],
                 f'or /{BotCommands.MirrorCommand[1]} Mirror [links/media/rclone_path]',
             ),
@@ -248,6 +252,70 @@ async def set_commands(client):
             BotCommand(
                 BotCommands.NzbMirrorCommand[0],
                 f'or /{BotCommands.NzbMirrorCommand[1]} Mirror nzb/usenet using sabnzbd',
+            ),
+            BotCommand(
+                BotCommands.NzbLeechCommand[0],
+                f'or /{BotCommands.NzbLeechCommand[1]} Unduh dan Unggah ke Telegram menggunakan SABnzbd.',
+            ),
+            BotCommand(
+                BotCommands.YtdlCommand[0],
+                f'or /{BotCommands.YtdlCommand[1]} Unduh dan Unggah ke Cloud menggunakan YT-DLP.',
+            ),
+            BotCommand(
+                BotCommands.YtdlLeechCommand[0],
+                f'or /{BotCommands.YtdlLeechCommand[1]} Unduh dan Unggah ke Telegram menggunakan YT-DLP.',
+            ),
+            BotCommand(
+                BotCommands.CloneCommand[0],
+                f'or /{BotCommands.CloneCommand[1]} Menggandakan File/Folder Google Drive.',
+            ),
+            BotCommand(
+                BotCommands.CountCommand[0],
+                f'or /{BotCommands.CountCommand[1]} Menghitung File/Folder Google Drive.',
+            ),
+            BotCommand(
+                BotCommands.ListCommand[0],
+                f'or /{BotCommands.ListCommand[1]} Mencari File/Folder di Google Drive.',
+            ),
+            BotCommand(
+                BotCommands.SearchCommand[0],
+                f'or /{BotCommands.SearchCommand[1]} Mencari torrent menggunakan API/Plugins.',
+            ),
+            BotCommand(
+                BotCommands.StatusCommand[0],
+                f'or /{BotCommands.StatusCommand[1]} Menampilkan status Tugas yang sedang berjalan.',
+            ),
+            BotCommand(
+                BotCommands.CancelTaskCommand[0],
+                f'or /{BotCommands.CancelTaskCommand[1]} [GID] : Membatalkan Tugas.',
+            ),
+            BotCommand(
+                BotCommands.CancelAllCommand[0],
+                f'or /{BotCommands.CancelAllCommand[1]} Membatalkan semua Tugas.',
+            ),
+            BotCommand(
+                BotCommands.ForceStartCommand[0],
+                f'or /{BotCommands.ForceStartCommand[1]} [GID] : Memulai Tugas secara paksa.',
+            ),
+            BotCommand(
+                BotCommands.PingCommand[0],
+                f'or /{BotCommands.PingCommand[1]} Mengetes kecepatan respon Bot.',
+            ),
+            BotCommand(
+                BotCommands.StatsCommand[0],
+                f'or /{BotCommands.StatsCommand[1]} Menampilan statistik dari mesin Bot.',
+            ),
+            BotCommand(
+                BotCommands.UserSetCommand[0],
+                f'or /{BotCommands.UserSetCommand[1]} Pengaturan User.',
+            ),
+            BotCommand(
+                BotCommands.RssCommand[0],
+                f'Menu rss',
+            ),
+            BotCommand(
+                BotCommands.DeleteCommand[0],
+                f'or /{BotCommands.DeleteCommand[1]} [gdriveUrl] : Menghapus File/Folder Google Drive.',
             ),
         ]
         await client.set_bot_commands(bot_cmds)
