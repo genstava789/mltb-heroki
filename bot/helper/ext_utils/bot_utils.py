@@ -199,22 +199,14 @@ async def cmd_exec(cmd, shell=False):
     return stdout, stderr, proc.returncode
 
 
-def new_task(func):
-    @wraps(func)
-    async def wrapper(*args, **kwargs):
-        task = bot_loop.create_task(func(*args, **kwargs))
-        return task
 
-    return wrapper
-
-"""
 def new_task(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         return bot_loop.create_task(func(*args, **kwargs))
 
     return wrapper
-"""
+
 
 async def sync_to_async(func, *args, wait=True, **kwargs):
     pfunc = partial(func, *args, **kwargs)
