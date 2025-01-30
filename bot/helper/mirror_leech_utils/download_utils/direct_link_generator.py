@@ -59,6 +59,8 @@ def direct_link_generator(link: str):
         return bigota(link)
     elif "mediafire.com" in domain:
         return mediafire(link)
+    elif "buzzheavier.com" in domain:
+        return buzzheavier(link)
     elif "osdn.net" in domain:
         return osdn(link)
     elif "github.com" in domain:
@@ -695,6 +697,43 @@ def get_captcha_token(session, params):
         return token[0]
 
 
+def buzzheavier(url):
+    """
+    Generate a direct download link for buzzheavier URLs.
+    @param link: URL from buzzheavier
+    @return: Direct download link
+    """
+    session = Session()
+    if "/download" not in url:
+        url += "/download"
+
+    # Normalize URL
+    url = url.strip()
+    session.headers.update(
+        {
+            "referer": url.split("/download")[0],
+            "hx-current-url": url.split("/download")[0],
+            "hx-request": "true",
+            "priority": "u=1, i",
+        }
+    )
+
+    try:
+        response = session.get(url)
+        d_url = response.headers.get("Hx-Redirect")
+
+        if not d_url:
+            raise DirectDownloadLinkException("ERROR: Failed to fetch direct link.")
+
+        parsed_url = urlparse(url)
+        return f"{parsed_url.scheme}://{parsed_url.netloc}{d_url}"
+    except Exception as e:
+        raise DirectDownloadLinkException(f"ERROR: {str(e)}") from e
+    finally:
+        session.close()
+
+
+
 def uptobox(url):
     try:
         urls = findall(r"\bhttps?://.*uptobox\.com\S+", url)[0]
@@ -741,65 +780,23 @@ def uptobox(url):
             raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}") from e
 
 
-def mediafire(url, session=None):
-    if "/folder/" in url:
-        return mediafireFolder(url)
+def mediafireFolder(url):
     if "::" in url:
         _password = url.split("::")[-1]
         url = url.split("::")[-2]
     else:
         _password = ""
-    if final_link := findall(
-        r"https?:\/\/download\d+\.mediafire\.com\/\S+\/\S+\/\S+", url
-    ):
-        return final_link[0]
-    if session is None:
-        session = Session()
-        parsed_url = urlparse(url)
-        url = f"{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}"
-    try:
-        html = HTML(session.get(url).text)
-    except Exception as e:
-        session.close()
-        raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}") from e
-    if error := html.xpath("//p[@class='notranslate']/text()"):
-        session.close()
-        raise DirectDownloadLinkException(f"ERROR: {error[0]}")
-    if html.xpath("//div[@class='passwordPrompt']"):
-        if not _password:
-            session.close()
-            raise DirectDownloadLinkException(
-                f"ERROR: {PASSWORD_ERROR_MESSAGE}".format(url)
-            )
-        try:
-            html = HTML(session.post(url, data={"downloadp": _password}).text)
-        except Exception as e:
-            session.close()
-            raise DirectDownloadLinkException(f"ERROR: {e.__class__.__name__}") from e
-        if html.xpath("//div[@class='passwordPrompt']"):
-            session.close()
-            raise DirectDownloadLinkException("ERROR: Password salah!")
-    if not (final_link := html.xpath("//a[@id='downloadButton']/@href")):
-        session.close()
-        raise DirectDownloadLinkException("ERROR: Link File tidak ditemukan!")
-    if final_link[0].startswith("//"):
-        return mediafire(f"https://{final_link[0][2:]}", session)
-    session.close()
-    return final_link[0]
-
-
-def mediafireFolder(url):
     try:
         raw = url.split("/", 4)[-1]
         folderkey = raw.split("/", 1)[0]
         folderkey = folderkey.split(",")
-    except Exception:
-        raise DirectDownloadLinkException("ERROR: Link Folder tidak ditemukan!")
+    except:
+        raise DirectDownloadLinkException("ERROR: Could not parse ")
     if len(folderkey) == 1:
         folderkey = folderkey[0]
     details = {"contents": [], "title": "", "total_size": 0, "header": ""}
 
-    session = Session()
+    session = create_scraper()
     adapter = HTTPAdapter(
         max_retries=Retry(total=10, read=10, connect=10, backoff_factor=0.3)
     )
@@ -826,8 +823,8 @@ def mediafireFolder(url):
             ).json()
         except Exception as e:
             raise DirectDownloadLinkException(
-                f"ERROR: {e.__class__.__name__} ketika mencoba mendapatkan Info Folder!"
-            ) from e
+                f"ERROR: {e.__class__.__name__} While getting info"
+            )
         _res = _json["response"]
         if "folder_infos" in _res:
             folder_infos.extend(_res["folder_infos"])
@@ -836,7 +833,7 @@ def mediafireFolder(url):
         elif "message" in _res:
             raise DirectDownloadLinkException(f"ERROR: {_res['message']}")
         else:
-            raise DirectDownloadLinkException("ERROR: Info Folder tidak ditemukan!")
+            raise DirectDownloadLinkException("ERROR: something went wrong!")
 
     try:
         __get_info(folderkey)
@@ -846,12 +843,39 @@ def mediafireFolder(url):
     details["title"] = folder_infos[0]["name"]
 
     def __scraper(url):
+        session = create_scraper()
+        parsed_url = urlparse(url)
+        url = f"{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}"
+
+        def __repair_download(url):
+            try:
+                html = HTML(session.get(url).text)
+                if new_link := html.xpath('//a[@id="continue-btn"]/@href'):
+                    return __scraper(f"https://mediafire.com/{new_link[0]}")
+            except:
+                return
+
         try:
             html = HTML(session.get(url).text)
-        except Exception:
+        except:
             return
-        if final_link := html.xpath("//a[@id='downloadButton']/@href"):
+        if html.xpath("//div[@class='passwordPrompt']"):
+            if not _password:
+                raise DirectDownloadLinkException(
+                    f"ERROR: {PASSWORD_ERROR_MESSAGE}".format(url)
+                )
+            try:
+                html = HTML(session.post(url, data={"downloadp": _password}).text)
+            except:
+                return
+            if html.xpath("//div[@class='passwordPrompt']"):
+                return
+        if final_link := html.xpath('//a[@aria-label="Download file"]/@href'):
+            if final_link[0].startswith("//"):
+                return __scraper(f"https://{final_link[0][2:]}")
             return final_link[0]
+        if repair_link := html.xpath("//a[@class='retry']/@href"):
+            return __repair_download(repair_link[0])
 
     def __get_content(folderKey, folderPath="", content_type="folders"):
         try:
@@ -866,8 +890,8 @@ def mediafireFolder(url):
             ).json()
         except Exception as e:
             raise DirectDownloadLinkException(
-                f"ERROR: {e.__class__.__name__} ketika mencoba mendapatkan Info File!"
-            ) from e
+                f"ERROR: {e.__class__.__name__} While getting content"
+            )
         _res = _json["response"]
         if "message" in _res:
             raise DirectDownloadLinkException(f"ERROR: {_res['message']}")
