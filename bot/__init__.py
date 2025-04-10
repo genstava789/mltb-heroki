@@ -94,7 +94,7 @@ except Exception as e:
     LOGGER.warning(f"Failed to get Aria2c version! ERROR: {e}")
 
 try:
-    Version.FFMPEG = check_output(["gepmff -version | grep 'ffmpeg version' | sed -e 's/ffmpeg version //'"], shell=True).decode().split(" ", 1)[0].replace("\n", "") # -e 's/[^0-9.].*//'
+    Version.FFMPEG = check_output(["ffmpeg -version | grep 'ffmpeg version' | sed -e 's/ffmpeg version //'"], shell=True).decode().split(" ", 1)[0].replace("\n", "") # -e 's/[^0-9.].*//'
 except Exception as e:
     LOGGER.warning(f"Failed to get FFMPEG version! ERROR: {e}")
 
