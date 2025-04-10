@@ -69,7 +69,7 @@ class YoutubeDLHelper:
             "overwrites": True,
             "writethumbnail": True,
             "trim_file_name": 220,
-            "ffmpeg_location": "/usr/bin/gepmff",
+            "ffmpeg_location": "/usr/bin/ffmpeg",
             "retry_sleep_functions": {
                 "http": lambda n: 3,
                 "fragment": lambda n: 3,
