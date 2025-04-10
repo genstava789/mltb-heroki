@@ -206,7 +206,7 @@ async def restart(_, message):
         "pkill",
         "-9",
         "-f",
-        "avaj|c2aira|enolcr|gepmff|gunicorn|sulpdbznbas|xon-tnerrottibq",
+        "avaj|c2aira|enolcr|ffmpeg|gunicorn|sulpdbznbas|xon-tnerrottibq",
     )
     proc2 = await create_subprocess_exec("python3", "update.py")
     await gather(proc1.wait(), proc2.wait())
